@@ -13,7 +13,7 @@ module.exports = route => (app, db) => {
   }),
   async (req, res) => {
    try {
-    const { id, required_size = process.env.DEFAULT_IMAGE_SIZE } = req.query;
+    const { id, required_size = "small" } = req.query;
 
     if (!id) return res.status(404).json({ success: false, msg: 'Document not found.' });
 

@@ -4,7 +4,7 @@ module.exports = route => (app, db) => {
  // Read Doctor Schedule[s]
  app.get(route, async (req, res) => {
   try {
-   const { doctor_id: id, limit = process.env.DB_NO_LIMIT_FLAG } = req.query;
+   const { doctor_id: id, limit = -1 } = req.query;
    if (!isPositiveInteger(id)) throw new Error('Doctor Schedules were not found.');
 
    const { rows } = await db.query(

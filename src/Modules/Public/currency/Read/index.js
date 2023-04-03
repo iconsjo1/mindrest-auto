@@ -4,7 +4,7 @@ module.exports = route => (app, db) => {
  // Read currenc[y|ies]
  app.get(route, async (req, res) => {
   try {
-   const { id, limit = process.env.DB_NO_LIMIT_FLAG } = req.query;
+   const { id, limit = -1 } = req.query;
 
    const currencies = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Currencies" WHERE 1=1 AND id=$1', [id])

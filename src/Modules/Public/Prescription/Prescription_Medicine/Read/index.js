@@ -4,7 +4,7 @@ module.exports = route => (app, db) => {
  // Read Prescription Medicine[s]
  app.get(route, async (req, res) => {
   try {
-   const { prescription_id: id, limit = process.env.DB_NO_LIMIT_FLAG } = req.query;
+   const { prescription_id: id, limit = -1 } = req.query;
 
    const { rows } = isPositiveInteger(id)
     ? await db.query(

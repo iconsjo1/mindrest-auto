@@ -5,10 +5,10 @@ module.exports = limit => {
 
  if (isPositiveInteger(limit)) {
   limitClause += limit;
- } else if (limit === process.env.DB_NO_LIMIT_FLAG) {
+ } else if (limit === -1) {
   limitClause += 'ALL';
  } else {
-  limitClause += process.env.DB_DEFAULT_ROWS_LIMIT;
+  limitClause += 1000;
  }
 
  return limitClause;

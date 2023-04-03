@@ -3,7 +3,7 @@ module.exports = route => app => {
  app.get(route, async (req, res) => {
   const { db, isPositiveInteger, getLimitClause, orderBy } = res.locals.utils;
   try {
-   const { id, limit = process.env.DB_NO_LIMIT_FLAG } = req.query;
+   const { id, limit = -1 } = req.query;
 
    const { rows } = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Group_Screens" WHERE 1=1 AND id=$1', [id])

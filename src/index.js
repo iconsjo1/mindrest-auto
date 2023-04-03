@@ -30,7 +30,7 @@ app.use((_, res, next) => {
 
 require('./Modules')(app, db);
 
-app.listen(process.env.PORT, () => {
+app.listen(5040, () => {
  console.clear();
  console.log('Server started\n');
 
