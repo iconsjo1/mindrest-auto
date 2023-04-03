@@ -10,7 +10,7 @@ module.exports = route => app => {
     `SELECT * FROM public."Users"
              WHERE 1=1
               AND email = $1
-              AND password = $2`.replaceAll(/\s+/g, ' '),
+              AND password = $2`.replace(/\s+/g, ' '),
     [email, password]
    );
 

@@ -44,7 +44,7 @@ module.exports = route => (app, db) => {
    const { rows: insertedRows } = await db.query(
     `INSERT INTO public."Bill_Services"(${fields},service_id,no_of_sessions,notes) VALUES${rows.join(
      ','
-    )} RETURNING *`.replaceAll(/\s+/g, ' '),
+    )} RETURNING *`.replace(/\s+/g, ' '),
     values
    );
 

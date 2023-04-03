@@ -32,7 +32,7 @@ module.exports = route => app => {
          VALUES(${enc_values.join(',')}) 
          ON CONFLICT(id) DO UPDATE SET 
           role         = EXCLUDED.role,
-          main_page_id = EXCLUDED.main_page_id RETURNING *`.replaceAll(/\s+/g, ' '),
+          main_page_id = EXCLUDED.main_page_id RETURNING *`.replace(/\s+/g, ' '),
     values
    );
 
