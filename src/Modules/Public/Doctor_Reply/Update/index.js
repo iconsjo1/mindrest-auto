@@ -14,7 +14,7 @@ module.exports = route => (app, db) => {
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(
-    `UPDATE public."Doctor_Replies" SET ${changed.join(',')} WHERE 1=1 AND id=$${i} RETURNING *`,
+    `UPDATE public."Doctor_Replies" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
 

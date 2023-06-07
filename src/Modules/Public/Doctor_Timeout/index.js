@@ -1,5 +1,5 @@
 module.exports = app => {
- const route = '/REST/doctor_holidays';
+ const route = '/REST/doctor_timeouts';
 
  require('./Read')(route)(app);
  require('./Create')(route)(app);

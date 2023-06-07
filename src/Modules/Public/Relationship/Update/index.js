@@ -8,15 +8,13 @@ module.exports = route => (app, db) => {
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'Relationship not found.' });
 
-   const modifiedData = [];
+   const changed = [];
 
    let i = 1;
-   for (let prop in req.body) modifiedData.push(`${prop} = $${i++}`);
+   for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const modifiedRelationship = await db.query(
-    `UPDATE public."Relationships" SET ${modifiedData.join(
-     ','
-    )} WHERE 1=1 AND id=$${i} RETURNING *`,
+    `UPDATE public."Relationships" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
 

@@ -13,7 +13,7 @@ module.exports = route => app => {
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(
-    `UPDATE public."Group_Screens" SET ${changed.join(',')} WHERE 1=1 AND id=$${i} RETURNING *`,
+    `UPDATE public."Group_Screens" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
    res.json({ success: true, msg: 'Screen group was updated successfully.', data: rows });

@@ -27,6 +27,7 @@ module.exports = (app, db) => {
  require('./Medicine')(app, db);
  require('./Patient')(app, db);
  require('./Personnel_Title')(app, db);
+ require('./Doctor_Timeout')(app);
  require('./Prescription')(app, db);
  require('./Relationship')(app, db);
  require('./Role')(app, db);

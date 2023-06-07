@@ -1,41 +1,47 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  app.post(route, async (req, res) => {
-  // UPSERT Doctor Holidays
+  // UPSERT Doctor Holiday[s]
   try {
+   const { db, isPositiveInteger, isSQLDate } = res.locals.utils;
+
    const { doctor_id, holidays } = req.body;
 
-   if (!Array.isArray(holidays) || 0 === holidays.length)
-    return res.json({ success: false, msg: 'holidays array is not submitted correctly.' });
+   if (!isPositiveInteger(doctor_id))
+    return res.status(400).json({ success: false, msg: 'doctor_id must be a positive integer.' });
 
-   delete req.body.holidays;
+   if (!Array.isArray(holidays) || 0 === holidays.length || !holidays.every(h => isSQLDate(h)))
+    return res
+     .status(400)
+     .json({ success: false, msg: 'holidays array was not submitted correctly.' });
 
-   const values = [doctor_id];
+   const values = [];
    const enc_values = ['$1'];
-
    const rows = [];
-   let indexIncrement = enc_values.length;
+
+   let currentIndex = enc_values.length;
 
    for (let date of holidays) {
-    if (isNaN(Date.parse(date))) throw new Error('Invalid date: ' + date);
-    enc_values.push(`$${++indexIncrement}`);
-    rows.push(`(${enc_values.join(',')})`);
-    enc_values.pop();
+    rows.push(`(${enc_values},$${++currentIndex})`);
     values.push(date);
    }
 
-   const newDoctorHolidays = await db.query(
-    `INSERT INTO public."Doctor_Holidays"(doctor_id,date) VALUES${rows.join(',')} 
-        ON CONFLICT DO NOTHING
-        RETURNING *`,
+   values.unshift(doctor_id);
+
+   const { rows: insertedRows } = await db.query(
+    `INSERT INTO public."Doctor_Holidays"(doctor_id, date)
+     VALUES${rows}
+     ON CONFLICT DO NOTHING
+     RETURNING *`.replace(/\s+/g, ' '),
     values
    );
 
    res.json({
     success: true,
-    msg: `Doctor Holiday${1 === newDoctorHolidays.rows.length ? '' : 's'} created successfully${
-     0 === newDoctorHolidays.rows.length ? ' [duplicae]' : ''
+    no_of_records: insertedRows.length,
+    msg: `Doctor Holiday${1 === insertedRows.length ? ' was' : 's were'} created successfully${
+     0 === insertedRows.length ? ' [duplicae]' : ''
     }.`,
-    data: newDoctorHolidays.rows.reverse(),
+    data: insertedRows.sort((a, b) => parseInt(b.id) - parseInt(a.id)),
    });
   } catch ({ message }) {
    res.json({ success: false, message });

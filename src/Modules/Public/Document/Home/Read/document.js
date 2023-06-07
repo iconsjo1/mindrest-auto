@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const cors = require('cors');
 
 const CONTENT_DISPOSITION = 'Content-Disposition';
@@ -13,7 +13,7 @@ module.exports = route => (app, db) => {
   }),
   async (req, res) => {
    try {
-    const { id, required_size = "small" } = req.query;
+    const { id, required_size = 'small' } = req.query;
 
     if (!id) return res.status(404).json({ success: false, msg: 'Document not found.' });
 
@@ -36,7 +36,7 @@ module.exports = route => (app, db) => {
     }
 
     document_abs.absulute_path = path.join(
-     process.env.UPLOAD_PATH,
+     'C:/mclinic-uploadpath',
      `${document_abs.document_path}.${document_abs.document_extension}`
     );
 

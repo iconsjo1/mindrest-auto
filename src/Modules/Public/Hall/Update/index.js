@@ -8,13 +8,13 @@ module.exports = route => (app, db) => {
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'Hall not found.' });
 
-   const modifiedData = [];
+   const changed = [];
 
    let i = 1;
-   for (let prop in req.body) modifiedData.push(`${prop} = $${i++}`);
+   for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const modifiedHall = await db.query(
-    `UPDATE public."Halls" SET ${modifiedData.join(',')} WHERE 1=1 AND id=$${i} RETURNING *`,
+    `UPDATE public."Halls" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
 

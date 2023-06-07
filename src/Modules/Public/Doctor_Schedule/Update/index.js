@@ -7,15 +7,13 @@ module.exports = route => (app, db) => {
    const { id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'Doctor schedule not found.' });
-   const modifiedData = [];
+   const changed = [];
 
    let i = 1;
-   for (let prop in req.body) modifiedData.push(`${prop} = $${i++}`);
+   for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(
-    `UPDATE public."Doctor_Schedules" SET ${modifiedData.join(
-     ','
-    )} WHERE 1=1 AND id=$${i} RETURNING *`,
+    `UPDATE public."Doctor_Schedules" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
    res.json({ success: true, msg: 'Doctor schedule updated successfully.', data: rows });

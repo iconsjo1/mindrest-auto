@@ -1,4 +1,4 @@
-const route = '/REST/Bill_Services';
+const route = '/REST/bill_services';
 
 module.exports = (app, db) => {
  require('./Read')(route)(app, db);

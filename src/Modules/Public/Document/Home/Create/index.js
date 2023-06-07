@@ -40,7 +40,7 @@ module.exports = route => (app, db) => {
 
    // Saving location vars
    const d = new Date();
-   const rootPath = process.env.UPLOAD_PATH;
+   const rootPath = 'C:/mclinic-uploadpath';
    const relativePath = [d.getFullYear(), d.getMonth() + 1, d.getDate()].join('/');
    const dir = rootPath + '/' + relativePath; // Absolute
    const filePath = dir + '/' + document_id; // Absolute

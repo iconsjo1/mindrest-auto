@@ -40,9 +40,10 @@ module.exports = route => (app, db) => {
    }
 
    const newPatientServiceDiscounts = await db.query(
-    `INSERT INTO public."Patient_Service_Discounts"(${fields},service_id,discount) VALUES${rows.join(
-     ','
-    )} RETURNING *`.replace(/\s+/g, ' '),
+    `INSERT INTO public."Patient_Service_Discounts"(${fields},service_id,discount) VALUES${rows} RETURNING *`.replace(
+     /\s+/g,
+     ' '
+    ),
     values
    );
 

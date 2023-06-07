@@ -9,6 +9,7 @@ module.exports = {
  isPositiveNumber: val => require('./checkPositiveNumber')(val),
  orderBy: fieldName => require('./orderBy')(fieldName),
  isSQLDate: dateStr => require('./isSQLDate')(dateStr),
+ isMilitarytime: time => require('./militaryTimeCheck')(time),
  isTherapist: val => require('./isTherapistCondition')(val),
  rollback: async (savepoint, db) => await require('./rollback')(savepoint, db),
 };

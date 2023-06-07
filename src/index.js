@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const db = require('./pool');
+const PORT = 5040;
 
 // middleware
 app.use(cors());
@@ -30,9 +31,9 @@ app.use((_, res, next) => {
 
 require('./Modules')(app, db);
 
-app.listen(5040, () => {
+app.listen(PORT, () => {
  console.clear();
- console.log('Server started\n');
+ console.log('Server started on port %s', PORT);
 
  let routes = [];
  app._router.stack.forEach(r => {
@@ -44,23 +45,28 @@ app.listen(5040, () => {
   }
  });
 
- console.log('Number of routes: %i\n', routes.length);
+ console.log('Number of routes: %i', routes.length);
 
  routes = routes.reduce((acc, { path }) => {
-  acc[path] = routes
-   .filter(rf => path === rf.path)
-   .map(({ method }) => method)
-   .sort()
-   .join(', ');
+  acc[path] = Array.from(
+   new Set(
+    routes
+     .reduce((acc, { method, path: rf_path }) => {
+      if (rf_path === path) acc.push(method);
+      return acc;
+     }, [])
+     .sort()
+   )
+  ).join(', ');
   return acc;
  }, {});
 
  console.table(
   Object.keys(routes)
    .sort((a, b) => b - a)
-   .reduce((acc, k) => {
-    acc[k] = routes[k];
-    return acc;
-   }, {})
+   .reduce(
+    (acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k] } }),
+    {}
+   )
  );
 });

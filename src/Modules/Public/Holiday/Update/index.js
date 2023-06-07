@@ -5,13 +5,13 @@ module.exports = route => (app, db) => {
    const { id } = req.query;
    if (!id) return res.status(404).json({ Success: false, msg: 'Holiday not found.' });
 
-   const modifiedData = [];
+   const changed = [];
 
    let i = 1;
-   for (let prop in req.body) modifiedData.push(`${prop} = $${i++}`);
+   for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const modifiedHoliday = await db.query(
-    `UPDATE public."Holidays" SET ${modifiedData.join(',')} WHERE 1=1 AND id=$${i} RETURNING *`,
+    `UPDATE public."Holidays" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
    res.json({
