@@ -39,4 +39,5 @@ module.exports = (app, db) => {
  require('./Vendor')(app, db);
  require('./Visit')(app, db);
  require('./Vital_Sign')(app, db);
+ require('./Report')(app, db);
 };
