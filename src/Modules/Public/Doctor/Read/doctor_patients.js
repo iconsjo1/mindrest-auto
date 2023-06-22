@@ -14,7 +14,9 @@ module.exports = route => (app, db) => {
       )
     : isPositiveInteger(doctor_id)
     ? await db.query(
-       `SELECT * FROM public."V_Doctor_Patients" WHERE 1=1 AND doctor_id=$1 AND ${condition}`,
+       `SELECT * FROM public."V_Doctor_Patients" WHERE 1=1 AND doctor_id=$1 AND ${condition} ${getLimitClause(
+        limit
+       )}`,
        [doctor_id]
       )
     : await db.query(
