@@ -2,6 +2,9 @@ module.exports = route => (app, db) => {
  // Create Expense
  app.post(route, async (req, res) => {
   try {
+    
+    const { db} = res.locals.utils;
+
    const fields = Object.keys(req.body);
    const values = Object.values(req.body);
    const enc_values = [];
