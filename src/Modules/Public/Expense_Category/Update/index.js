@@ -2,9 +2,7 @@ module.exports = route => (app, db) => {
  // Update Expense Category
  app.put(route, async (req, res) => {
   try {
-
-    const { db,isPositiveInteger } = res.locals.utils;
-
+   const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
    if (!isPositiveInteger(id))

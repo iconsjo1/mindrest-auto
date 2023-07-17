@@ -2,6 +2,7 @@ module.exports = (app, db) => {
  // Read Form[s]
  app.get('/REST/forms', async (req, res) => {
   try {
+   const { db } = res.locals.utils;
    const { id } = req.query;
 
    const forms = id

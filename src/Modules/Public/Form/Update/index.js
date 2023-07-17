@@ -2,6 +2,7 @@ module.exports = (app, db) => {
  // Update Form
  app.put('/REST/forms', async (req, res) => {
   try {
+   const { db } = res.locals.utils;
    const { id } = req.query;
    if (!id) return res.status(404).json({ Success: false, msg: 'Form not found.' });
    const changed = [];
