@@ -2,6 +2,9 @@ module.exports = (app, db) => {
  // Read Countr[y|ies]
  app.get('/REST/countries', async (req, res) => {
   try {
+
+    const { db } = res.locals.utils;
+    
    const { id } = req.query;
 
    const countries = id
