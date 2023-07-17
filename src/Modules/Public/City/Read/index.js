@@ -3,6 +3,8 @@ module.exports = route => (app, db) => {
  // Read Cit[y|ies]
  app.get(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger, getLimitClause, orderBy } = res.locals.utils;
+
    const { country_id, limit } = req.query;
 
    const cities = isPositiveInteger(country_id)

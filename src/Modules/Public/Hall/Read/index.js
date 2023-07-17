@@ -4,6 +4,8 @@ module.exports = route => (app, db) => {
  // Read Hall[s]
  app.get(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
+
    const { id, limit } = req.query;
 
    const halls = isPositiveInteger(id)

@@ -2,6 +2,8 @@ module.exports = route => (app, db) => {
  // Read Documents
  app.get(route, async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const documents = await db.query('SELECT * FROM public."Documents"');
 
    res.json({

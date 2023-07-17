@@ -2,6 +2,8 @@ module.exports = (app, db) => {
  // Delete Emergency Contact
  app.delete('/REST/emergency_contacts', async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const { id } = req.query;
    if (!id) return res.status(404).json({ success: false, msg: 'Emergency contact not found.' });
 

@@ -1,9 +1,9 @@
-const { isPositiveInteger, isEString } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // UPSERT Bill Service[s]
  app.post(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger, isEString } = res.locals.utils;
+
    const { service_list } = req.body;
    if (!Array.isArray(service_list) || 0 === service_list.length)
     return res.json({ success: false, msg: 'Service list is not submitted correctly.' });

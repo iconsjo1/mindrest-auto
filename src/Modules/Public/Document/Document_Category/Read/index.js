@@ -2,6 +2,8 @@ module.exports = route => (app, db) => {
  // Read Document Categor[ies]
  app.get(route, async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const { id } = req.query;
 
    const documentCategories = id

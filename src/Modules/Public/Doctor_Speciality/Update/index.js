@@ -2,6 +2,8 @@ module.exports = (app, db) => {
  // Update Doctor Speciality
  app.put('/REST/doctor_specialities', async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const { id } = req.query;
    if (!id) return res.status(404).json({ Success: false, msg: 'Doctor speciality not found.' });
    const changed = [];

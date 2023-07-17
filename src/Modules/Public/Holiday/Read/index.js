@@ -2,6 +2,8 @@ module.exports = route => (app, db) => {
  // Read Holiday[s]
  app.get(route, async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const holidays = await db.query('SELECT * FROM public."Holidays"');
 
    res.json({

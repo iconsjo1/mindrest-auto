@@ -2,6 +2,8 @@ module.exports = (app, db) => {
  // Create Emergency Contact
  app.post('/REST/emergency_contacts', async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const fields = Object.keys(req.body);
    const values = Object.values(req.body);
    const enc_values = [];

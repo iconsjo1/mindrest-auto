@@ -2,6 +2,7 @@ module.exports = (app, db) => {
  // Read Emergency Contact[s]
  app.get('/REST/emergency_contacts', async (req, res) => {
   try {
+   const { db } = res.locals.utils;
    const { id } = req.query;
 
    const emergencyContacts = id

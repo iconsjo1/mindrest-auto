@@ -2,6 +2,7 @@ module.exports = (app, db) => {
  // Update Emergency Contacts
  app.put('/REST/emergency_contacts', async (req, res) => {
   try {
+   const { db } = res.locals.utils;
    const { id } = req.query;
    if (!id) return res.status(404).json({ Success: false, msg: 'Emergency contact not found.' });
 
