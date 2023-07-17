@@ -1,8 +1,9 @@
-const { isPositiveInteger, isString } = require('../../../../Utils');
 module.exports = route => (app, db) => {
  // Create Doctor Schedule
  app.post(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger, isString } = res.locals.utils;
+
    const { time_table } = req.body;
    if (!Array.isArray(time_table) || 0 === time_table.length)
     return res.json({ success: false, msg: 'time table array is not submitted correctly.' });

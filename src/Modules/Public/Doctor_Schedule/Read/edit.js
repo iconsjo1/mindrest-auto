@@ -1,9 +1,9 @@
-const { isPositiveInteger, getLimitClause } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Read Doctor Schedule[s]
  app.get(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
+
    const { doctor_id: id, limit = -1 } = req.query;
    if (!isPositiveInteger(id)) throw new Error('Doctor Schedules were not found.');
 

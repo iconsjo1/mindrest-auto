@@ -1,9 +1,9 @@
-const { getLimitClause } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Read Doctor Schedule Reprort
  app.get(route, async (req, res) => {
   try {
+   const { db, getLimitClause } = res.locals.utils;
+
    const { limit } = req.query;
 
    const { rows } = await db.query(
