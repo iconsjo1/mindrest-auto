@@ -2,6 +2,8 @@ module.exports = route => (app, db) => {
  // Update Deposite Method
  app.put(route, async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const { id } = req.query;
    if (!id) return res.status(404).json({ Success: false, msg: 'Deposite method not found.' });
    const changed = [];

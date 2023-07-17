@@ -2,6 +2,8 @@ module.exports = route => (app, db) => {
  // Read Deposite Method[s]
  app.get(route, async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const { id } = req.query;
 
    const depositeMethods = id
