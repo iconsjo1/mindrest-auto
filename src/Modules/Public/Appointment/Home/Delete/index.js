@@ -1,9 +1,8 @@
-const { isPositiveInteger } = require('../../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Delete Appointment
  app.delete(route, async (req, res) => {
   try {
+    const { isPositiveInteger ,db} =res.locals.utils;
    const { id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ success: false, msg: 'Appointment not found.' });
