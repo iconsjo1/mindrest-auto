@@ -2,6 +2,9 @@ module.exports = (app, db) => {
  // Read Contact[s]
  app.get('/REST/contacts', async (req, res) => {
   try {
+
+    const { db } = res.locals.utils;
+    
    const { id } = req.query;
 
    const contacts = id
