@@ -1,9 +1,9 @@
-const { isPositiveInteger, getLimitClause } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Read Relationship[s]
  app.get(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
+
    const { id, limit } = req.query;
 
    const { rows } = isPositiveInteger(id)
@@ -13,7 +13,7 @@ module.exports = route => (app, db) => {
    res.json({
     success: true,
     no_of_records: rows.length,
-    msg: `Relationship${1 === rows.length ? '' : 's'} retrieved successfully.`,
+    msg: `Payment${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
     data: rows,
    });
   } catch ({ message }) {

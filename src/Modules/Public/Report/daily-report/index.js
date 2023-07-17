@@ -1,9 +1,9 @@
-const { isPositiveInteger, getLimitClause } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
- // Read Relationship[s]
+ // Read Expenses report[s]
  app.get(route, async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const { rows: Patient_Deposites } = await db.query('SELECT * FROM public."V_Patient_Deposites"');
 
    const { rows: Expenses } = await db.query('SELECT * FROM public."V_Expenses"');
