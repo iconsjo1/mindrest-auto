@@ -32,41 +32,42 @@ app.use((_, res, next) => {
 require('./Modules')(app, db);
 
 app.listen(PORT, () => {
- console.clear();
- console.log('Server started on port %s', PORT);
-
- let routes = [];
- app._router.stack.forEach(r => {
-  if (r?.route?.path && '*' !== r.route.path) {
-   routes.push({
-    path: r.route.path.substring(5),
-    method: Object.keys(r.route.methods).join(',').toUpperCase(),
-   });
-  }
+  console.clear();
+  console.log('Server started on port %s', PORT);
+ 
+  let routes = [];
+  app._router.stack.forEach(r => {
+   if (r?.route?.path && '*' !== r.route.path) {
+    routes.push({
+     path: r.route.path.substring(5),
+     method: Object.keys(r.route.methods).join(',').toUpperCase(),
+    });
+   }
+  });
+ 
+  console.log('Number of routes: %i', routes.length);
+ 
+  routes = routes.reduce((acc, { path }) => {
+   acc[path] = Array.from(
+    new Set(
+     routes
+      .reduce((acc, { method, path: rf_path }) => {
+       if (rf_path === path) acc.push(method);
+       return acc;
+      }, [])
+      .sort()
+    )
+   ).join(', ');
+   return acc;
+  }, {});
+ 
+  console.table(
+   Object.keys(routes)
+    .sort((a, b) => b - a)
+    .reduce(
+     (acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k] } }),
+     {}
+    )
+  );
  });
-
- console.log('Number of routes: %i', routes.length);
-
- routes = routes.reduce((acc, { path }) => {
-  acc[path] = Array.from(
-   new Set(
-    routes
-     .reduce((acc, { method, path: rf_path }) => {
-      if (rf_path === path) acc.push(method);
-      return acc;
-     }, [])
-     .sort()
-   )
-  ).join(', ');
-  return acc;
- }, {});
-
- console.table(
-  Object.keys(routes)
-   .sort((a, b) => b - a)
-   .reduce(
-    (acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k] } }),
-    {}
-   )
- );
-});
+ 
