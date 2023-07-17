@@ -2,9 +2,8 @@ module.exports = (app, db) => {
  // Update Country
  app.put('/REST/countries', async (req, res) => {
   try {
+   const { db } = res.locals.utils;
 
-    const { db } = res.locals.utils;
-    
    const { id } = req.query;
    if (!id) return res.status(404).json({ Success: false, msg: 'Country not found.' });
 

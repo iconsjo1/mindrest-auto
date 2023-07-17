@@ -2,7 +2,7 @@ module.exports = (app, db) => {
  // Create Country
  app.post('/REST/countries', async (req, res) => {
   try {
-    const { db } = res.locals.utils;
+   const { db } = res.locals.utils;
 
    const fields = Object.keys(req.body);
    const values = Object.values(req.body);

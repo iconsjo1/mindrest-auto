@@ -1,9 +1,9 @@
-const { isPositiveInteger, getLimitClause } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Read currenc[y|ies]
  app.get(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
+
    const { id, limit = -1 } = req.query;
 
    const currencies = isPositiveInteger(id)
