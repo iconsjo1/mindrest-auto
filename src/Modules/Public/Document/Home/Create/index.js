@@ -10,6 +10,7 @@ module.exports = route => (app, db) => {
  // Create Document
  app.post(route, fileupload({ createParentPath: true }), async (req, res) => {
   try {
+   const { db } = res.locals.utils;
    const { file } = req.files;
    if (!file.name) throw new Error('No file was uploaded.');
 

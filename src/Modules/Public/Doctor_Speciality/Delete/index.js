@@ -2,9 +2,8 @@ module.exports = (app, db) => {
  // Delete Doctor Speciality
  app.delete('/REST/doctor_specialities', async (req, res) => {
   try {
-        
-    const { db} = res.locals.utils;
-    
+   const { db } = res.locals.utils;
+
    const { id } = req.query;
    if (!id) return res.status(404).json({ success: false, msg: 'Doctor speciality not found.' });
 
