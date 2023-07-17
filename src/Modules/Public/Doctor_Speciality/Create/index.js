@@ -2,6 +2,9 @@ module.exports = (app, db) => {
  // Create Doctor Speciality
  app.post('/REST/doctor_specialities', async (req, res) => {
   try {
+    
+    const { db} = res.locals.utils;
+
    const fields = Object.keys(req.body);
    const values = Object.values(req.body);
    const enc_values = [];
