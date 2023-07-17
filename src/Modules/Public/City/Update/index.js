@@ -1,8 +1,9 @@
-const { isPositiveInteger } = require('../../../../Utils');
 module.exports = route => (app, db) => {
  // Update City
  app.put(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger } = res.locals.utils;
+
    const { id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'City not found.' });
