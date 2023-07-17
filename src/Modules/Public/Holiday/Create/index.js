@@ -2,6 +2,8 @@ module.exports = route => (app, db) => {
  // UPSERT Holiday[s]
  app.post(route, async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const { holidays } = req.body;
    if (!Array.isArray(holidays) || -1 > holidays.length)
     throw new Error('Holidays array were not supplied properly');
