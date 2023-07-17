@@ -1,14 +1,14 @@
-const { isPositiveInteger } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Delete Relationship
  app.delete(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger } = res.locals.utils;
+
    const { id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ success: false, msg: 'Relationship not found.' });
 
-   const deletedRelationship = await db.query(
+   const { rows } = await db.query(
     'DELETE FROM public."Relationships" WHERE 1=1 AND id = $1 RETURNING *',
     [id]
    );
@@ -16,7 +16,7 @@ module.exports = route => (app, db) => {
    res.json({
     Success: true,
     msg: 'Relationship deleted successfully.',
-    data: deletedRelationship.rows,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
