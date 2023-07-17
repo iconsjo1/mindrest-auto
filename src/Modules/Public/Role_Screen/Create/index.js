@@ -18,7 +18,7 @@ module.exports = route => app => {
 
    delete req.body.screens;
 
-   const fields = Object.keys(req.body).join(',');
+   const fields = Object.keys(req.body);
    const values = Object.values(req.body);
    const enc_values = [];
 
@@ -29,7 +29,7 @@ module.exports = route => app => {
     rows: [{ id: role_id }],
    } = await db.query(
     `INSERT INTO public."Roles"(${fields}) OVERRIDING SYSTEM VALUE
-         VALUES(${enc_values.join(',')}) 
+         VALUES(${enc_values}) 
          ON CONFLICT(id) DO UPDATE SET 
           role         = EXCLUDED.role,
           main_page_id = EXCLUDED.main_page_id RETURNING *`.replace(/\s+/g, ' '),

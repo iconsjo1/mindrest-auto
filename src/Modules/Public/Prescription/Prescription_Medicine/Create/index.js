@@ -12,7 +12,7 @@ module.exports = route => (app, db) => {
    delete req.body.medicine_list;
 
    const fields =
-    Object.keys(req.body).join(',') +
+    Object.keys(req.body) +
     ', medicine_id, morning, afternoon, evening, anytime, medicine_to_food_id ,start_date, end_date';
    const values = Object.values(req.body);
    const enc_values = [];
@@ -58,7 +58,7 @@ module.exports = route => (app, db) => {
 
     for (let i = 0; i++ < medicinePropCount; enc_values.push(`$${++currIndexIncrement}`));
 
-    rows.push(`(${enc_values.join(',')})`);
+    rows.push(`(${enc_values})`);
 
     // Initialize new row
     enc_values.splice(0 - medicinePropCount, medicinePropCount); // remove items to reset counter
@@ -74,7 +74,7 @@ module.exports = route => (app, db) => {
     );
    }
    const { rows: insertedRows } = await db.query(
-    `INSERT INTO public."Prescription_Medicines"(${fields}) VALUES${rows.join(',')} RETURNING *`,
+    `INSERT INTO public."Prescription_Medicines"(${fields}) VALUES${rows} RETURNING *`,
     values
    );
 

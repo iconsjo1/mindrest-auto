@@ -10,7 +10,7 @@ module.exports = route => (app, db) => {
 
    delete req.body.service_discount_list;
 
-   const fields = Object.keys(req.body).join(',');
+   const fields = Object.keys(req.body);
    const values = Object.values(req.body);
    const enc_values = [];
 
@@ -32,7 +32,7 @@ module.exports = route => (app, db) => {
     // ($1,$2,$3),($1,$4,$5)
     for (let i = 0; i++ < discountPropCount; enc_values.push(`$${++currIndexIncrement}`));
 
-    rows.push(`(${enc_values.join(',')})`);
+    rows.push(`(${enc_values})`);
 
     // Initialize new row
     enc_values.splice(0 - discountPropCount, discountPropCount); // remove items to reset counter

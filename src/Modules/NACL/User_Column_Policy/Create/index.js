@@ -26,9 +26,7 @@ module.exports = (app, db) => {
    }
 
    const newUserColumnPolicies = await db.query(
-    `INSERT INTO nacl."User_Column_Policies"(user_id, column_id, policy_id) VALUES${enc_values.join(
-     ','
-    )} RETURNING *`,
+    `INSERT INTO nacl."User_Column_Policies"(user_id, column_id, policy_id) VALUES${enc_values} RETURNING *`,
     values
    );
    res.json({

@@ -10,7 +10,7 @@ module.exports = route => (app, db) => {
 
    delete req.body.service_list;
 
-   const fields = Object.keys(req.body).join(',');
+   const fields = Object.keys(req.body);
    const values = Object.values(req.body);
    const enc_values = [];
 
@@ -35,16 +35,14 @@ module.exports = route => (app, db) => {
     // ($1,$2,$3,$4),($1,$5,$6,$7)
     for (let i = 0; i++ < billServicePropCount; enc_values.push(`$${++currIndexIncrement}`));
 
-    rows.push(`(${enc_values.join(',')})`);
+    rows.push(`(${enc_values})`);
 
     // Initialize new row
     enc_values.splice(0 - billServicePropCount, billServicePropCount); // remove items to reset counter
     values.push(service_id, no_of_sessions, notes);
    }
    const { rows: insertedRows } = await db.query(
-    `INSERT INTO public."Bill_Services"(${fields},service_id,no_of_sessions,notes) VALUES${rows.join(
-     ','
-    )} RETURNING *`.replace(/\s+/g, ' '),
+    `INSERT INTO public."Bill_Services"(${fields},service_id,no_of_sessions,notes) VALUES${rows} RETURNING *`.replace(/\s+/g, ' '),
     values
    );
 

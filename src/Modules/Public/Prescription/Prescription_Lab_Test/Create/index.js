@@ -23,7 +23,7 @@ module.exports = route => (app, db) => {
      throw new Error('one of the labTest ids is going to violate foreign key constraint. ');
    });
 
-   const fields = ['prescription_id', 'lab_test_id'].join(',');
+   const fields = ['prescription_id', 'lab_test_id'];
    const values = [];
    const enc_values = ['$1'];
 
@@ -32,13 +32,13 @@ module.exports = route => (app, db) => {
 
    for (let id of labsTestIds) {
     // 1 field
-    rows.push(`(${enc_values.join(',')},$${++currIndexIncrement})`);
+    rows.push(`(${enc_values},$${++currIndexIncrement})`);
     values.push(id);
    }
    values.unshift(prescription_id);
 
    const { rows: insertedRows } = await db.query(
-    `INSERT INTO public."Prescription_Tests"(${fields}) VALUES${rows.join(',')} RETURNING *`,
+    `INSERT INTO public."Prescription_Tests"(${fields}) VALUES${rows} RETURNING *`,
     values
    );
 

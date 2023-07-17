@@ -9,7 +9,7 @@ module.exports = route => (app, db) => {
 
    delete req.body.time_table;
 
-   const fields = Object.keys(req.body).join(',');
+   const fields = Object.keys(req.body);
    const values = Object.values(req.body);
    const enc_values = [];
 
@@ -40,7 +40,7 @@ module.exports = route => (app, db) => {
      fieldCounter += 2;
      enc_values.push(`$${++currIndexIncrement}`, `$${++currIndexIncrement}`);
      values.push(schedule_start_time, schedule_end_time);
-     rows.push(`(${enc_values.join(',')})`);
+     rows.push(`(${enc_values})`);
 
      enc_values.splice(1 - fieldCounter, fieldCounter - 1);
      fieldCounter -= 2;
@@ -49,9 +49,7 @@ module.exports = route => (app, db) => {
     fieldCounter = 0;
    }
    const { rows: insertedRows } = await db.query(
-    `INSERT INTO public."Doctor_Schedules"(${fields},week_day_id,schedule_start_time, schedule_end_time) VALUES${rows.join(
-     ','
-    )} RETURNING *`,
+    `INSERT INTO public."Doctor_Schedules"(${fields},week_day_id,schedule_start_time, schedule_end_time) VALUES${rows} RETURNING *`,
     values
    );
 

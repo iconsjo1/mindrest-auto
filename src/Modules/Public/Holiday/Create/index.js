@@ -15,14 +15,14 @@ module.exports = route => (app, db) => {
    for (let date of holidays) {
     if (isNaN(Date.parse(date))) throw new Error('Invalid date: ' + date);
     enc_values.push(`$${++indexIncrement}`);
-    rows.push(`(${enc_values.join(',')})`);
+    rows.push(`(${enc_values})`);
     enc_values.pop();
     values.push(date);
    }
 
    const newHolidays = await db.query(
     `INSERT INTO public."Holidays"(date) 
-         VALUES${rows.join(',')} 
+         VALUES${rows} 
          ON CONFLICT DO NOTHING
          RETURNING *`,
     values

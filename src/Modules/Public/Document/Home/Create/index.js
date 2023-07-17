@@ -20,14 +20,14 @@ module.exports = route => (app, db) => {
    delete req.body.is_resizable;
 
    await db.query('BEGIN;SAVEPOINT fresh');
-   const fields = Object.keys(req.body).join(',');
+   const fields = Object.keys(req.body);
    const values = Object.values(req.body);
    const enc_values = [];
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
    const newDocument_id = await db.query(
-    `INSERT INTO public."Documents"(${fields}) VALUES(${enc_values.join(',')}) RETURNING *`,
+    `INSERT INTO public."Documents"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
 
