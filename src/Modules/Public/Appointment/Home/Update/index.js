@@ -3,7 +3,7 @@ module.exports = route => (app, db) => {
  app.put(route, async (req, res) => {
   try {
    const { id } = req.query;
-   const { isPositiveInteger ,db } =res.locals.utils;
+   const { isPositiveInteger, db } = res.locals.utils;
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'Appointment not found.' });
 

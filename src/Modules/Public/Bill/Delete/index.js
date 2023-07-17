@@ -2,7 +2,7 @@ module.exports = route => (app, db) => {
  // Delete Bill
  app.delete(route, async (req, res) => {
   try {
-    const { db,isPositiveInteger } =res.locals.utils;
+   const { db, isPositiveInteger } = res.locals.utils;
    const { id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ success: false, msg: 'Bill not found.' });

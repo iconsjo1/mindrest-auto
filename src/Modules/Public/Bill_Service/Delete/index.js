@@ -1,9 +1,9 @@
-const { isPositiveInteger } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Delete Bill Service
  app.delete(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger } = res.locals.utils;
+
    const { bill_id: id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ success: false, msg: 'Bill service not found.' });
