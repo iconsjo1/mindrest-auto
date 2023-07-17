@@ -13,19 +13,19 @@ module.exports = route => (app, db) => {
 
    if (
     !Array.isArray(medicine_list) ||
-    (0 === medicine_list.length &&
-     !medicine_list.every(
-      m =>
-       isValidObject(m) &&
-       isPositiveInteger(m.medicine_id) &&
-       isPositiveNumber(m.morning) &&
-       isPositiveNumber(m.afternoon) &&
-       isPositiveNumber(m.evening) &&
-       isPositiveNumber(m.anytime) &&
-       isPositiveInteger(m.medicine_to_food_id) &&
-       isSQLDate(m.start_date) &&
-       isSQLDate(m.end_date)
-     ))
+    0 === medicine_list.length ||
+    !medicine_list.every(
+     m =>
+      isValidObject(m) &&
+      isPositiveInteger(m.medicine_id) &&
+      isPositiveNumber(m.morning) &&
+      isPositiveNumber(m.afternoon) &&
+      isPositiveNumber(m.evening) &&
+      isPositiveNumber(m.anytime) &&
+      isPositiveInteger(m.medicine_to_food_id) &&
+      isSQLDate(m.start_date) &&
+      isSQLDate(m.end_date)
+    )
    )
     return res
      .status(400)
