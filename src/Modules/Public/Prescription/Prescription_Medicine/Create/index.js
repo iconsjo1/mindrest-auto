@@ -2,77 +2,66 @@ module.exports = route => (app, db) => {
  // UPSERT Prescription Medicine
  app.post(route, async (req, res) => {
   try {
-   const { isPositiveNumber, isPositiveInteger, isSQLDate } = res.locals.utils;
+   const { db, isPositiveInteger, isSQLDate, isValidObject, isPositiveNumber } = res.locals.utils;
 
-   const { medicine_list } = req.body;
+   const { prescription_id, medicine_list } = req.body;
 
-   if (!Array.isArray(medicine_list) || 0 === medicine_list.length)
-    return res.json({ success: false, msg: 'Medicine list is not submitted correctly.' });
+   if (!isPositiveInteger(prescription_id))
+    return res
+     .status(400)
+     .json({ success: false, msg: 'prescription_id is not a positive integer.' });
 
-   delete req.body.medicine_list;
+   if (
+    !Array.isArray(medicine_list) ||
+    (0 === medicine_list.length &&
+     !medicine_list.every(
+      m =>
+       isValidObject(m) &&
+       isPositiveInteger(m.medicine_id) &&
+       isPositiveNumber(m.morning) &&
+       isPositiveNumber(m.afternoon) &&
+       isPositiveNumber(m.evening) &&
+       isPositiveNumber(m.anytime) &&
+       isPositiveInteger(m.medicine_to_food_id) &&
+       isSQLDate(m.start_date) &&
+       isSQLDate(m.end_date)
+     ))
+   )
+    return res
+     .status(400)
+     .json({ success: false, msg: 'Medicine list is not submitted correctly.' });
 
-   const fields =
-    Object.keys(req.body) +
-    ', medicine_id, morning, afternoon, evening, anytime, medicine_to_food_id ,start_date, end_date';
-   const values = Object.values(req.body);
-   const enc_values = [];
-
-   for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
+   const fields = [
+    'prescription_id',
+    'medicine_id',
+    'morning',
+    'afternoon',
+    'evening',
+    'anytime',
+    'medicine_to_food_id',
+    'start_date',
+    'end_date',
+   ];
+   const values = [prescription_id];
+   const enc_values = ['$1'];
 
    const rows = [];
-   let currIndexIncrement = enc_values.length;
+   let currIndex = enc_values.length;
 
-   for (const medicine of medicine_list) {
-    const {
-     medicine_id,
-     morning,
-     afternoon,
-     evening,
-     anytime,
-     medicine_to_food_id,
-     start_date,
-     end_date,
-    } = medicine;
-
-    if (
-     !isPositiveInteger(medicine_id) ||
-     (null != morning && !isPositiveNumber(morning)) ||
-     (null != afternoon && !isPositiveNumber(afternoon)) ||
-     (null != evening && !isPositiveNumber(evening)) ||
-     (null != anytime && !isPositiveNumber(anytime)) ||
-     !isPositiveInteger(medicine_to_food_id) ||
-     !isSQLDate(start_date) ||
-     !isSQLDate(end_date)
-    )
-     throw new Error(
-      'Medicine number {' + (medicine_list.indexOf(medicine) + 1) + '} is not valid'
-     );
-
-    const medicinePropCount = Object.keys({
-     morning,
-     afternoon,
-     evening,
-     anytime,
-     ...medicine,
-    }).length;
-
-    for (let i = 0; i++ < medicinePropCount; enc_values.push(`$${++currIndexIncrement}`));
-
-    rows.push(`(${enc_values})`);
-
-    // Initialize new row
-    enc_values.splice(0 - medicinePropCount, medicinePropCount); // remove items to reset counter
+   for (const m of medicine_list) {
+    rows.push(`(${enc_values},${Array.from({ length: 8 }, _ => `$${++currIndex}`)})`);
     values.push(
-     medicine_id,
-     morning,
-     afternoon,
-     evening,
-     anytime,
-     medicine_to_food_id,
-     start_date,
-     end_date
+     m.medicine_id,
+     m.morning,
+     m.afternoon,
+     m.evening,
+     m.anytime,
+     m.medicine_to_food_id,
+     m.start_date,
+     m.end_date
     );
    }
+
    const { rows: insertedRows } = await db.query(
     `INSERT INTO public."Prescription_Medicines"(${fields}) VALUES${rows} RETURNING *`,
     values
@@ -80,8 +69,10 @@ module.exports = route => (app, db) => {
 
    res.json({
     success: true,
-    msg: `Prescription medicine${1 === insertedRows.length ? '' : 's'} created successfully.`,
-    data: insertedRows,
+    msg: `Prescription medicine${
+     1 === insertedRows.length ? ' was' : 's were'
+    } created successfully.`,
+    data: insertedRows.sort((a, b) => parseInt(b.id) - parseInt(a.id)),
    });
   } catch ({ message }) {
    res.json({ success: false, message });

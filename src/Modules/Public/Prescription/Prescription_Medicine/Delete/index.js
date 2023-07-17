@@ -1,9 +1,9 @@
-const { isPositiveInteger } = require('../../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Delete Prescription Medicine[s]
  app.delete(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger } = res.locals.utils;
+
    const { prescription_id: id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ success: false, msg: 'Prescription medicine not found.' });

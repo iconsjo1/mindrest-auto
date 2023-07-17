@@ -1,9 +1,9 @@
-const { getLimitClause, isPositiveInteger, orderBy } = require('../../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Read Prescription Medicine[s]
  app.get(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
+
    const { prescription_id: id, limit = -1 } = req.query;
 
    const { rows } = isPositiveInteger(id)
@@ -17,7 +17,8 @@ module.exports = route => (app, db) => {
 
    res.json({
     success: true,
-    msg: `Prescription medicine${1 === rows.length ? '' : 's'} retrieved successfully.`,
+    no_of_records: rows.length,
+    msg: `Prescription medicine${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
     data: rows,
    });
   } catch ({ message }) {

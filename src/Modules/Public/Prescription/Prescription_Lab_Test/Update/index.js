@@ -1,5 +1,5 @@
 module.exports = route => (app, db) => {
- // Update Doctor Schedule
+ // Update Prescription Lab Test
  app.put(route, async (req, res) => {
   try {
    const { id } = req.query;
