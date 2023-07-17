@@ -2,6 +2,8 @@ module.exports = (app, db) => {
  // Read Department[s]
  app.get('/REST/departments', async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const { id, limit } = req.query;
    const { orderBy, getLimitClause, isPositiveInteger } = res.locals.utils;
 
