@@ -2,40 +2,49 @@ module.exports = route => (app, db) => {
  // UPSERT Holiday[s]
  app.post(route, async (req, res) => {
   try {
-   const { db } = res.locals.utils;
+   const dateSort = (a, b) => new Date(b.getTime()) - new Date(a.getTime());
+
+   const { db, isSQLDate } = res.locals.utils;
 
    const { holidays } = req.body;
-   if (!Array.isArray(holidays) || -1 > holidays.length)
-    throw new Error('Holidays array were not supplied properly');
+
+   const holidaysArray = isIterable(holidays)
+    ? Array.from(new Set(holidays).filter(date => isSQLDate(date))).sort(dateSort)
+    : [];
+
+   if (0 === holidaysArray.length)
+    return res
+     .status(400)
+     .json({ success: false, msg: 'no holidays were successfully submitted.' });
 
    const values = [];
-   const enc_values = [];
-
+   const enc_values = [] + ',';
    const rows = [];
-   let indexIncrement = enc_values.length;
+   let currentIndex = enc_values.length;
 
-   for (let date of holidays) {
-    if (isNaN(Date.parse(date))) throw new Error('Invalid date: ' + date);
-    enc_values.push(`$${++indexIncrement}`);
-    rows.push(`(${enc_values})`);
-    enc_values.pop();
-    values.push(date);
+   for (const d of holidaysArray) {
+    rows.push(`($${++currentIndex})`);
+    values.push(d);
    }
 
-   const newHolidays = await db.query(
-    `INSERT INTO public."Holidays"(date) 
-         VALUES${rows} 
-         ON CONFLICT DO NOTHING
-         RETURNING *`,
-    values
-   );
+   const insertedRows = await db
+    .query({
+     text: `INSERT INTO public."Holidays"(date) 
+            VALUES${rows} 
+            ON CONFLICT DO NOTHING
+            RETURNING *`.replace(/\s+/g, ' '),
+     values,
+     rowMode: 'array',
+    })
+    .then(({ rows }) => rows.flat().sort(dateSort));
 
    res.json({
     success: true,
-    msg: `Holiday${1 === newHolidays.rows.length ? '' : 's'} created successfully${
-     0 === newHolidays.rows.length ? ' [duplicae]' : ''
+    no_of_records: insertedRows.length,
+    msg: `Holiday${1 === insertedRows.length ? ' was' : 's were'} created successfully${
+     0 === insertedRows.length ? ' [duplicate]' : ''
     }.`,
-    data: newHolidays.rows.reverse(),
+    data: insertedRows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
