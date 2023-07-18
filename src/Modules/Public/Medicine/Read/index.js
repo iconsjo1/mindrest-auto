@@ -1,4 +1,6 @@
-module.exports = (app, db) => {
- require('./Medicine_to_Food')(app, db);
- require('./Read')(app, db);
-};
+module.exports =
+ ({ medicine, mtf }) =>
+ (app, db) => {
+  require('./Medicine_to_Food')(mtf)(app, db);
+  require('./Read')(medicine)(app, db);
+ };

@@ -1,6 +1,6 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Create Medicine
- app.post('/REST/medicines', async (req, res) => {
+ app.post(route, async (req, res) => {
   try {
    const fields = Object.keys(req.body);
    const values = Object.values(req.body);
@@ -8,11 +8,11 @@ module.exports = (app, db) => {
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
-   const newMedicine = await db.query(
+   const { rows } = await db.query(
     `INSERT INTO public."Medicines"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
-   res.json({ success: true, msg: 'Medicine created successfully.', data: newMedicine.rows });
+   res.json({ success: true, msg: 'Medicine created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

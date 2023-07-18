@@ -1,17 +1,20 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Read Medicine[s]
- app.get('/REST/medicines', async (req, res) => {
+ app.get(route, async (req, res) => {
   try {
-   const { id } = req.query;
+   const { db, isPositiveInteger, orderBy, getLimitClause } = res.locals.utils;
 
-   const midicines = id
+   const { id, limit } = req.query;
+
+   const { rows } = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Medicines" WHERE 1=1 AND id=$1', [id])
-    : await db.query('SELECT * FROM public."Medicines"');
+    : await db.query(`SELECT * FROM public."Medicines" ${orderBy('id')} ${getLimitClause(limit)}`);
 
    res.json({
     success: true,
-    msg: `Medicine${1 === midicines.rows.length ? '' : 's'} retrieved successfully.`,
-    data: midicines.rows,
+    no_of_records: rows.length,
+    msg: `Medicine${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
