@@ -10,7 +10,6 @@ module.exports = route => (app, db) => {
 
    let i = 1;
    const changed = [];
-
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(
