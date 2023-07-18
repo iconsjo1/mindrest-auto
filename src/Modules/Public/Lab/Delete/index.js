@@ -1,16 +1,17 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Delete Lab
- app.delete('/REST/labs', async (req, res) => {
+ app.delete(route, async (req, res) => {
   try {
+   const { db, isPositiveInteger } = res.locals.utils;
    const { id } = req.query;
-   if (!id) return res.status(404).json({ success: false, msg: 'Lab not found.' });
+   if (!isPositiveInteger(id))
+    return res.status(404).json({ success: false, msg: 'Lab not found.' });
 
-   const deletedLab = await db.query(
-    'DELETE FROM public."Labs" WHERE 1=1 AND id = $1 RETURNING *',
-    [id]
-   );
+   const { rows } = await db.query('DELETE FROM public."Labs" WHERE 1=1 AND id = $1 RETURNING *', [
+    id,
+   ]);
 
-   res.json({ Success: true, msg: 'Lab deleted successfully.', data: deletedLab.rows });
+   res.json({ Success: true, msg: 'Lab deleted successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }
