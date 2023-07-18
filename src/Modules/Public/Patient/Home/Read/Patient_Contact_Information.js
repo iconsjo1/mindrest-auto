@@ -24,7 +24,7 @@ module.exports = route => (app, db) => {
     msg: `Patient contact information${
      1 === rows.length ? ' was' : 's were'
     } retrieved successfully.`,
-    data: patientContactInfo.rows,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });

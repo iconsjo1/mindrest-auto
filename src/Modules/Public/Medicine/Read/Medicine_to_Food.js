@@ -8,11 +8,11 @@ module.exports = route => (app, db) => {
 
    const { rows } = isPositiveInteger(id)
     ? await db.query(
-       `SELECT id, CONCAT(time_desc,' ',food) food_relation FROM public."Medicine_to_Foods" WHERE 1=1 AND id=$1`,
+       `SELECT id, CONCAT(time_desc,' ','food') food_relation FROM public."Medicine_to_Foods" WHERE 1=1 AND id=$1`,
        [id]
       )
     : await db.query(
-       `SELECT id,CONCAT(time_desc,' ',food) food_relation FROM public."Medicine_to_Foods" ${orderBy(
+       `SELECT id,CONCAT(time_desc,' ','food') food_relation FROM public."Medicine_to_Foods" ${orderBy(
         'id'
        )} ${getLimitClause(limit)}`
       );
