@@ -10,14 +10,14 @@ module.exports = route => (app, db) => {
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
-   const newDocumentCategory = await db.query(
+   const { rows } = await db.query(
     `INSERT INTO public."Document_Categories"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
    res.json({
     success: true,
     msg: 'Document category created successfully.',
-    data: newDocumentCategory.rows,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
