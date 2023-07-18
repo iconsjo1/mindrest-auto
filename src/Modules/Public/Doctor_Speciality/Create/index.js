@@ -1,6 +1,6 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Create Doctor Speciality
- app.post('/REST/doctor_specialities', async (req, res) => {
+ app.post(route, async (req, res) => {
   try {
    const { db } = res.locals.utils;
 
@@ -10,14 +10,14 @@ module.exports = (app, db) => {
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
-   const newDoctorSpeciality = await db.query(
+   const { rows } = await db.query(
     `INSERT INTO public."Doctor_Specialities"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
    res.json({
     success: true,
     msg: 'Doctor speciality created successfully.',
-    data: newDoctorSpeciality.rows,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
