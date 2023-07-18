@@ -1,6 +1,6 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Create Form
- app.post('/REST/forms', async (req, res) => {
+ app.post(route, async (req, res) => {
   try {
    const { db } = res.locals.utils;
 
