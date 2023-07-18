@@ -1,6 +1,6 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Create Emergency Contact
- app.post('/REST/emergency_contacts', async (req, res) => {
+ app.post(route, async (req, res) => {
   try {
    const { db } = res.locals.utils;
 
@@ -9,7 +9,8 @@ module.exports = (app, db) => {
    const enc_values = [];
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
-   const newEmergencyContact = await db.query(
+
+   const { rows } = await db.query(
     `INSERT INTO public."Emergency_Contacts"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
@@ -17,7 +18,7 @@ module.exports = (app, db) => {
    res.json({
     success: true,
     msg: 'Emergency contact created successfully.',
-    data: newEmergencyContact.rows,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });

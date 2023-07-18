@@ -1,19 +1,22 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Read Emergency Contact[s]
- app.get('/REST/emergency_contacts', async (req, res) => {
-  try {
-   const { db } = res.locals.utils;
-   const { id } = req.query;
 
-   const emergencyContacts = id
+ app.get(route, async (req, res) => {
+  try {
+   const { db, isPositiveInteger, orderBy, getLimitClause } = res.locals.utils;
+
+   const { id, limit } = req.query;
+
+   const emergencyContacts = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Emergency_Contacts" WHERE 1=1 AND id=$1', [id])
-    : await db.query('SELECT * FROM public."Emergency_Contacts"');
+    : await db.query(
+       `SELECT * FROM public."Emergency_Contacts" ${orderBy('id')} ${getLimitClause(limit)}`
+      );
 
    res.json({
     success: true,
-    msg: `Emergency contact${
-     1 === emergencyContacts.rows.length ? '' : 's'
-    } retrieved successfully.`,
+    no_of_records: rows.length,
+    msg: `Emergency contact${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
     data: emergencyContacts.rows,
    });
   } catch ({ message }) {

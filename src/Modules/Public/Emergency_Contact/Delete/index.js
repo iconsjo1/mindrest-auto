@@ -1,13 +1,14 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Delete Emergency Contact
- app.delete('/REST/emergency_contacts', async (req, res) => {
+ app.delete(route, async (req, res) => {
   try {
-   const { db } = res.locals.utils;
+   const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
-   if (!id) return res.status(404).json({ success: false, msg: 'Emergency contact not found.' });
+   if (!isPositiveInteger(id))
+    return res.status(404).json({ success: false, msg: 'Emergency contact not found.' });
 
-   const deletedEmergencyContact = await db.query(
+   const { rows } = await db.query(
     'DELETE FROM public."Emergency_Contacts" WHERE 1=1 AND id = $1 RETURNING *',
     [id]
    );
@@ -15,7 +16,7 @@ module.exports = (app, db) => {
    res.json({
     Success: true,
     msg: 'Emergency contact deleted successfully.',
-    data: deletedEmergencyContact.rows,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
