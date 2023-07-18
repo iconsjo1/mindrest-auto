@@ -7,9 +7,9 @@ module.exports = route => (app, db) => {
    const { id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'Expense category not found.' });
-   const changed = [];
 
    let i = 1;
+   const changed = [];
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(

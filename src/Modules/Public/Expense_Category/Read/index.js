@@ -14,7 +14,8 @@ module.exports = route => (app, db) => {
 
    res.json({
     success: true,
-    msg: `Expense categor${1 === rows.length ? 'y' : 'ies'} retrieved successfully.`,
+    no_of_records: rows.length,
+    msg: `Expense categor${1 === rows.length ? 'y was' : 'ies were'} retrieved successfully.`,
     data: rows,
    });
   } catch ({ message }) {
