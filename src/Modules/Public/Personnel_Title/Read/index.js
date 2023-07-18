@@ -2,16 +2,20 @@ module.exports = route => (app, db) => {
  // Read Personnel Title[s]
  app.get(route, async (req, res) => {
   try {
-   const { id } = req.query;
+   const { db, isPositiveInteger, orderBy, getLimitClause } = res.locals.utils;
+   const { id, limit } = req.query;
 
-   const personnelTitles = id
+   const { rows } = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Personnel_Titles" WHERE 1=1 AND id=$1', [id])
-    : await db.query('SELECT * FROM public."Personnel_Titles"');
+    : await db.query(
+       `SELECT * FROM public."Personnel_Titles" ${orderBy('id')} ${getLimitClause(limit)}`
+      );
 
    res.json({
     success: true,
-    msg: `Personnel title${1 === personnelTitles.rows.length ? '' : 's'} retrieved successfully.`,
-    data: personnelTitles.rows,
+    no_of_records: rows.length,
+    msg: `Personnel title${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });

@@ -1,58 +1,49 @@
-const { isPositiveInteger, isPositiveNumber } = require('../../../../../Utils');
-
 module.exports = route => (app, db) => {
  // UPSERT Patient Service Discount[s]
  app.post(route, async (req, res) => {
   try {
-   const { service_discount_list } = req.body;
-   if (!Array.isArray(service_discount_list) || 0 === service_discount_list.length)
-    return res.json({ success: false, msg: 'Service discount list is not submitted correctly.' });
+   const { db, isValidObject, isPositiveInteger, isPositiveNumber } = res.locals.utils;
 
-   delete req.body.service_discount_list;
+   const { patient_id, service_discount_list } = req.body;
 
-   const fields = Object.keys(req.body);
-   const values = Object.values(req.body);
-   const enc_values = [];
+   if (!isPositiveInteger(patient_id))
+    return res.status(400).json({ success: false, msg: 'patient_idis not a positive integer.' });
 
-   for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
+   if (
+    !Array.isArray(service_discount_list) ||
+    0 === service_discount_list.length ||
+    !service_discount_list.every(
+     sdl =>
+      isValidObject(sdl) && isPositiveInteger(sdl.service_id) && isPositiveNumber(sdl.discount)
+    )
+   )
+    return res
+     .status(400)
+     .json({ success: false, msg: 'Service discount list is not submitted correctly.' });
+
+   const fields = ['patient_id', 'service_id', 'discount'];
+   const values = [patient_id];
+   const enc_values = ['$1'];
 
    const rows = [];
-   let currIndexIncrement = enc_values.length;
+   let currentIndex = enc_values.length;
 
-   for (let service_discount of service_discount_list) {
-    const { service_id, discount } = service_discount;
-
-    if (!isPositiveInteger(service_id) || !isPositiveNumber(discount))
-     throw new Error(
-      'Discount number {' + (service_discount_list.indexOf(service_discount) + 1) + '} is not valid'
-     );
-
-    const discountPropCount = Object.keys(service_discount).length;
-
-    // ($1,$2,$3),($1,$4,$5)
-    for (let i = 0; i++ < discountPropCount; enc_values.push(`$${++currIndexIncrement}`));
-
-    rows.push(`(${enc_values})`);
-
-    // Initialize new row
-    enc_values.splice(0 - discountPropCount, discountPropCount); // remove items to reset counter
-    values.push(service_id, discount);
+   for (const sd of service_discount_list) {
+    rows.push(`(${enc_values},${Array.from({ length: 2 }, _ => `$${++currentIndex}`)})`);
+    values.push(sd.service_id, sd.discount);
    }
 
-   const newPatientServiceDiscounts = await db.query(
-    `INSERT INTO public."Patient_Service_Discounts"(${fields},service_id,discount) VALUES${rows} RETURNING *`.replace(
-     /\s+/g,
-     ' '
-    ),
+   const { rows: insertedRows } = await db.query(
+    `INSERT INTO public."Patient_Service_Discounts"(${fields}) VALUES${rows} RETURNING *`,
     values
    );
 
    res.json({
     success: true,
     msg: `Patient service discount${
-     1 === newPatientServiceDiscounts.rows.length ? '' : 's'
+     1 === insertedRows.length ? ' was' : 's were'
     } created successfully.`,
-    data: newPatientServiceDiscounts.rows,
+    data: insertedRows.sort((a, b) => parseInt(b.id) - parseInt(a.id)),
    });
   } catch ({ message }) {
    res.json({ success: false, message });

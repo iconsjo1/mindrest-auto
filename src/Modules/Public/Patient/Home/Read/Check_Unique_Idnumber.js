@@ -2,17 +2,23 @@ module.exports = route => (app, db) => {
  // Check UNIQUE IDNUMBER
  app.get(route, async (req, res) => {
   try {
-   const { idnumber: idNumber } = req.query;
-   if (!idNumber) return res.json({ success: false, msg: 'ID-NUMBER not porovided.' });
+   const { db, isPositiveInteger } = res.locals.utils;
 
-   const idNumber_exists = await db.query(
-    'SELECT * FROM public."Patients" WHERE 1=1 AND patient_national_idnumber=$1',
-    [idNumber]
-   );
-   const result = 0 === idNumber_exists.rows.length;
+   const { idnumber: idNumber } = req.query;
+   if (!isPositiveInteger(idNumber))
+    return res.json({ success: false, msg: 'ID-NUMBER not a positive integer.' });
+
+   const hasMatch = await db
+    .query({
+     text: 'SELECT true FROM public."Patients" WHERE 1=1 AND patient_national_idnumber=$1',
+     values: [idNumber],
+     rowMode: 'array',
+    })
+    .then(({ rows }) => 0 < rows.length);
+
    res.json({
     success: true,
-    msg: `ID-NUMBER ${result ? 'does not exist' : 'exists'}`,
+    msg: `ID-NUMBER ${hasMatch ? 'does not exist' : 'exists'}`,
     result,
    });
   } catch ({ message }) {
