@@ -10,12 +10,12 @@ module.exports = route => (app, db) => {
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
-   const newHall = await db.query(
+   const { rows } = await db.query(
     `INSERT INTO public."Halls"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
 
-   res.json({ success: true, msg: 'Hall created successfully.', data: newHall.rows });
+   res.json({ success: true, msg: 'Hall created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

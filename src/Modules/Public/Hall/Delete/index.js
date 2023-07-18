@@ -1,5 +1,3 @@
-const { isPositiveInteger } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Delete Hall
  app.delete(route, async (req, res) => {
@@ -10,12 +8,11 @@ module.exports = route => (app, db) => {
    if (!isPositiveInteger(id))
     return res.status(404).json({ success: false, msg: 'Hall not found.' });
 
-   const deletedHall = await db.query(
-    'DELETE FROM public."Halls" WHERE 1=1 AND id = $1 RETURNING *',
-    [id]
-   );
+   const { rows } = await db.query('DELETE FROM public."Halls" WHERE 1=1 AND id = $1 RETURNING *', [
+    id,
+   ]);
 
-   res.json({ Success: true, msg: 'Hall deleted successfully.', data: deletedHall.rows });
+   res.json({ Success: true, msg: 'Hall deleted successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }
