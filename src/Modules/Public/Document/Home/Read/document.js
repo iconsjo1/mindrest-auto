@@ -47,8 +47,8 @@ module.exports = route => (app, db) => {
      'Content-Type': document_abs.document_mimetype,
     });
     stream.pipe(res);
-   } catch (error) {
-    res.json({ success: false, msg: error.message });
+   } catch ({ message }) {
+    res.json({ success: false, message });
    }
   }
  );

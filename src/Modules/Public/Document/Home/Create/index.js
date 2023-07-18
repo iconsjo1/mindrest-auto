@@ -1,7 +1,7 @@
 const fileupload = require('express-fileupload');
-const { extname } = require('path');
+const { extname } = require('node:path');
 const sharp = require('sharp');
-const { mkdirSync, existsSync } = require('fs');
+const { mkdirSync, existsSync } = require('node:fs');
 
 const IS_RESIZABLE = true;
 const IS_NOT_RESIZABLE = false;
@@ -52,7 +52,7 @@ module.exports = route => (app, db) => {
      'UPDATE public."Documents" SET document_path=$1,document_extension=$2,is_resizable=$3 WHERE id=$4 RETURNING *',
      [relativePath + '/' + document_id, ext.substring(1), canResize, document_id]
     );
-    db.query(0 < newDocument.rows.length ? 'COMMIT' : 'ROLLBACK TO SAVEPOINT fresh');
+    await db.query(0 < newDocument.rows.length ? 'COMMIT' : 'ROLLBACK TO SAVEPOINT fresh');
     res.json({ success: true, msg: 'Document created successfully.', data: newDocument.rows });
    };
 

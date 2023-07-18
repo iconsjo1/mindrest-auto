@@ -1,15 +1,16 @@
 module.exports = route => (app, db) => {
  // Read Documents
- app.get(route, async (req, res) => {
+ app.get(route, async (_, res) => {
   try {
    const { db } = res.locals.utils;
 
-   const documents = await db.query('SELECT * FROM public."Documents"');
+   const { rows } = await db.query('SELECT * FROM public."Documents"');
 
    res.json({
     success: true,
-    msg: `Documents${1 === documents.rows.length ? '' : 's'} retrieved successfully.`,
-    data: documents.rows,
+    no_of_records: rows.length,
+    msg: `Documents${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
