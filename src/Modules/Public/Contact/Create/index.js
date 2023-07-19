@@ -1,6 +1,6 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Create Contact
- app.post('/REST/contacts', async (req, res) => {
+ app.post(route, async (req, res) => {
   try {
    const { db } = res.locals.utils;
 
@@ -9,12 +9,13 @@ module.exports = (app, db) => {
    const enc_values = [];
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
-   const newContact = await db.query(
+
+   const { rows } = await db.query(
     `INSERT INTO public."Contacts"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
 
-   res.json({ success: true, msg: 'Contact created successfully.', data: newContact.rows });
+   res.json({ success: true, msg: 'Contact created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }
