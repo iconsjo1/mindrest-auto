@@ -51,7 +51,7 @@ module.exports = route => (app, db) => {
     const row = [...enc_values, `$${++currentIndex}`];
     values.push(tt.week_day_id);
     for (const ts of tt.times) {
-     rows.push(`(${row},${Array.from({ length: 2 }, _ => `$${++currentIndex}`)})`);
+     rows.push(`(${[...row, ...Array.from({ length: 2 }, _ => `$${++currentIndex}`)]})`);
      values.push(ts.schedule_start_time, ts.schedule_end_time);
     }
    }
