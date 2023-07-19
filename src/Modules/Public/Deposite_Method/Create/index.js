@@ -10,14 +10,14 @@ module.exports = route => (app, db) => {
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
-   const newDepositeMethod = await db.query(
+   const { rows } = await db.query(
     `INSERT INTO public."Deposite_Methods"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
    res.json({
     success: true,
     msg: 'Deposite method created successfully.',
-    data: newDepositeMethod.rows,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });

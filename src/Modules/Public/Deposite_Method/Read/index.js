@@ -2,18 +2,21 @@ module.exports = route => (app, db) => {
  // Read Deposite Method[s]
  app.get(route, async (req, res) => {
   try {
-   const { db } = res.locals.utils;
+   const { db, isPositiveInteger, orderBy, getLimitClause } = res.locals.utils;
 
-   const { id } = req.query;
+   const { id, limit } = req.query;
 
-   const depositeMethods = id
+   const { rows } = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Deposite_Methods" WHERE 1=1 AND id=$1', [id])
-    : await db.query('SELECT * FROM public."Deposite_Methods"');
+    : await db.query(
+       `SELECT * FROM public."Deposite_Methods" ${orderBy('id')} ${getLimitClause(limit)}`
+      );
 
    res.json({
     success: true,
-    msg: `Deposite method${1 === depositeMethods.rows.length ? '' : 's'} retrieved successfully.`,
-    data: depositeMethods.rows,
+    no_of_records: rows.length,
+    msg: `Deposite method${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
