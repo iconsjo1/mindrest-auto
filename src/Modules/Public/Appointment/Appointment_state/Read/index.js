@@ -3,6 +3,7 @@ module.exports = route => (app, db) => {
  app.get(route, async (req, res) => {
   try {
    const { db, isPositiveInteger, getLimitClause, orderBy } = res.locals.utils;
+
    const { id, limit = -1 } = req.query;
 
    const { rows } = isPositiveInteger(id)
@@ -14,7 +15,7 @@ module.exports = route => (app, db) => {
    res.json({
     success: true,
     no_of_records: rows.length,
-    msg: `Appointment state${1 === rows.length ? '' : 's'} retrieved successfully.`,
+    msg: `Appointment state${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
     data: rows,
    });
   } catch ({ message }) {

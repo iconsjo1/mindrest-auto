@@ -1,4 +1,11 @@
+const routes = {
+ appointment: '/REST/appointment_states',
+ state: '/REST/appointments',
+};
+
 module.exports = (app, db) => {
- require('./Appointment_state')('/REST/appointment_states')(app, db);
- require('./Home')('/REST/appointments')(app, db);
+ const { appointment, state } = routes;
+
+ require('./Appointment_state')(appointment)(app, db);
+ require('./Home')(state)(app, db);
 };

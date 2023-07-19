@@ -3,9 +3,10 @@ module.exports = route => (app, db) => {
  app.get(route, async (req, res) => {
   try {
    const { db, isPositiveInteger, getLimitClause, orderBy } = res.locals.utils;
+
    const { id, limit } = req.query;
 
-   const appointments = isPositiveInteger(id)
+   const { rows } = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Appointments" WHERE 1=1 AND id=$1', [id])
     : await db.query(
        `SELECT * FROM public."Appointments" ${orderBy('id')} ${getLimitClause(limit)}`
@@ -13,9 +14,9 @@ module.exports = route => (app, db) => {
 
    res.json({
     success: true,
-    no_of_records: appointments.rows.length,
-    msg: `Appointment${1 === appointments.rows.length ? '' : 's'} retrieved successfully.`,
-    data: appointments.rows,
+    no_of_records: rows.length,
+    msg: `Appointment${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
