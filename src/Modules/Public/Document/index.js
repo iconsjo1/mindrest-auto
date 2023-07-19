@@ -3,12 +3,12 @@ const routes = {
  document: { documents: '/REST/documents', document: '/REST/document' },
 };
 
-module.exports = (app, db) => {
+module.exports = app => {
  const {
   cat,
   document: { documents, document },
  } = routes;
 
- require('./Document_Category')(cat)(app, db);
- require('./Home')({ documents, document })(app, db);
+ require('./Document_Category')(cat)(app);
+ require('./Home')({ documents, document })(app);
 };

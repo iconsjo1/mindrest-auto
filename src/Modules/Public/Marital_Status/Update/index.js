@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Update Marital Status
  app.put(route, async (req, res) => {
   try {

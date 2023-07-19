@@ -1,10 +1,10 @@
-module.exports = (app, db) => {
+module.exports = app => {
  const route = '/REST/vital_signs';
 
  app.use(route, require('../../../Utils/Route_Logger'));
 
- require('./Read')(route)(app, db);
- require('./Create')(route)(app, db);
- require('./Update')(route)(app, db);
- require('./Delete')(route)(app, db);
+ require('./Read')(route)(app);
+ require('./Create')(route)(app);
+ require('./Update')(route)(app);
+ require('./Delete')(route)(app);
 };

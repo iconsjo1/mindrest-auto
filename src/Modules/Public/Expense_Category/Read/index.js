@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Read Expense Categor[y|ies]
  app.get(route, async (req, res) => {
   try {

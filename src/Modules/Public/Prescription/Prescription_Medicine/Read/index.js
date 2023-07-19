@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Read Prescription Medicine[s]
  app.get(route, async (req, res) => {
   try {

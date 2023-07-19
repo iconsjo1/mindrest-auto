@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Delete Document Category
  app.delete(route, async (req, res) => {
   try {

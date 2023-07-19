@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Create Patient Answer
  app.post(route, async (req, res) => {
   try {

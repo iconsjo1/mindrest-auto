@@ -1,9 +1,9 @@
 const routes = { form: '/REST/forms', details: '/REST/form_details' };
-module.exports = (app, db) => {
+module.exports = app => {
  const { form, details } = routes;
 
- require('./Read')({ form, details })(app, db);
- require('./Create')(form)(app, db);
- require('./Update')(form)(app, db);
- require('./Delete')(form)(app, db);
+ require('./Read')({ form, details })(app);
+ require('./Create')(form)(app);
+ require('./Update')(form)(app);
+ require('./Delete')(form)(app);
 };

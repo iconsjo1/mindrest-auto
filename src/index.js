@@ -29,7 +29,7 @@ app.use((_, res, next) => {
 
 // routs
 
-require('./Modules')(app, db);
+require('./Modules')(app);
 
 app.listen(PORT, () => {
  console.clear();

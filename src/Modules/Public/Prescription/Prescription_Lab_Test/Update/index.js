@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Update Prescription Lab Test
  app.put(route, async (req, res) => {
   try {

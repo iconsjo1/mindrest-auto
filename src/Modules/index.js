@@ -1,3 +1,3 @@
-module.exports = (app, db) => {
- require('./Public')(app, db);
+module.exports = app => {
+ require('./Public')(app);
 };

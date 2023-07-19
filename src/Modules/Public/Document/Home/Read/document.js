@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const CONTENT_DISPOSITION = 'Content-Disposition';
 
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Read Document
  app.get(
   route,

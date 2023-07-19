@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // UPSERT Prescription Medicine
  app.post(route, async (req, res) => {
   try {

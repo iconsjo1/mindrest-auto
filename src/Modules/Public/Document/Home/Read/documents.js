@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Read Documents
  app.get(route, async (_, res) => {
   try {

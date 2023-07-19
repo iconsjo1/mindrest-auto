@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Delete Contact
  app.delete(route, async (req, res) => {
   try {

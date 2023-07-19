@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Read Appointment State[s]
  app.get(route, async (req, res) => {
   try {

@@ -1,4 +1,4 @@
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Read currenc[y|ies]
  app.get(route, async (req, res) => {
   try {

@@ -1,7 +1,7 @@
 module.exports =
  ({ idnum, patients, pcontactInfo }) =>
- (app, db) => {
-  require('./Patient_Contact_Information')(pcontactInfo)(app, db);
-  require('./Check_Unique_Idnumber')(idnum)(app, db);
-  require('./Read')(patients)(app, db);
+ app => {
+  require('./Patient_Contact_Information')(pcontactInfo)(app);
+  require('./Check_Unique_Idnumber')(idnum)(app);
+  require('./Read')(patients)(app);
  };

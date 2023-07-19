@@ -1,6 +1,6 @@
 module.exports =
  ({ form, details }) =>
- (app, db) => {
-  require('./form')(form)(app, db);
-  require('./formDetails')(details)(app, db);
+ app => {
+  require('./form')(form)(app);
+  require('./formDetails')(details)(app);
  };

@@ -6,7 +6,7 @@ const { mkdirSync, existsSync } = require('node:fs');
 const IS_RESIZABLE = true;
 const IS_NOT_RESIZABLE = false;
 
-module.exports = route => (app, db) => {
+module.exports = route => app => {
  // Create Document
  app.post(route, fileupload({ createParentPath: true }), async (req, res) => {
   try {

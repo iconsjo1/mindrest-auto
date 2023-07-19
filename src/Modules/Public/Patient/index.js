@@ -10,7 +10,7 @@ const routes = {
  discount: '/REST/patient_service_discounts',
 };
 
-module.exports = (app, db) => {
+module.exports = app => {
  const {
   patient: { idnum, patients, pcontactInfo },
   answer,
@@ -23,9 +23,9 @@ module.exports = (app, db) => {
   idnum,
   patients,
   pcontactInfo,
- })(app, db);
- require('./Patient_Answer')(answer)(app, db);
- require('./Patient_Deposite')(deposite)(app, db);
- require('./Patient_Document')(document)(app, db);
- require('./Patient_Service_Discount')(discount)(app, db);
+ })(app);
+ require('./Patient_Answer')(answer)(app);
+ require('./Patient_Deposite')(deposite)(app);
+ require('./Patient_Document')(document)(app);
+ require('./Patient_Service_Discount')(discount)(app);
 };

@@ -4,11 +4,11 @@ const routes = {
  doctor_patients: '/REST/doctor_patients',
 };
 
-module.exports = (app, db) => {
+module.exports = app => {
  const { all, contact_info, doctor_patients } = routes;
 
- require('./Read')({ all, contact_info, doctor_patients })(app, db);
- require('./Create')(all)(app, db);
- require('./Update')(all)(app, db);
- require('./Delete')(all)(app, db);
+ require('./Read')({ all, contact_info, doctor_patients })(app);
+ require('./Create')(all)(app);
+ require('./Update')(all)(app);
+ require('./Delete')(all)(app);
 };
