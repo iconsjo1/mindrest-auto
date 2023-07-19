@@ -6,6 +6,7 @@ const routes = {
 
 module.exports = app => {
  const { services, servicec, servicep } = routes;
+
  require('./Home')(services)(app);
  require('./Service_Category')(servicec)(app);
  require('./Service_Provider')(servicep)(app);
