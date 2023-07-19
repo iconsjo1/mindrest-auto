@@ -1,6 +1,6 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Create Department
- app.post('/REST/departments', async (req, res) => {
+ app.post(route, async (req, res) => {
   try {
    const { db } = res.locals.utils;
 
@@ -10,11 +10,11 @@ module.exports = (app, db) => {
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
-   const newDepartment = await db.query(
+   const { rows } = await db.query(
     `INSERT INTO public."Departments"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
-   res.json({ success: true, msg: 'Department created successfully.', data: newDepartment.rows });
+   res.json({ success: true, msg: 'Department created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

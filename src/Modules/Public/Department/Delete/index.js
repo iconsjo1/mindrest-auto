@@ -1,13 +1,14 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Delete Department
- app.delete('/REST/departments', async (req, res) => {
+ app.delete(route, async (req, res) => {
   try {
-   const { db } = res.locals.utils;
+   const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
-   if (!id) return res.status(404).json({ success: false, msg: 'Department not found.' });
+   if (!isPositiveInteger(id))
+    return res.status(404).json({ success: false, msg: 'Department not found.' });
 
-   const deletedDepartment = await db.query(
+   const { rows } = await db.query(
     'DELETE FROM public."Departments" WHERE 1=1 AND id = $1 RETURNING *',
     [id]
    );
@@ -15,7 +16,7 @@ module.exports = (app, db) => {
    res.json({
     Success: true,
     msg: 'Department deleted successfully.',
-    data: deletedDepartment.rows,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });

@@ -1,11 +1,10 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Read Department[s]
- app.get('/REST/departments', async (req, res) => {
+ app.get(route, async (req, res) => {
   try {
-   const { db } = res.locals.utils;
+   const { db, isPositiveInteger, orderBy, getLimitClause } = res.locals.utils;
 
    const { id, limit } = req.query;
-   const { orderBy, getLimitClause, isPositiveInteger } = res.locals.utils;
 
    const { rows } = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Departments" WHERE 1=1 AND id=$1', [id])
