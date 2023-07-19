@@ -6,6 +6,11 @@ const routes = {
 
 module.exports = app => {
  const { all, contact_info, doctor_patients } = routes;
+ const logger = require('../../../Utils/Route_Logger');
+
+ app.use(all, logger);
+ app.get(contact_info, logger);
+ app.get(doctor_patients, logger);
 
  require('./Read')({ all, contact_info, doctor_patients })(app);
  require('./Create')(all)(app);
