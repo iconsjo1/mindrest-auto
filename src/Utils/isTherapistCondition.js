@@ -5,6 +5,6 @@ module.exports = val => {
  return null == val
   ? { msg: 'All ', condition: '1=1' }
   : isPositiveInteger(val) && 1 === +val
-  ? { msg: 'Therapist ', condition: 'true = is_therapist' }
-  : { msg: '', condition: 'false = is_therapist' };
+  ? { msg: 'Therapist ', condition: 'TRUE = is_therapist' }
+  : { msg: '', condition: 'FALSE = is_therapist' };
 };

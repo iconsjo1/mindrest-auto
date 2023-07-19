@@ -5,6 +5,7 @@ module.exports = route => (app, db) => {
    const { doctor_id, patient_id, therapist, limit } = req.query;
 
    const { db, isPositiveInteger, getLimitClause, isTherapist } = res.locals.utils;
+
    const { condition, msg } = isTherapist(therapist);
 
    const { rows } = isPositiveInteger(patient_id)

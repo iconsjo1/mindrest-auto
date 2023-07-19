@@ -6,6 +6,7 @@ module.exports = route => (app, db) => {
    const { doctor_id: id, therapist, limit } = req.query;
 
    const { db, isPositiveInteger, getLimitClause, isTherapist } = res.locals.utils;
+
    const { condition, msg } = isTherapist(therapist);
 
    const { rows } = isPositiveInteger(id)
@@ -20,7 +21,9 @@ module.exports = route => (app, db) => {
    res.json({
     success: true,
     no_of_records: rows.length,
-    msg: `${msg}Doctor contact information${1 === rows.length ? '' : 's'} retrieved successfully.`,
+    msg: `${msg}Doctor contact information${
+     1 === rows.length ? ' was' : 's were'
+    } retrieved successfully.`,
     data: rows,
    });
   } catch ({ message }) {

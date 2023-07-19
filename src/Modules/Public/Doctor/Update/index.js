@@ -3,12 +3,13 @@ module.exports = route => (app, db) => {
  app.put(route, async (req, res) => {
   try {
    const { db, isPositiveInteger } = res.locals.utils;
+
    const { id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'Doctor not found.' });
-   const changed = [];
 
    let i = 1;
+   const changed = [];
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(
