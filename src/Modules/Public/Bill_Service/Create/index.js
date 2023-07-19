@@ -2,57 +2,58 @@ module.exports = route => (app, db) => {
  // UPSERT Bill Service[s]
  app.post(route, async (req, res) => {
   try {
-   const { db, isPositiveInteger, isEString } = res.locals.utils;
+   const { db, isValidObject, isPositiveInteger, isEString } = res.locals.utils;
 
-   const { service_list } = req.body;
-   if (!Array.isArray(service_list) || 0 === service_list.length)
+   const { bill_id, service_list } = req.body;
+
+   if (!isPositiveInteger(bill_id))
+    return res.status(400).json({ success: false, msg: 'bill_id must be a positive integer.' });
+   if (
+    !Array.isArray(service_list) ||
+    0 === service_list.length ||
+    !service_list.every(
+     sl =>
+      isValidObject(sl) &&
+      isPositiveInteger(sl.service_id) &&
+      (null == sl.no_of_sessions || isPositiveInteger(sl.no_of_sessions)) &&
+      isEString(sl.notes)
+    )
+   )
     return res.json({ success: false, msg: 'Service list is not submitted correctly.' });
 
-   delete req.body.service_list;
-
-   const fields = Object.keys(req.body);
-   const values = Object.values(req.body);
-   const enc_values = [];
-
-   for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
-
+   const fields = ['bill_id', 'service_id', 'notes', 'no_of_sessions'];
+   const values = [bill_id];
+   const enc_values = ['$1'];
    const rows = [];
-   let currIndexIncrement = enc_values.length;
+   let currentIndex = enc_values.length;
 
-   for (let service of service_list) {
-    const serviceProps = {
-     no_of_sessions: 1,
-     notes: null,
-     ...service,
-    };
+   for (const s of service_list) {
+    const row_enc = Array.from({ length: 2 }, _ => `$${++currentIndex}`);
+    values.push(s.service_id, s.notes);
 
-    const { service_id, no_of_sessions, notes } = serviceProps;
-    if (!isPositiveInteger(service_id) || !isEString(notes) || !isPositiveInteger(no_of_sessions))
-     throw new Error('Bill service {' + (service_list.indexOf(service) + 1) + '} is not valid');
-
-    const billServicePropCount = Object.keys(serviceProps).length;
-
-    // ($1,$2,$3,$4),($1,$5,$6,$7)
-    for (let i = 0; i++ < billServicePropCount; enc_values.push(`$${++currIndexIncrement}`));
-
-    rows.push(`(${enc_values})`);
-
-    // Initialize new row
-    enc_values.splice(0 - billServicePropCount, billServicePropCount); // remove items to reset counter
-    values.push(service_id, no_of_sessions, notes);
+    (s => {
+     (function () {
+      Object.values(arguments).forEach(arg => {
+       if (null == s[arg]) row_enc.push('DEFAULT');
+       else {
+        row_enc.push(`$${++currentIndex}`);
+        values.push(s[arg]);
+       }
+      });
+      rows.push(`(${[...enc_values, ...row_enc]})`);
+     })('no_of_sessions');
+    })(s);
    }
+
    const { rows: insertedRows } = await db.query(
-    `INSERT INTO public."Bill_Services"(${fields},service_id,no_of_sessions,notes) VALUES${rows} RETURNING *`.replace(
-     /\s+/g,
-     ' '
-    ),
+    `INSERT INTO public."Bill_Services"(${fields}) VALUES${rows} RETURNING *`,
     values
    );
 
    res.json({
     success: true,
-    msg: `Bill service${1 === insertedRows.length ? '' : 's'} created successfully.`,
-    data: insertedRows,
+    msg: `Bill service${1 === insertedRows.length ? ' was' : 's were'} created successfully.`,
+    data: insertedRows.sort((a, b) => Number(b.id) - Number(a.id)),
    });
   } catch ({ message }) {
    res.json({ success: false, message });
