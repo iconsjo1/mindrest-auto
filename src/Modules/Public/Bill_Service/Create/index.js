@@ -30,7 +30,6 @@ module.exports = route => (app, db) => {
    for (const s of service_list) {
     const row_enc = Array.from({ length: 2 }, _ => `$${++currentIndex}`);
     values.push(s.service_id, s.notes);
-
     (s => {
      (function () {
       Object.values(arguments).forEach(arg => {

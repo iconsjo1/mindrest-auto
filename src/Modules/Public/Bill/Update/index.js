@@ -8,9 +8,8 @@ module.exports = route => (app, db) => {
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'Bill not found.' });
 
-   const changed = [];
-
    let i = 1;
+   const changed = [];
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(
