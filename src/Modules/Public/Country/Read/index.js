@@ -1,20 +1,20 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Read Countr[y|ies]
- app.get('/REST/countries', async (req, res) => {
+ app.get(route, async (req, res) => {
   try {
-   const { db } = res.locals.utils;
+   const { db, isPositiveInteger, orderBy, getLimitClause } = res.locals.utils;
 
-   const { id } = req.query;
+   const { id, limit } = req.query;
 
-   const countries = id
+   const { rows } = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Countries" WHERE 1=1 AND id=$1', [id])
-    : await db.query('SELECT * FROM public."Countries"');
+    : await db.query(`SELECT * FROM public."Countries" ${orderBy('id')} ${getLimitClause(limit)}`);
 
    res.json({
     success: true,
-    no_of_records: countries.rows.length,
-    msg: `Countr${1 === countries.rows.length ? 'y' : 'ies'} retrieved successfully.`,
-    data: countries.rows.reverse(),
+    no_of_records: rows.length,
+    msg: `Countr${1 === rows.length ? 'y' : 'ies'} retrieved successfully.`,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });

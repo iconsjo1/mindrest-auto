@@ -1,17 +1,19 @@
-module.exports = (app, db) => {
+module.exports = route => (app, db) => {
  // Delete Country
- app.delete('/REST/countries', async (req, res) => {
+ app.delete(route, async (req, res) => {
   try {
-   const { db } = res.locals.utils;
-   const { id } = req.query;
-   if (!id) return res.status(404).json({ success: false, msg: 'Country not found.' });
+   const { db, isPositiveInteger } = res.locals.utils;
 
-   const deletedCountry = await db.query(
+   const { id } = req.query;
+   if (!isPositiveInteger(id))
+    return res.status(404).json({ success: false, msg: 'Country not found.' });
+
+   const { rows } = await db.query(
     'DELETE FROM public."Countries" WHERE 1=1 AND id = $1 RETURNING *',
     [id]
    );
 
-   res.json({ Success: true, msg: 'Country deleted successfully.', data: deletedCountry.rows });
+   res.json({ Success: true, msg: 'Country deleted successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }
