@@ -8,17 +8,16 @@ module.exports = route => (app, db) => {
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'City not found.' });
 
-   const changed = [];
-
    let i = 1;
+   const changed = [];
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
-   const modifiedCity = await db.query(
+   const { rows } = await db.query(
     `UPDATE public."Cities" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
 
-   res.json({ success: true, msg: 'City updated successfully.', data: modifiedCity.rows });
+   res.json({ success: true, msg: 'City updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }
