@@ -77,11 +77,11 @@ module.exports = [
   if (![5, 26].includes(role_id)) next();
   else {
    switch (role_id) {
-    case 1:
+    case 7:
      pool
       .query({
-       name: 'get-student-id',
-       text: 'SELECT id FROM public."Students" WHERE user_id = $1',
+       name: 'get-therapist-id',
+       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1  AND is_therapist = true',
        values: [user_id],
        rowMode,
       })
@@ -91,16 +91,16 @@ module.exports = [
          .status(500)
          .json({ success: false, message: 'Internal server error contact system administrator.' });
 
-       res.locals.student_id = parseInt(rows[0][0]);
+       res.locals.therapist_id = parseInt(rows[0][0]);
 
        next();
       });
      break;
-    case 2:
+    case 6:
      pool
       .query({
-       name: 'get-professor-id',
-       text: 'SELECT id FROM public."Professors" WHERE user_id = $1',
+       name: 'get-doctor-id',
+       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1  AND is_therapist = false',
        values: [user_id],
        rowMode,
       })
@@ -110,7 +110,26 @@ module.exports = [
          .status(500)
          .json({ success: false, message: 'Internal server error contact system administrator.' });
 
-       res.locals.professor_id = parseInt(rows[0][0]);
+       res.locals.doctor_id = parseInt(rows[0][0]);
+
+       next();
+      });
+     break;
+    case 14:
+     pool
+      .query({
+       name: 'get-patients-id',
+       text: 'SELECT id FROM public."Patients" WHERE user_id = $1 ',
+       values: [user_id],
+       rowMode,
+      })
+      .then(({ rows }) => {
+       if (0 === rows.length)
+        return res
+         .status(500)
+         .json({ success: false, message: 'Internal server error contact system administrator.' });
+
+       res.locals.patients_id = parseInt(rows[0][0]);
 
        next();
       });
