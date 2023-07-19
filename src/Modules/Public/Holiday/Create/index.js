@@ -18,7 +18,7 @@ module.exports = route => (app, db) => {
      .json({ success: false, msg: 'no holidays were successfully submitted.' });
 
    const values = [];
-   const enc_values = [] + ',';
+   const enc_values = [];
    const rows = [];
    let currentIndex = enc_values.length;
 

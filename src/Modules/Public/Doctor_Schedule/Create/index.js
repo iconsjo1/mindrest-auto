@@ -2,62 +2,70 @@ module.exports = route => (app, db) => {
  // Create Doctor Schedule
  app.post(route, async (req, res) => {
   try {
-   const { db, isPositiveInteger, isString } = res.locals.utils;
+   const { db, isValidObject, isPositiveInteger, isMilitarytime } = res.locals.utils;
 
-   const { time_table } = req.body;
-   if (!Array.isArray(time_table) || 0 === time_table.length)
+   const { doctor_id, appointment_duration_in_minutes, time_table } = req.body;
+
+   if (!isPositiveInteger(doctor_id))
+    return res.status(400).json({ success: false, msg: 'doctor_id must be a positive integer.' });
+
+   if (!isPositiveInteger(appointment_duration_in_minutes))
+    return res
+     .status(400)
+     .json({ success: false, msg: 'appointment_duration_in_minutes must be a positive integer.' });
+
+   if (
+    !Array.isArray(time_table) ||
+    0 === time_table.length ||
+    !time_table.every(
+     tt =>
+      isValidObject(tt) &&
+      isPositiveInteger(tt.week_day_id) &&
+      Array.isArray(tt.times) &&
+      0 < tt.times.length &&
+      tt.times.every(
+       ts =>
+        isValidObject(ts) &&
+        isMilitarytime(ts.schedule_start_time) &&
+        isMilitarytime(ts.schedule_end_time) &&
+        Number(ts.schedule_start_time.replace(':', '')) <=
+         Number(ts.schedule_end_time.replace(':', ''))
+      )
+    )
+   )
     return res.json({ success: false, msg: 'time table array is not submitted correctly.' });
 
-   delete req.body.time_table;
-
-   const fields = Object.keys(req.body);
-   const values = Object.values(req.body);
-   const enc_values = [];
-
-   for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
-
+   const fields = [
+    'doctor_id',
+    'appointment_duration_in_minutes',
+    'week_day_id',
+    'schedule_start_time',
+    'schedule_end_time',
+   ];
+   const values = [doctor_id, appointment_duration_in_minutes];
+   const enc_values = ['$1', '$2'];
    const rows = [];
-   let currIndexIncrement = enc_values.length;
-   let fieldCounter = 0;
+   let currentIndex = enc_values.length;
 
-   for (let aTimeTable of time_table) {
-    const { week_day_id, times } = aTimeTable;
-    if (!Array.isArray(times) || 0 === times.length)
-     throw new Error(
-      'Times table array is not submitted correctly @' + (time_table.indexOf(aTimeTable) + 1)
-     );
-    if (!isPositiveInteger(week_day_id))
-     throw new Error('week_day_id is not a number @' + (time_table.indexOf(aTimeTable) + 1));
-    fieldCounter = 1;
-    enc_values.push(`$${++currIndexIncrement}`);
-    values.push(week_day_id);
-
-    for (let time_schedule of times) {
-     const { schedule_start_time, schedule_end_time } = time_schedule;
-
-     if (!isString(schedule_start_time) || !isString(schedule_end_time))
-      throw new Error('Times are not strings @' + (time_table.indexOf(aTimeTable) + 1));
-
-     fieldCounter += 2;
-     enc_values.push(`$${++currIndexIncrement}`, `$${++currIndexIncrement}`);
-     values.push(schedule_start_time, schedule_end_time);
-     rows.push(`(${enc_values})`);
-
-     enc_values.splice(1 - fieldCounter, fieldCounter - 1);
-     fieldCounter -= 2;
+   for (const tt of time_table) {
+    const row = [...enc_values, `$${++currentIndex}`];
+    values.push(tt.week_day_id);
+    for (const ts of tt.times) {
+     rows.push(`(${row},${Array.from({ length: 2 }, _ => `$${++currentIndex}`)})`);
+     values.push(ts.schedule_start_time, ts.schedule_end_time);
     }
-    enc_values.pop();
-    fieldCounter = 0;
    }
+
    const { rows: insertedRows } = await db.query(
-    `INSERT INTO public."Doctor_Schedules"(${fields},week_day_id,schedule_start_time, schedule_end_time) VALUES${rows} RETURNING *`,
+    `INSERT INTO public."Doctor_Schedules"(${fields}) VALUES${rows} RETURNING *`,
     values
    );
 
    res.json({
     success: true,
-    msg: `Doctor schedule${1 === insertedRows.length ? '' : 's'} created successfully.`,
-    data: insertedRows,
+    no_of_records: insertedRows.length,
+    msg: `Doctor schedule${1 === insertedRows.length ? ' was' : 's were'} created successfully.`,
+    data: insertedRows.sort((a, b) => Number(b.id) < Number(a.id)),
    });
   } catch ({ message }) {
    res.json({ success: false, message });

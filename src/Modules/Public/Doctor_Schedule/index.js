@@ -1,8 +1,10 @@
-const route = { edit: '/REST/doctor_schedules', report: '/REST/doctor_schedules/report' };
+const routes = { edit: '/REST/doctor_schedules', report: '/REST/doctor_schedules/report' };
 
 module.exports = (app, db) => {
- require('./Read')(route)(app, db);
- require('./Create')(route.edit)(app, db);
- require('./Update')(route.edit)(app, db);
- require('./Delete')(route.edit)(app, db);
+ const { edit, report } = routes;
+
+ require('./Read')({ edit, report })(app, db);
+ require('./Create')(edit)(app, db);
+ require('./Update')(edit)(app, db);
+ require('./Delete')(edit)(app, db);
 };

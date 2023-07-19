@@ -1,5 +1,3 @@
-const { isPositiveInteger } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Delete Doctor Schedule
  app.delete(route, async (req, res) => {

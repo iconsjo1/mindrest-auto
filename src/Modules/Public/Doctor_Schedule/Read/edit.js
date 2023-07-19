@@ -5,7 +5,9 @@ module.exports = route => (app, db) => {
    const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
 
    const { doctor_id: id, limit = -1 } = req.query;
-   if (!isPositiveInteger(id)) throw new Error('Doctor Schedules were not found.');
+
+   if (!isPositiveInteger(id))
+    return res.status(404).json({ Success: false, msg: 'Doctor Schedules were not found.' });
 
    const { rows } = await db.query(
     `SELECT * FROM public."V_Doctor_Schedules" WHERE 1=1 AND doctor_id=$1 ${getLimitClause(limit)}`,
