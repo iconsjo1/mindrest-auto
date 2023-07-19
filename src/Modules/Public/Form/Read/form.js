@@ -13,7 +13,7 @@ module.exports = route => (app, db) => {
    res.json({
     success: true,
     msg: `Form${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
-    data: forms.rows,
+    data: rows,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
