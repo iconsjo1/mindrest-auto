@@ -1,5 +1,3 @@
-const { isPositiveInteger } = require('../../../../Utils');
-
 module.exports = route => (app, db) => {
  // Update Currency
  app.put(route, async (req, res) => {
@@ -15,12 +13,12 @@ module.exports = route => (app, db) => {
    let i = 1;
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
-   const modifiedCurrency = await db.query(
+   const { rows } = await db.query(
     `UPDATE public."Currencies" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
 
-   res.json({ success: true, msg: 'Currency updated successfully.', data: modifiedCurrency.rows });
+   res.json({ success: true, msg: 'Currency updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }
