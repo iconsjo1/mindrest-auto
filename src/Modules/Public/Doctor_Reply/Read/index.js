@@ -14,7 +14,7 @@ module.exports = route => (app, db) => {
    res.json({
     success: true,
     no_of_records: rows.length,
-    msg: `Doctor repl${1 === rows.length ? 'y' : 'ies'} retrieved successfully.`,
+    msg: `Doctor repl${1 === rows.length ? 'y was' : 'ies were'} retrieved successfully.`,
     data: rows,
    });
   } catch ({ messge }) {
