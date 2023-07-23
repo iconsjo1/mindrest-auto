@@ -7,7 +7,7 @@ const rowMode = 'array';
 module.exports = [
  (req, res, next) => {
   const token = req.headers['x-access-token'];
-  const secret = 'jwt-UOA-2023';
+  const secret = 'jwt-MIND-2023';
 
   try {
    jwt.verify(token, secret);
@@ -53,7 +53,7 @@ module.exports = [
     text: `SELECT 1 
            FROM public."Role_Routes" rr 
             JOIN public."Rest_Routes" rer ON rr.rest_route_id = rer.id 
-            WHERE $1 IN(5, 26) OR (role_id = $1
+            WHERE $1 = 5 OR (role_id = $1
              AND route = $2
              AND method = $3)`.replace(/\s+/g, ' '),
     values: [res.locals.role_id, pathname, method],
@@ -70,26 +70,25 @@ module.exports = [
  },
 
  (_, res, next) => {
+  const INTSERERR = 'Internal server error contact system administrator.';
+
   const {
    locals: { role_id, user_id },
   } = res;
 
-  if (![5, 26].includes(role_id)) next();
+  if (5 === role_id) next();
   else {
    switch (role_id) {
     case 7:
      pool
       .query({
        name: 'get-therapist-id',
-       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1  AND is_therapist = true',
+       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND is_therapist = true',
        values: [user_id],
        rowMode,
       })
       .then(({ rows }) => {
-       if (0 === rows.length)
-        return res
-         .status(500)
-         .json({ success: false, message: 'Internal server error contact system administrator.' });
+       if (0 === rows.length) return res.status(500).json({ success: false, message: INTSERERR });
 
        res.locals.therapist_id = parseInt(rows[0][0]);
 
@@ -100,15 +99,12 @@ module.exports = [
      pool
       .query({
        name: 'get-doctor-id',
-       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1  AND is_therapist = false',
+       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND is_therapist = false',
        values: [user_id],
        rowMode,
       })
       .then(({ rows }) => {
-       if (0 === rows.length)
-        return res
-         .status(500)
-         .json({ success: false, message: 'Internal server error contact system administrator.' });
+       if (0 === rows.length) return res.status(500).json({ success: false, message: INTSERERR });
 
        res.locals.doctor_id = parseInt(rows[0][0]);
 
@@ -124,10 +120,7 @@ module.exports = [
        rowMode,
       })
       .then(({ rows }) => {
-       if (0 === rows.length)
-        return res
-         .status(500)
-         .json({ success: false, message: 'Internal server error contact system administrator.' });
+       if (0 === rows.length) return res.status(500).json({ success: false, message: INTSERERR });
 
        res.locals.patients_id = parseInt(rows[0][0]);
 
