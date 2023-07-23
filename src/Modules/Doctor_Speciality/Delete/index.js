@@ -2,7 +2,7 @@ module.exports = route => app => {
  // Delete Doctor Speciality
  app.delete(route, async (req, res) => {
   try {
-   const { db } = res.locals.utils;
+   const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
    if (!isPositiveInteger(id))
@@ -15,7 +15,7 @@ module.exports = route => app => {
 
    res.json({
     Success: true,
-    msg: 'Doctor speciality deleted successfully.',
+    msg: 'Doctor speciality was deleted successfully.',
     data: rows,
    });
   } catch ({ message }) {
