@@ -10,10 +10,9 @@ module.exports = route => app => {
     throw new Error('Prescription_id must be a positive integer');
 
    const labsTestIdsArray = isIterable(labsTestIds)
-    ? Array.from(
-       new Set(labsTestIds).filter(id => isPositiveInteger(id)),
-       id => parseInt(id)
-      ).sort((a, b) => b - a)
+    ? Array.from([...new Set(labsTestIds)].filter(isPositiveInteger), id => parseInt(id, 10)).sort(
+       (a, b) => b - a
+      )
     : [];
 
    if (0 === labsTestIdsArray.length)
@@ -25,7 +24,7 @@ module.exports = route => app => {
      values: [labsTestIdsArray],
      rowMode: 'array',
     })
-    .then(({ rows }) => (1 === rows.length ? parseInt(rows[0][0]) : -1));
+    .then(({ rows }) => (1 === rows.length ? parseInt(rows[0][0], 10) : -1));
 
    if (labsTestIdsArray.length !== countLAbTests)
     throw new Error('one of the labTest ids is going to violate foreign key constraint. ');
@@ -38,8 +37,7 @@ module.exports = route => app => {
    let currIndex = enc_values.length;
 
    for (let id of labsTestIds) {
-    // 1 field
-    rows.push(`(${enc_values},$${++currIndex})`);
+    rows.push(`(${[...enc_values, `$${++currIndex}`]})`);
     values.push(id);
    }
 

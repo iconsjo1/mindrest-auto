@@ -2,14 +2,14 @@ module.exports = route => app => {
  // UPSERT Holiday[s]
  app.post(route, async (req, res) => {
   try {
-   const dateSort = (a, b) => new Date(b.getTime()) - new Date(a.getTime());
+   const dateSort = (a, b) => new Date(b).getTime() - new Date(a).getTime();
 
-   const { db, isSQLDate } = res.locals.utils;
+   const { db, isSQLDate, isIterable } = res.locals.utils;
 
    const { holidays } = req.body;
 
    const holidaysArray = isIterable(holidays)
-    ? Array.from(new Set(holidays).filter(date => isSQLDate(date))).sort(dateSort)
+    ? Array.from([...new Set(holidays)].filter(isSQLDate)).sort(dateSort)
     : [];
 
    if (0 === holidaysArray.length)
@@ -32,11 +32,16 @@ module.exports = route => app => {
      text: `INSERT INTO public."Holidays"(date) 
             VALUES${rows} 
             ON CONFLICT DO NOTHING
-            RETURNING *`.replace(/\s+/g, ' '),
+            RETURNING (id,date)`.replace(/\s+/g, ' '),
      values,
      rowMode: 'array',
     })
-    .then(({ rows }) => rows.flat().sort(dateSort));
+    .then(({ rows }) =>
+     rows.flatMap(([row]) => {
+      const vars = row.replace(/[\(\)]/g, '').split(',');
+      return { id: vars[0], date: vars[1] };
+     })
+    );
 
    res.json({
     success: true,
@@ -44,7 +49,7 @@ module.exports = route => app => {
     msg: `Holiday${1 === insertedRows.length ? ' was' : 's were'} created successfully${
      0 === insertedRows.length ? ' [duplicate]' : ''
     }.`,
-    data: insertedRows,
+    data: insertedRows.sort(dateSort),
    });
   } catch ({ message }) {
    res.json({ success: false, message });

@@ -2,14 +2,16 @@ module.exports = route => app => {
  // Update Patient Deposite
  app.put(route, async (req, res) => {
   try {
+   const { db } = res.locals.utils;
+
    const { isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
    if (!isPositiveInteger(id))
     return res.status(404).json({ Success: false, msg: 'Patient deposite not found.' });
 
-   const changed = [];
    let i = 1;
+   const changed = [];
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(
