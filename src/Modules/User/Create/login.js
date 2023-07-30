@@ -6,6 +6,7 @@ module.exports = route => app => {
   const { db, isString } = res.locals.utils;
   try {
    const { email, password } = req.body;
+
    if (!(isString(email) && isString(password)))
     return res.status(400).json({ success: false, msg: 'Credentials must be strings.' });
 
