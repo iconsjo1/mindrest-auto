@@ -5,7 +5,7 @@ module.exports = route => app => {
   try {
    const { email, password } = req.body;
    if (!(isString(email) && isString(password))) throw new Error('Credentials must be strings.');
-
+   // pull request test
    const { rows } = await db.query(
     `SELECT * FROM public."Users"
              WHERE 1=1
