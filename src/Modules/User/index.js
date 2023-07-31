@@ -32,7 +32,6 @@ module.exports = app => {
      'country_id',
      'avatar_id',
      'role_id',
-     'password',
      'jwt_token',
     ];
     next();
