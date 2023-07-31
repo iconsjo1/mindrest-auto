@@ -3,7 +3,12 @@ const jwt = require('jsonwebtoken');
 module.exports = route => app => {
  // Create User [LOGIN]
  app.post(route, async (req, res) => {
-  const { db, isString } = res.locals.utils;
+  const {
+   locals: {
+    utils: { db, isPositiveInteger, isString },
+    user_columns,
+   },
+  } = res;
   try {
    const { email, password } = req.body;
 
