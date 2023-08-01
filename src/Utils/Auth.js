@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const pool = require('../pool');
+// const pool = require('../pool');
 
 const rowMode = 'array';
 
@@ -8,11 +8,10 @@ module.exports = [
  (req, res, next) => {
   const token = req.headers['x-access-token'];
   const secret = 'jwt-MIND-2023';
-
   try {
    jwt.verify(token, secret);
-
-   pool
+   const { db } = res.locals.utils;
+   db
     .query({
      name: 'SELECT-ROLE',
      text: 'SELECT id, role_id FROM public."Users" WHERE jwt_token = $1',
@@ -47,7 +46,8 @@ module.exports = [
    },
   } = res;
 
-  pool
+  const { db } = res.locals.utils;
+  db
    .query({
     name: 'CHECK_PERMISSION',
     text: `SELECT 1 
@@ -75,12 +75,13 @@ module.exports = [
   const {
    locals: { role_id, user_id },
   } = res;
+  const { db } = res.locals.utils;
 
   if (5 === role_id) next();
   else {
    switch (role_id) {
     case 7:
-     pool
+     db
       .query({
        name: 'get-therapist-id',
        text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND is_therapist = true',
@@ -96,7 +97,7 @@ module.exports = [
       });
      break;
     case 6:
-     pool
+     db
       .query({
        name: 'get-doctor-id',
        text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND is_therapist = false',
@@ -112,7 +113,7 @@ module.exports = [
       });
      break;
     case 14:
-     pool
+     db
       .query({
        name: 'get-patients-id',
        text: 'SELECT id FROM public."Patients" WHERE user_id = $1 ',
