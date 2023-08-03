@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const { ROLES } = require('.');
 // const pool = require('../pool');
 
 const rowMode = 'array';
@@ -77,14 +77,14 @@ module.exports = [
   } = res;
   const { db } = res.locals.utils;
 
-  if (5 === role_id) next();
+  if (ROLES.SUPERADMIN === role_id) next();
   else {
    switch (role_id) {
-    case 7:
+    case ROLES.THERAPIST:
      db
       .query({
        name: 'get-therapist-id',
-       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND is_therapist = true',
+       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND TRUE = is_therapist',
        values: [user_id],
        rowMode,
       })
@@ -96,11 +96,11 @@ module.exports = [
        next();
       });
      break;
-    case 6:
+    case ROLES.DOCTOR:
      db
       .query({
        name: 'get-doctor-id',
-       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND is_therapist = false',
+       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND FALSE = is_therapist',
        values: [user_id],
        rowMode,
       })
@@ -112,7 +112,7 @@ module.exports = [
        next();
       });
      break;
-    case 14:
+    case ROLES.PATIENT:
      db
       .query({
        name: 'get-patients-id',
@@ -123,7 +123,7 @@ module.exports = [
       .then(({ rows }) => {
        if (0 === rows.length) return res.status(500).json({ success: false, message: INTSERERR });
 
-       res.locals.patients_id = parseInt(rows[0][0]);
+       res.locals.patient_id = parseInt(rows[0][0]);
 
        next();
       });
