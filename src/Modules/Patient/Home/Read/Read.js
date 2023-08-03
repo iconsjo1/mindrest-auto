@@ -7,10 +7,13 @@ module.exports = route => app => {
      utils: { db, isPositiveInteger, orderBy, getLimitClause, ROLES },
      role_id,
      patient_id,
+     doctor_id,
     },
    } = res;
 
-   const patientClause = role_id === ROLES.PATIENT ? 'id= ' + patient_id : '1=1';
+   const Clause = [ROLES.PATIENT, ROLES.DOCTOR].includes(role_id)
+    ? 'id= ' + patient_id ?? 'doctor_id =' + doctor_id
+    : '1=1';
 
    const { id, limit } = req.query;
 

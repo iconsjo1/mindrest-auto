@@ -2,12 +2,20 @@ module.exports = route => app => {
  // Read Doctor Schedule Reprort
  app.get(route, async (req, res) => {
   try {
-   const { db, getLimitClause } = res.locals.utils;
+   const {
+    locals: {
+     utils: { db, getLimitClause, ROLES },
+     role_id,
+     doctor_id,
+    },
+   } = res;
+
+   const clause = ROLES.DOCTOR === role_id ? 'doctor_id= ' + doctor_id : '1=1';
 
    const { limit } = req.query;
 
    const { rows } = await db.query(
-    `SELECT * FROM public."V_Doctor_Schedules_Report" ${getLimitClause(limit)}`
+    `SELECT * FROM public."V_Doctor_Schedules_Report" WHERE ${clause} ${getLimitClause(limit)}`
    );
 
    res.json({
