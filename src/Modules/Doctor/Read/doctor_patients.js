@@ -3,7 +3,7 @@ module.exports = route => app => {
  app.get(route, async (req, res) => {
   try {
    const { doctor_id, patient_id, therapist, limit } = req.query;
-   
+
    const {
     locals: {
      utils: { db, isPositiveInteger, getLimitClause, ROLES, isTherapist },

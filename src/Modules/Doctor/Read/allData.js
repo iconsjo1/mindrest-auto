@@ -5,7 +5,7 @@ module.exports = route => app => {
   try {
    const { id, therapist, limit } = req.query;
 
-  const {
+   const {
     locals: {
      utils: { db, isPositiveInteger, orderBy, getLimitClause, ROLES, isTherapist },
      role_id,
