@@ -10,7 +10,7 @@ module.exports = route => app => {
     },
    } = res;
 
-   const patientClause = '1=1';
+   const patientClause = role_id === ROLES.PATIENTS ? `user_id= ${patient_id}` : '1=1';
 
    const { id, limit } = req.query;
 
