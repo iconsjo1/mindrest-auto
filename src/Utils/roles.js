@@ -3,5 +3,5 @@ module.exports = {
  DOCTOR: 6,
  THERAPIST: 7,
  ADMINISTRATION: 26,
- PATIENTS: 14,
+ PATIENT: 14,
 };

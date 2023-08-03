@@ -10,12 +10,12 @@ module.exports = route => app => {
     },
    } = res;
 
-   const patientClause = role_id === ROLES.PATIENTS ? `user_id= ${patient_id}` : '1=1';
+   const patientClause = role_id === ROLES.PATIENT ? 'id= ' + patient_id : '1=1';
 
    const { id, limit } = req.query;
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."Patients" WHERE 1=1 AND id=$1 AND' + patientClause, [
+    ? await db.query('SELECT * FROM public."Patients" WHERE 1=1 AND id=$1 AND ' + patientClause, [
        id,
       ])
     : await db.query(
