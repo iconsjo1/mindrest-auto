@@ -14,4 +14,5 @@ module.exports = {
  isMilitarytime: time => require('./militaryTimeCheck')(time),
  isTherapist: val => require('./isTherapistCondition')(val),
  rollback: async (savepoint, db) => await require('./rollback')(savepoint, db),
+ ROLES: require('./rules'),
 };
