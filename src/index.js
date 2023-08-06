@@ -13,7 +13,8 @@ const flatData = (req, _, next) => {
    null != req.body[prop] &&
    !Array.isArray(req.body[prop])
   )
-   req.body = { ...req.body, [prop]: req.body[prop].value };
+  console.log('here');
+   //req.body = { ...req.body, [prop]: req.body[prop].value };
  }
  next();
 };
