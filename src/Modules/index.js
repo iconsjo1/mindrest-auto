@@ -1,6 +1,6 @@
 module.exports = app => {
  require('./User')(app);
-// app.use(require('../Utils/Auth'));
+ app.use(require('../Utils/Auth'));
  [
   'Appointment',
   'Bill',
