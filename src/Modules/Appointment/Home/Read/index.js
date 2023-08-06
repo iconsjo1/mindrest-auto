@@ -2,14 +2,23 @@ module.exports = route => app => {
  // Read Appoinment[s]
  app.get(route, async (req, res) => {
   try {
-   const { db, isPositiveInteger, getLimitClause, orderBy } = res.locals.utils;
+   const {
+    locals: {
+     utils: { db, isPositiveInteger, getLimitClause, ROLES, isTherapist },
+     role_id,
+     doctor_id,
+    },
+   } = res;
+   const clause = ROLES.DOCTOR === role_id ? 'doctor_id=' + doctor_id : '1=1';
 
    const { id, limit } = req.query;
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."Appointments" WHERE 1=1 AND id=$1', [id])
+    ? await db.query('SELECT * FROM public."Appointments" WHERE 1=1 AND id=$ AND ' + clause, [id])
     : await db.query(
-       `SELECT * FROM public."Appointments" ${orderBy('id')} ${getLimitClause(limit)}`
+       `SELECT * FROM public."Appointments WHERE " ${clause} ${orderBy('id')} ${getLimitClause(
+        limit
+       )}`
       );
 
    res.json({
