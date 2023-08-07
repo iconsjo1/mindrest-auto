@@ -1,4 +1,4 @@
-const auth = require('../../Utils/Auth');
+// const auth = require('../../Utils/Auth');
 
 const routes = {
  all: '/REST/users',
@@ -9,11 +9,11 @@ const routes = {
 module.exports = app => {
  const { all, login, logout } = routes;
 
- app.post(all, auth);
- app.delete(logout, auth);
- app.delete(all, auth);
- app.get(all, auth);
- app.put(all, auth);
+ //  app.post(all, auth);
+ //  app.delete(logout, auth);
+ //  app.delete(all, auth);
+ //  app.get(all, auth);
+ //  app.put(all, auth);
 
  app.use(
   [all, login, logout],
