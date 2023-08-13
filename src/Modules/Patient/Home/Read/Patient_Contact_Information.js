@@ -15,9 +15,12 @@ module.exports = route => app => {
     },
    } = res;
 
-   const Clause = [ROLES.THERAPIST, ROLES.DOCTOR].includes(role_id)
-    ? 'id= ' + therapist_id ?? 'doctor_id =' + id
-    : '1=1';
+   const Clause =
+    ROLES.THERAPIST === role_id
+     ? 'id= ' + therapist_id
+     : ROLES.DOCTOR === role_id
+     ? 'doctor_id = ' + id
+     : '1=1';
 
    const { rows } = isPositiveInteger(patient_id)
     ? await db.query(
@@ -26,13 +29,12 @@ module.exports = route => app => {
       )
     : isPositiveInteger(doctor_id)
     ? await db.query(
-       'SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND doctor_id=$1 ' +
-        Clause +
-        getLimitClause(limit),
+       `SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND doctor_id=$1 AND ${Clause}
+        ${getLimitClause(limit)}`,
        [doctor_id]
       )
     : await db.query(
-       'SELECT * FROM public."V_Patient_Contact_Info" ' + Clause + getLimitClause(limit)
+       `SELECT * FROM public."V_Patient_Contact_Info" WHERE ${Clause} ${getLimitClause(limit)}`
       );
 
    res.json({
