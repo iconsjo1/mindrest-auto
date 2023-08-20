@@ -4,7 +4,7 @@ module.exports = route => app => {
   try {
    const {
     locals: {
-     utils: { db, isPositiveInteger, getLimitClause, ROLES, isTherapist },
+     utils: { db, isPositiveInteger, getLimitClause, ROLES, isTherapist, orderBy },
      role_id,
      doctor_id,
     },
@@ -14,9 +14,9 @@ module.exports = route => app => {
    const { id, limit } = req.query;
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."Appointments" WHERE 1=1 AND id=$ AND ' + clause, [id])
+    ? await db.query('SELECT * FROM public."Appointments" WHERE 1=1 AND id=$1 AND ' + clause, [id])
     : await db.query(
-       `SELECT * FROM public."Appointments WHERE " ${clause} ${orderBy('id')} ${getLimitClause(
+       `SELECT * FROM public."Appointments" WHERE  ${clause}  ${orderBy('id')} ${getLimitClause(
         limit
        )}`
       );
