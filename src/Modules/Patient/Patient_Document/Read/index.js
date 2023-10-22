@@ -2,13 +2,33 @@ module.exports = route => app => {
  // Read Patient Document[s]
  app.get(route, async (req, res) => {
   try {
-   const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
+   const {
+    locals: {
+     utils: { db, isPositiveInteger, isSQLDate, getLimitClause, ROLES },
+     role_id,
+     patient_id,
+    },
+   } = res;
+
+   const clause = (r => {
+    switch (r) {
+     case ROLES.PATIENT:
+      return 'patient_id= ' + patient_id;
+     default:
+      return '1=1';
+    }
+   })(role_id);
 
    const { patient_id: id, limit = -1 } = req.query;
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."V_Patient_Documents" WHERE 1=1 AND patient_id=$1', [id])
-    : await db.query('SELECT * FROM public."V_Patient_Documents" ' + getLimitClause(limit));
+    ? await db.query(
+       'SELECT * FROM public."V_Patient_Documents" WHERE 1=1 AND patient_id=$1 AND ' + clause,
+       [id]
+      )
+    : await db.query(
+       'SELECT * FROM public."V_Patient_Documents" WHERE 1=1 AND ' + clause + getLimitClause(limit)
+      );
 
    res.json({
     success: true,

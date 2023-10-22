@@ -7,15 +7,18 @@ const PORT = 5040;
 // middleware
 app.use(cors());
 const flatData = (req, _, next) => {
- for (let prop in req.body) {
-  if (
-   'object' === typeof req.body[prop] &&
-   null != req.body[prop] &&
-   !Array.isArray(req.body[prop])
-  )
-   req.body = { ...req.body, [prop]: req.body[prop].value };
+ if ('/REST/new-patient' === req._parsedUrl.path) next();
+ else {
+  for (let prop in req.body) {
+   if (
+    'object' === typeof req.body[prop] &&
+    null != req.body[prop] &&
+    !Array.isArray(req.body[prop])
+   )
+    req.body = { ...req.body, [prop]: req.body[prop].value };
+  }
+  next();
  }
- next();
 };
 
 app.post('*', [express.json(), flatData]);

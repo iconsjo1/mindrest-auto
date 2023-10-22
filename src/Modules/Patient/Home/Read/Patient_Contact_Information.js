@@ -2,8 +2,6 @@ module.exports = route => app => {
  // Read Patient Contact Information[s]
  app.get(route, async (req, res) => {
   try {
-   //const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
-
    const { id: patient_id, doctor_id, limit } = req.query;
 
    const {
@@ -12,29 +10,35 @@ module.exports = route => app => {
      role_id,
      doctor_id: id,
      therapist_id,
+     patient_id: pid,
     },
    } = res;
-
-   const Clause =
-    ROLES.THERAPIST === role_id
-     ? 'id= ' + therapist_id
-     : ROLES.DOCTOR === role_id
-     ? 'doctor_id = ' + id
-     : '1=1';
+   const clause = (r => {
+    switch (r) {
+     case ROLES.DOCTOR:
+      return `doctor_id=  '${id}'`;
+     case ROLES.THERAPIST:
+      return `doctor_id= '${therapist_id}'`;
+     case ROLES.PATIENT:
+      return `patient_id= '${pid}'`;
+     default:
+      return '1=1';
+    }
+   })(role_id);
 
    const { rows } = isPositiveInteger(patient_id)
     ? await db.query(
-       'SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND patient_id=$1 AND ' + Clause,
+       'SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND patient_id=$1 AND ' + clause,
        [patient_id]
       )
     : isPositiveInteger(doctor_id)
     ? await db.query(
-       `SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND doctor_id=$1 AND ${Clause}
+       `SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND doctor_id=$1 AND ${clause}
         ${getLimitClause(limit)}`,
        [doctor_id]
       )
     : await db.query(
-       `SELECT * FROM public."V_Patient_Contact_Info" WHERE ${Clause} ${getLimitClause(limit)}`
+       `SELECT * FROM public."V_Patient_Contact_Info" WHERE ${clause} ${getLimitClause(limit)}`
       );
 
    res.json({

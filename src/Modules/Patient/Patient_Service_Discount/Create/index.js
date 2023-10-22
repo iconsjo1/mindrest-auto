@@ -13,8 +13,7 @@ module.exports = route => app => {
     !Array.isArray(service_discount_list) ||
     0 === service_discount_list.length ||
     !service_discount_list.every(
-     sdl =>
-      isValidObject(sdl) && isPositiveInteger(sdl.service_id) && isPositiveNumber(sdl.discount)
+     sd => isValidObject(sd) && isPositiveInteger(sd.service_id) && isPositiveNumber(sd.discount)
     )
    )
     return res

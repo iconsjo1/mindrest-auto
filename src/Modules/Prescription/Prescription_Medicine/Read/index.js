@@ -2,7 +2,7 @@ module.exports = route => app => {
  // Read Prescription Medicine[s]
  app.get(route, async (req, res) => {
   try {
-   const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
+   const { db, isPositiveInteger, orderBy, getLimitClause } = res.locals.utils;
 
    const { prescription_id: id, limit = -1 } = req.query;
 

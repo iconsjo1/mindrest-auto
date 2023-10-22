@@ -10,10 +10,17 @@ module.exports = route => app => {
      therapist_id,
     },
    } = res;
-   //doctor_id
-   const clause = [ROLES.DOCTOR, ROLES.THERAPIST].includes(role_id)
-    ? 'doctor_id=' + idd ?? 'doctor_id= ' + therapist_id
-    : '1=1';
+   const clause = (r => {
+    switch (r) {
+     case ROLES.DOCTOR:
+      return 'doctor_id= ' + doctor_id;
+     case ROLES.THERAPIST:
+      return 'doctor_id= ' + therapist_id;
+     default:
+      return '1=1';
+    }
+   })(role_id);
+
    const { doctor_id, id, limit = -1 } = req.query;
 
    const { rows } = isPositiveInteger(doctor_id)

@@ -2,7 +2,25 @@ module.exports = route => app => {
  // Update Doctor Schedule
  app.put(route, async (req, res) => {
   try {
-   const { db, isPositiveInteger } = res.locals.utils;
+   const {
+    locals: {
+     utils: { db, isPositiveInteger, ROLES },
+     role_id,
+     doctor_id,
+     therapist_id,
+    },
+   } = res;
+
+   const clause = (r => {
+    switch (r) {
+     case ROLES.DOCTOR:
+      return 'doctor_id= ' + doctor_id;
+     case ROLES.THERAPIST:
+      return 'doctor_id= ' + therapist_id;
+     default:
+      return '1=1';
+    }
+   })(role_id);
 
    const { id } = req.query;
    if (!isPositiveInteger(id))
@@ -13,7 +31,7 @@ module.exports = route => app => {
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(
-    `UPDATE public."Doctor_Schedules" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
+    `UPDATE public."Doctor_Schedules" SET ${changed} WHERE 1=1 AND ${clause} AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
    res.json({ success: true, msg: 'Doctor schedule updated successfully.', data: rows });

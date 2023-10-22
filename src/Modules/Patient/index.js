@@ -2,6 +2,7 @@ const routes = {
  patient: {
   idnum: '/REST/patients/unique_idnumber',
   patients: '/REST/patients',
+  newPatiant: '/REST/new-patient',
   pcontactInfo: '/REST/patient_contact_info',
  },
  answer: '/REST/patient_answers',
@@ -12,7 +13,7 @@ const routes = {
 
 module.exports = app => {
  const {
-  patient: { idnum, patients, pcontactInfo },
+  patient: { idnum, patients, pcontactInfo, newPatiant },
   answer,
   deposite,
   document,
@@ -22,6 +23,7 @@ module.exports = app => {
 
  app.use([answer, deposite, document, discount, patients], logger);
 
+ app.post(newPatiant, logger);
  app.get(idnum, logger);
  app.get(pcontactInfo, logger);
 
@@ -29,6 +31,7 @@ module.exports = app => {
   idnum,
   patients,
   pcontactInfo,
+  newPatiant,
  })(app);
  require('./Patient_Answer')(answer)(app);
  require('./Patient_Deposite')(deposite)(app);

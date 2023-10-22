@@ -2,7 +2,14 @@ module.exports = route => app => {
  // Update Appointment
  app.put(route, async (req, res) => {
   try {
-   const { db, isPositiveInteger } = res.locals.utils;
+   const {
+    locals: {
+     utils: { db, isPositiveInteger, ROLES },
+     role_id,
+     doctor_id,
+    },
+   } = res;
+   const clause = ROLES.DOCTOR === role_id ? 'doctor_id=' + doctor_id : '1=1';
 
    const { id } = req.query;
    if (!isPositiveInteger(id))
@@ -13,7 +20,7 @@ module.exports = route => app => {
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);
 
    const { rows } = await db.query(
-    `UPDATE public."Appointments" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
+    `UPDATE public."Appointments" SET ${changed} WHERE 1=1 AND id=$${i} AND ${clause} RETURNING *`,
     [...Object.values(req.body), id]
    );
    res.json({

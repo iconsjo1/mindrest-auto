@@ -13,9 +13,16 @@ module.exports = route => app => {
     },
    } = res;
 
-   const clause = [ROLES.DOCTOR, ROLES.THERAPIST].includes(role_id)
-    ? 'id=' + id ?? 'id= ' + therapist_id
-    : '1=1';
+   const clause = (r => {
+    switch (r) {
+     case ROLES.DOCTOR:
+      return 'doctor_id= ' + doctor_id;
+     case ROLES.THERAPIST:
+      return 'doctor_id= ' + therapist_id;
+     default:
+      return '1=1';
+    }
+   })(role_id);
 
    const { condition, msg } = isTherapist(therapist);
 
@@ -32,7 +39,7 @@ module.exports = route => app => {
        [doctor_id]
       )
     : await db.query(
-       `SELECT * FROM public."V_Doctor_Patients" WHERE ${condition} AND ${clause}${getLimitClause(
+       `SELECT * FROM public."V_Doctor_Patients" WHERE ${condition} AND ${clause} ${getLimitClause(
         limit
        )}`
       );
