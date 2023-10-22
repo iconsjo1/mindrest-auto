@@ -13,6 +13,7 @@ module.exports = app => {
  app.use(all, logger);
  app.get(contact_info, logger);
  app.get(doctor_patients, logger);
+ app.post(newDoctor, logger);
 
  require('./Read')({ all, contact_info, doctor_patients })(app);
  require('./Create')({ all, newDoctor })(app);
