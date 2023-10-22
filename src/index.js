@@ -7,7 +7,7 @@ const PORT = 5040;
 // middleware
 app.use(cors());
 const flatData = (req, _, next) => {
- if ('/REST/new-patient' === req._parsedUrl.path) next();
+ if (/new-(patient|doctor)$/.test(req._parsedUrl.path)) next();
  else {
   for (let prop in req.body) {
    if (

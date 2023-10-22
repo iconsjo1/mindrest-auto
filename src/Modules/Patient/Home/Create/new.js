@@ -5,13 +5,8 @@ module.exports = route => app => {
 
   const SAVEPOINT = 'fresh';
   try {
-   const dispData = {
-    user: {},
-    patient: {},
-    contact: {},
-    emergency_contact: {},
-    service_discounts: {},
-   };
+   const dispData = {};
+
    const { db, isValidObject, isPositiveInteger, isPositiveNumber } = res.locals.utils;
    const { user, contact, patient, emergency_contact, service_discounts = [] } = req.body;
    if (
@@ -38,24 +33,25 @@ module.exports = route => app => {
      values,
     ];
    };
+   const getRows = oneRow => (false === oneRow ? ({ rows }) => rows[0] : ({ rows }) => rows);
 
    client = await db.connect();
    await client.query('BEGIN;SAVEPOINT ' + SAVEPOINT);
 
    const [userSQL, userValues] = dbSQLInsert(user, 'Users');
-   dispData.user = await client.query(userSQL, userValues).then(({ rows }) => rows[0]);
+   dispData.user = await client.query(userSQL, userValues).then(getRows(false));
 
    const [contactSQL, contactValues] = dbSQLInsert(
     { ...contact, user_id: dispData.user.id },
     'Contacts'
    );
-   dispData.contact = await client.query(contactSQL, contactValues).then(({ rows }) => rows[0]);
+   dispData.contact = await client.query(contactSQL, contactValues).then(getRows(false));
 
    const [patientSQL, patientValues] = dbSQLInsert(
     { ...patient, user_id: dispData.user.id },
     'Patients'
    );
-   dispData.patient = await client.query(patientSQL, patientValues).then(({ rows }) => rows[0]);
+   dispData.patient = await client.query(patientSQL, patientValues).then(getRows(false));
 
    const { id: patient_id } = dispData.patient;
 
@@ -65,7 +61,7 @@ module.exports = route => app => {
    );
    dispData.emergency_contact = await client
     .query(econtactSQL, econtactValues)
-    .then(({ rows }) => rows[0]);
+    .then(getRows(false));
 
    if (0 === service_discounts.length) dispData.service_discounts = service_discounts;
    else {
@@ -86,7 +82,7 @@ module.exports = route => app => {
       `INSERT INTO public."Patient_Service_Discounts"(${fields}) VALUES${rows} RETURNING *`,
       values
      )
-     .then(({ rows }) => rows);
+     .then(getRows(true));
 
     dispData.service_discounts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
    }
