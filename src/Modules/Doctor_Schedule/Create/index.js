@@ -9,11 +9,6 @@ module.exports = route => app => {
    if (!isPositiveInteger(doctor_id))
     return res.status(400).json({ success: false, msg: 'doctor_id must be a positive integer.' });
 
-   if (!isPositiveInteger(appointment_duration_in_minutes))
-    return res
-     .status(400)
-     .json({ success: false, msg: 'appointment_duration_in_minutes must be a positive integer.' });
-
    if (
     !Array.isArray(time_table) ||
     0 === time_table.length ||
