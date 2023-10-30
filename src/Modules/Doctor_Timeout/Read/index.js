@@ -4,16 +4,16 @@ module.exports = route => app => {
   try {
    const {
     locals: {
-     utils: { db, isPositiveInteger, getLimitClause, ROLES, isTherapist },
+     utils: { db, isPositiveInteger, getLimitClause, ROLES },
      role_id,
-     doctor_id: idd,
+     doctor_id: diddb,
      therapist_id,
     },
    } = res;
    const clause = (r => {
     switch (r) {
      case ROLES.DOCTOR:
-      return 'doctor_id= ' + doctor_id;
+      return 'doctor_id= ' + diddb;
      case ROLES.THERAPIST:
       return 'doctor_id= ' + therapist_id;
      default:
