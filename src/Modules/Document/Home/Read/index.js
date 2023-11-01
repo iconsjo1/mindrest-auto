@@ -1,6 +1,6 @@
 module.exports =
- ({ document, documents }) =>
+ ({ documents, do_documents }) =>
  app => {
-  require('./document')(document)(app);
   require('./documents')(documents)(app);
+  require('./DO-read')(do_documents)(app);
  };

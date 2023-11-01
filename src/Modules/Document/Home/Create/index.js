@@ -1,81 +1,163 @@
-const fileupload = require('express-fileupload');
-const { extname } = require('node:path');
-const sharp = require('sharp');
-const { mkdirSync, existsSync } = require('node:fs');
-
-const IS_RESIZABLE = true;
-const IS_NOT_RESIZABLE = false;
-
 module.exports = route => app => {
- // Create Document
- app.post(route, fileupload({ createParentPath: true }), async (req, res) => {
+ // Create DO-Document
+ let client = null;
+
+ const { extname } = require('node:path');
+ const { lookup } = require('mime-types');
+ const multer = require('multer');
+ const sharp = require('sharp');
+
+ const upload = multer({ storage: multer.memoryStorage() });
+ const AWS = require('aws-sdk');
+
+ const SAVEPOINT = 'FRESH';
+ const rowMode = 'array';
+ const TODAY = new Date();
+
+ app.post(route, upload.single('file'), async (req, res) => {
+  let transactionStarted = false;
   try {
-   const { db } = res.locals.utils;
-   const { file } = req.files;
-   if (!file.name) throw new Error('No file was uploaded.');
+   const {
+    locals: {
+     utils: { db, isString, isPositiveInteger },
+     do: { bucket, folder, credentials },
+    },
+   } = res;
 
-   req.body.document_mimetype = file.mimetype;
-   req.body.document_category_id = +JSON.parse(req.body.document_category_id).value;
+   const {
+    file,
+    body: { document_category_id, is_resizable, document_filename: name, description },
+   } = req;
+   const canResize = '1' === is_resizable;
 
-   const isResizable = 'true' === req.body.is_resizable;
-   delete req.body.is_resizable;
+   if (!isPositiveInteger(document_category_id))
+    throw Error('category_id must be a positive integer.');
 
-   await db.query('BEGIN;SAVEPOINT fresh');
-   const fields = Object.keys(req.body);
-   const values = Object.values(req.body);
-   const enc_values = [];
+   if (null == file) throw Error('File was not uploaded.');
 
-   for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
+   if (!isString(name)) throw Error('File name is not a string.');
 
-   const newDocument_id = await db.query(
-    `INSERT INTO public."Documents"(${fields}) VALUES(${enc_values}) RETURNING *`,
-    values
-   );
+   const ext = extname(file.originalname);
+   const mimetype = lookup(ext);
 
-   const { id: document_id, document_mimetype: mime } = newDocument_id.rows[0];
+   if (false === mimetype) throw Error('File extention of [' + ext + '] does not have a mimetype');
 
-   if (!document_id) {
-    await db.query('ROLLBACK TO SAVEPOINT fresh');
-    throw new Error('Document was not uploaded properly');
-   }
+   const s3 = new AWS.S3({
+    ...credentials,
+    s3BucketEndpoint: true,
+   });
+   client = await db.connect();
 
-   // Saving location vars
-   const d = new Date();
-   const rootPath = 'C:/mclinic-uploadpath';
-   const relativePath = [d.getFullYear(), d.getMonth() + 1, d.getDate()].join('/');
-   const dir = rootPath + '/' + relativePath; // Absolute
-   const filePath = dir + '/' + document_id; // Absolute
-   const ext = extname(file.name);
+   const cat = await client
+    .query({
+     text: 'SELECT category_name FROM public."Document_Categories" WHERE id=$1',
+     values: [document_category_id],
+     rowMode,
+    })
+    .then(({ rows }) => rows[0][0]);
 
-   const updateDocumentPath = canResize => async () => {
-    const newDocument = await db.query(
-     'UPDATE public."Documents" SET document_path=$1,document_extension=$2,is_resizable=$3 WHERE id=$4 RETURNING *',
-     [relativePath + '/' + document_id, ext.substring(1), canResize, document_id]
+   if (!isString(cat))
+    throw Error(
+     'Category id={' + document_category_id + '} is going to violate foreign key constraint.'
     );
-    await db.query(0 < newDocument.rows.length ? 'COMMIT' : 'ROLLBACK TO SAVEPOINT fresh');
-    res.json({ success: true, msg: 'Document created successfully.', data: newDocument.rows });
+
+   const document = {
+    document_filename: name,
+    document_mimetype: mimetype,
+    document_extension: ext.substring(1), // Omits first char '.'
+    description: description,
+    document_category_id,
+    is_resizable: canResize,
    };
 
-   if (isResizable && /^image/.test(mime)) {
-    // Double check for security reasons.
-    if (!existsSync(dir)) {
-     mkdirSync(dir, { recursive: true });
-    }
-    await sharp(file.data).resize(48, 48).toFile(`${filePath}-small${ext}`);
-    await sharp(file.data).resize(300, 300).toFile(`${filePath}-medium${ext}`);
-    await sharp(file.data).toFile(`${filePath}-full${ext}`);
-    await updateDocumentPath(IS_RESIZABLE)();
+   const docFields = Object.keys(document);
+   const doc_encValues = docFields.map((_, i) => `$${i + 1}`);
+
+   await client.query('BEGIN;SAVEPOINT ' + SAVEPOINT);
+   transactionStarted = true;
+
+   const document_id = await client
+    .query({
+     text: `INSERT INTO public."Documents"(${docFields}) VALUES(${doc_encValues}) RETURNING id`,
+     values: Object.values(document),
+     rowMode,
+    })
+    .then(({ rows }) => parseInt(rows[0][0], 10));
+
+   if (!isPositiveInteger(document_id)) throw Error('Document was not inserted.');
+
+   document.document_path = [
+    folder,
+    TODAY.getFullYear(),
+    TODAY.getMonth() + 1,
+    TODAY.getDate(),
+    document_id,
+   ].join('/');
+
+let rows = []
+
+   if (true === canResize && /^ima/.test(mimetype)) {
+    await Promise.all([
+     s3
+      .putObject({
+       Body: await sharp(file.buffer).resize({ width: 48, height: 48 }).toBuffer(),
+       Bucket: bucket,
+       Key: document.document_path + '-small' + ext,
+      })
+      .promise(),
+     s3
+      .putObject({
+       Body: await sharp(file.buffer).resize({ width: 300, height: 300 }).toBuffer(),
+       Bucket: bucket,
+       Key: document.document_path + '-medium' + ext,
+      })
+      .promise(),
+     s3
+      .putObject({
+       Body: file.buffer,
+       Bucket: bucket,
+       Key: document.document_path + '-full' + ext,
+      })
+      .promise(),
+    ]);
+    const { rows: uploaded_document } = await client.query(
+        'UPDATE public."Documents" SET document_path=$1 WHERE id=$2 RETURNING *',
+        [document.document_path, document_id]
+       );
+       rows =uploaded_document;
    } else {
-    file.mv(filePath + ext, async err => {
-     if (err) {
-      await db.query('ROLLBACK TO SAVEPOINT fresh');
-      return res.json({ success: false, msg: err.message });
-     }
-     await updateDocumentPath(IS_NOT_RESIZABLE)();
-    });
+    await s3
+     .putObject({
+      Body: file.buffer,
+      Bucket: bucket,
+      Key: document.document_path + ext,
+     })
+     .promise();
+     const { rows: uploaded_document } = await client.query(
+        'UPDATE public."Documents" SET document_path=$1,is_resizable = false WHERE id=$2 RETURNING *',
+        [document.document_path, document_id]
+       );
+       rows =uploaded_document;
    }
+
+   await client.query('COMMIT;');
+   transactionStarted = false;
+   client.release();
+
+   res.json({ success: true, msg: 'File was uploaded successfully.', data: rows });
   } catch ({ message }) {
-   res.json({ success: false, message });
+   let msg = message;
+   if (null != client) {
+    if (true === transactionStarted) {
+     try {
+      await client.query('ROLLBACK TO SAVEPOINT ' + SAVEPOINT);
+     } catch ({ message: rmessage }) {
+      msg = rmessage;
+     }
+    }
+    client.release();
+   }
+   res.json({ success: false, message: msg });
   }
  });
 };

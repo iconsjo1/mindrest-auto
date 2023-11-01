@@ -1,11 +1,9 @@
 module.exports = route => app => {
- // Read Document Categor[ies]
+ // Read Document Categor[y|ies]
  app.get(route, async (req, res) => {
+  const { db, isPositiveInteger, getLimitClause, orderBy } = res.locals.utils;
   try {
-   const { db, isPositiveInteger, orderBy, getLimitClause } = res.locals.utils;
-
-   const { id, limit = -1 } = req.query;
-
+   const { id, limit } = req.query;
    const { rows } = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Document_Categories" WHERE 1=1 AND id=$1', [id])
     : await db.query(
@@ -15,7 +13,7 @@ module.exports = route => app => {
    res.json({
     success: true,
     no_of_records: rows.length,
-    msg: `Document categor${1 === rows.length ? 'y was' : 'ies were'} retrieved successfully.`,
+    msg: `Documents categor${1 === rows.length ? 'y was' : 'ies were'} retrieved successfully.`,
     data: rows,
    });
   } catch ({ message }) {
