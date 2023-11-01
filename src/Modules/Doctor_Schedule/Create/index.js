@@ -4,7 +4,7 @@ module.exports = route => app => {
   try {
    const { db, isValidObject, isPositiveInteger, isMilitarytime } = res.locals.utils;
 
-   const { doctor_id, appointment_duration_in_minutes, time_table } = req.body;
+   const { doctor_id, time_table } = req.body;
 
    if (!isPositiveInteger(doctor_id))
     return res.status(400).json({ success: false, msg: 'doctor_id must be a positive integer.' });
@@ -16,6 +16,8 @@ module.exports = route => app => {
      tt =>
       isValidObject(tt) &&
       isPositiveInteger(tt.week_day_id) &&
+      (null == tt.appointment_duration_in_minutes ||
+       isPositiveInteger(tt.appointment_duration_in_minutes)) &&
       Array.isArray(tt.times) &&
       0 < tt.times.length &&
       tt.times.every(
@@ -32,13 +34,14 @@ module.exports = route => app => {
 
    const fields = [
     'doctor_id',
-    'appointment_duration_in_minutes',
     'week_day_id',
     'schedule_start_time',
     'schedule_end_time',
+    'appointment_duration_in_minutes',
    ];
-   const values = [doctor_id, appointment_duration_in_minutes];
-   const enc_values = ['$1', '$2'];
+
+   const values = [doctor_id];
+   const enc_values = ['$1'];
    const rows = [];
    let currentIndex = enc_values.length;
 
@@ -46,8 +49,8 @@ module.exports = route => app => {
     const row = [...enc_values, `$${++currentIndex}`];
     values.push(tt.week_day_id);
     for (const ts of tt.times) {
-     rows.push(`(${[...row, ...Array.from({ length: 2 }, _ => `$${++currentIndex}`)]})`);
-     values.push(ts.schedule_start_time, ts.schedule_end_time);
+     rows.push(`(${[...row, ...Array.from({ length: 3 }, _ => `$${++currentIndex}`)]})`);
+     values.push(ts.schedule_start_time, ts.schedule_end_time, ts.appointment_duration_in_minutes);
     }
    }
 
