@@ -15,7 +15,7 @@ module.exports = route => app => {
     do: { bucket, credentials },
    },
   } = res;
-  
+
   const { id, required_size } = req.query;
   try {
    if (!isPositiveInteger(id)) throw Error('document_id must be a positive integer.');
@@ -32,7 +32,7 @@ module.exports = route => app => {
    });
 
    const { rows: dbdocument } = await db.query(
-   `SELECT 
+    `SELECT 
         CONCAT(document_path, '-${required_size}.', document_extension) "Key",
         document_mimetype mimetype
     FROM public."Documents"

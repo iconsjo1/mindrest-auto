@@ -10,9 +10,7 @@ module.exports = route => app => {
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
    const { rows } = await db.query(
-    `INSERT INTO public."Document_Categories"(${fields}) VALUES(${enc_values.join(
-     ','
-    )}) RETURNING *`,
+    `INSERT INTO public."Document_Categories"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
 

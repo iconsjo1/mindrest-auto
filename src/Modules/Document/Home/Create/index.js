@@ -94,7 +94,7 @@ module.exports = route => app => {
     document_id,
    ].join('/');
 
-let rows = []
+   let rows = [];
 
    if (true === canResize && /^ima/.test(mimetype)) {
     await Promise.all([
@@ -121,10 +121,10 @@ let rows = []
       .promise(),
     ]);
     const { rows: uploaded_document } = await client.query(
-        'UPDATE public."Documents" SET document_path=$1 WHERE id=$2 RETURNING *',
-        [document.document_path, document_id]
-       );
-       rows =uploaded_document;
+     'UPDATE public."Documents" SET document_path=$1 WHERE id=$2 RETURNING *',
+     [document.document_path, document_id]
+    );
+    rows = uploaded_document;
    } else {
     await s3
      .putObject({
@@ -133,11 +133,12 @@ let rows = []
       Key: document.document_path + ext,
      })
      .promise();
-     const { rows: uploaded_document } = await client.query(
-        'UPDATE public."Documents" SET document_path=$1,is_resizable = false WHERE id=$2 RETURNING *',
-        [document.document_path, document_id]
-       );
-       rows =uploaded_document;
+
+    const { rows: uploaded_document } = await client.query(
+     'UPDATE public."Documents" SET document_path=$1,is_resizable = false WHERE id=$2 RETURNING *',
+     [document.document_path, document_id]
+    );
+    rows = uploaded_document;
    }
 
    await client.query('COMMIT;');
