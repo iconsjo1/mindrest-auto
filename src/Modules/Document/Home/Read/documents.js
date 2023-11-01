@@ -1,12 +1,12 @@
 module.exports = route => app => {
  // Read Document[s]
  app.get(route, async (req, res) => {
-  const { db, getLimitClause, isPositiveInteger, orderBy, isItrable } = res.locals.utils;
+  const { db, getLimitClause, isPositiveInteger, orderBy, isIterable } = res.locals.utils;
 
   try {
    const { limit, ids } = req.query;
 
-   const idsArray = isItrable(ids)
+   const idsArray = isIterable(ids)
     ? Array.from(new Set(ids.split('|').filter(isPositiveInteger)), id => parseInt(id, 10))
     : [];
 
