@@ -1,5 +1,6 @@
-module.exports = route => app => {
- require('./Create')(route.documents)(app);
- require('./Delete')(route.documents)(app);
- require('./Read')(route)(app);
-};
+module.exports =
+ ({ documents, do_documents }) =>
+ app => {
+  require('./Create')(do_documents)(app);
+  require('./Read')({ documents, do_documents })(app);
+ };

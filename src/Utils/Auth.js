@@ -77,7 +77,7 @@ module.exports = [
   } = res;
   const { db } = res.locals.utils;
 
-  if (ROLES.SUPERADMIN === role_id ||ROLES.ADMINISTRATION === role_id) next();
+  if (ROLES.SUPERADMIN === role_id || ROLES.ADMINISTRATION === role_id) next();
   else {
    switch (role_id) {
     case ROLES.THERAPIST:
