@@ -23,7 +23,7 @@ module.exports = route => app => {
    const required_sizelc = required_size?.toLowerCase();
 
    const resizeCond = ['small', 'medium', 'full'].includes(required_sizelc)
-    ? "true = is_resizable AND '^ima' ~ document_mimetype"
+    ? "true = is_resizable AND document_mimetype ilike 'ima%'"
     : '1=1';
 
    const s3 = new AWS.S3({
@@ -41,18 +41,18 @@ module.exports = route => app => {
     AND ${resizeCond}`.replace(/\s+/g, ' '),
     [id]
    );
-   console.log(dbdocument, resizeCond);
+
    if (0 === dbdocument.length) throw Error('DB Document was not found.');
 
-   const { Key, mimetype } = dbdocument;
+   const [{ Key, mimetype }] = dbdocument;
 
-   const data = await s3.getObject({ Bucket: bucket, Key }).promise();
+   const { Body } = await s3.getObject({ Bucket: bucket, Key }).promise();
 
    res.set({
     [CONTENT_DISPOSITION]: `attachment; filename=${basename(Key)}`,
     'Content-Type': mimetype,
    });
-   res.end(data.Body, 'binary');
+   res.end(Body, 'binary');
   } catch ({ message }) {
    res.json({ success: false, message });
   }
