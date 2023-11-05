@@ -96,7 +96,7 @@ module.exports = route => app => {
 
    let rows = [];
 
-   if (true === canResize && /^ima/.test(mimetype)) {
+   if (true === canResize && /^ima/.test(mimetype) && 'Picture' === cat) {
     await Promise.all([
      s3
       .putObject({
