@@ -30,8 +30,7 @@ module.exports = route => app => {
    } = req;
    const canResize = '1' === is_resizable;
 
-   if (!isPositiveInteger(document_category_id))
-    throw Error('category_id must be a positive integer.');
+   if (!isPositiveInteger(document_category_id)) throw Error('category_id must be a positive integer.');
 
    if (null == file) throw Error('File was not uploaded.');
 
@@ -57,9 +56,7 @@ module.exports = route => app => {
     .then(({ rows }) => rows[0][0]);
 
    if (!isString(cat))
-    throw Error(
-     'Category id={' + document_category_id + '} is going to violate foreign key constraint.'
-    );
+    throw Error('Category id={' + document_category_id + '} is going to violate foreign key constraint.');
 
    const document = {
     document_filename: name,
@@ -86,13 +83,7 @@ module.exports = route => app => {
 
    if (!isPositiveInteger(document_id)) throw Error('Document was not inserted.');
 
-   document.document_path = [
-    folder,
-    TODAY.getFullYear(),
-    TODAY.getMonth() + 1,
-    TODAY.getDate(),
-    document_id,
-   ].join('/');
+   document.document_path = [folder, TODAY.getFullYear(), TODAY.getMonth() + 1, TODAY.getDate(), document_id].join('/');
 
    let rows = [];
 

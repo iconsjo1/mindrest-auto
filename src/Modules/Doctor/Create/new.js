@@ -17,10 +17,7 @@ module.exports = route => app => {
     const values = Object.values(data);
     const enc_values = values.map((_, i) => `$${++i}`);
 
-    return [
-     `INSERT INTO public."${tableName}"(${fields}) VALUES(${enc_values}) RETURNING *`,
-     values,
-    ];
+    return [`INSERT INTO public."${tableName}"(${fields}) VALUES(${enc_values}) RETURNING *`, values];
    };
    const getRow = ({ rows }) => rows[0];
 
@@ -30,16 +27,10 @@ module.exports = route => app => {
    const [userSQL, userValues] = dbSQLInsert(user, 'Users');
    dispData.user = await client.query(userSQL, userValues).then(getRow);
 
-   const [contactSQL, contactValues] = dbSQLInsert(
-    { ...contact, user_id: dispData.user.id },
-    'Contacts'
-   );
+   const [contactSQL, contactValues] = dbSQLInsert({ ...contact, user_id: dispData.user.id }, 'Contacts');
    dispData.contact = await client.query(contactSQL, contactValues).then(getRow);
 
-   const [doctorSQL, doctorValues] = dbSQLInsert(
-    { ...doctor, user_id: dispData.user.id },
-    'Doctors'
-   );
+   const [doctorSQL, doctorValues] = dbSQLInsert({ ...doctor, user_id: dispData.user.id }, 'Doctors');
    dispData.doctor = await client.query(doctorSQL, doctorValues).then(getRow);
 
    await client.query('COMMIT;');

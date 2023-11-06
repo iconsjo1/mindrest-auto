@@ -20,8 +20,7 @@ module.exports = route => app => {
    });
 
    const { id } = req.query;
-   if (!isPositiveInteger(id))
-    return res.status(404).json({ success: false, message: 'Document was not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, message: 'Document was not found.' });
 
    client = await db.connect();
 
@@ -32,9 +31,8 @@ module.exports = route => app => {
     .then(({ rows }) => rows);
 
    if (0 < deletedDocument.length) {
-    const [
-     { is_resizable, document_path, document_extension, document_mimetype, document_category_id },
-    ] = deletedDocument;
+    const [{ is_resizable, document_path, document_extension, document_mimetype, document_category_id }] =
+     deletedDocument;
 
     const cat = await client
      .query({

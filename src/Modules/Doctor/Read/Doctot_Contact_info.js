@@ -32,17 +32,13 @@ module.exports = route => app => {
        [id]
       )
     : await db.query(
-       `SELECT * FROM public."V_Doctor_Contact_Info" WHERE ${condition} AND ${clause} ${getLimitClause(
-        limit
-       )}`
+       `SELECT * FROM public."V_Doctor_Contact_Info" WHERE ${condition} AND ${clause} ${getLimitClause(limit)}`
       );
 
    res.json({
     success: true,
     no_of_records: rows.length,
-    msg: `${msg}Doctor contact information${
-     1 === rows.length ? ' was' : 's were'
-    } retrieved successfully.`,
+    msg: `${msg}Doctor contact information${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
     data: rows,
    });
   } catch ({ message }) {

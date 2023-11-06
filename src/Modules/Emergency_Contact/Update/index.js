@@ -6,8 +6,7 @@ module.exports = route => app => {
 
    const { id } = req.query;
 
-   if (!isPositiveInteger(id))
-    return res.status(404).json({ Success: false, msg: 'Emergency contact not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Emergency contact not found.' });
 
    let i = 1;
    const changed = [];

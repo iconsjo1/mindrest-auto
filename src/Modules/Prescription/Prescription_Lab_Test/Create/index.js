@@ -6,13 +6,10 @@ module.exports = route => app => {
 
    const { prescription_id, labsTestIds } = req.body;
 
-   if (!isPositiveInteger(prescription_id))
-    throw new Error('Prescription_id must be a positive integer');
+   if (!isPositiveInteger(prescription_id)) throw new Error('Prescription_id must be a positive integer');
 
    const labsTestIdsArray = isIterable(labsTestIds)
-    ? Array.from([...new Set(labsTestIds)].filter(isPositiveInteger), id => parseInt(id, 10)).sort(
-       (a, b) => b - a
-      )
+    ? Array.from([...new Set(labsTestIds)].filter(isPositiveInteger), id => parseInt(id, 10)).sort((a, b) => b - a)
     : [];
 
    if (0 === labsTestIdsArray.length)
@@ -49,9 +46,7 @@ module.exports = route => app => {
    res.json({
     success: true,
     no_of_records: insertedRows.length,
-    msg: `Prescription lab test${
-     1 === insertedRows.length ? ' was' : 's were'
-    } created successfully.`,
+    msg: `Prescription lab test${1 === insertedRows.length ? ' was' : 's were'} created successfully.`,
     data: insertedRows.sort((a, b) => parseInt(b.id) - parseInt(a.id)),
    });
   } catch ({ message }) {

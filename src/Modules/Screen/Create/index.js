@@ -9,10 +9,7 @@ module.exports = route => app => {
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
-   const { rows } = await db.query(
-    `INSERT INTO public."Screens"(${fields}) VALUES(${enc_values}) RETURNING *`,
-    values
-   );
+   const { rows } = await db.query(`INSERT INTO public."Screens"(${fields}) VALUES(${enc_values}) RETURNING *`, values);
    res.json({ success: true, msg: 'Screen was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });

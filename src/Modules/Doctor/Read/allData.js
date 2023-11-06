@@ -28,10 +28,7 @@ module.exports = route => app => {
    })(role_id);
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query(
-       `SELECT * FROM public."Doctors" WHERE 1=1 AND id=$1 AND ${condition} AND ${clause}`,
-       [id]
-      )
+    ? await db.query(`SELECT * FROM public."Doctors" WHERE 1=1 AND id=$1 AND ${condition} AND ${clause}`, [id])
     : await db.query(
        `SELECT * 
               FROM public."Doctors" 

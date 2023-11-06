@@ -5,15 +5,12 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id))
-    return res.status(404).json({ Success: false, msg: 'Doctor holiday not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor holiday not found.' });
 
    const changed = Object.keys(req.body).map((k, i) => `${k} = $${++i}`);
 
    const { rows } = await db.query(
-    `UPDATE public."Doctor_Holidays" SET ${changed} WHERE 1=1 AND id=$${
-     changed.length + 1
-    } RETURNING *`,
+    `UPDATE public."Doctor_Holidays" SET ${changed} WHERE 1=1 AND id=$${changed.length + 1} RETURNING *`,
     [...Object.values(req.body), id]
    );
 

@@ -7,9 +7,7 @@ module.exports = route => app => {
 
    const { rows } = isPositiveInteger(id)
     ? await db.query('SELECT * FROM public."Group_Screens" WHERE 1=1 AND id=$1', [id])
-    : await db.query(
-       `SELECT * FROM public."Group_Screens" ${orderBy('id')} ${getLimitClause(limit)}`
-      );
+    : await db.query(`SELECT * FROM public."Group_Screens" ${orderBy('id')} ${getLimitClause(limit)}`);
 
    res.json({
     success: true,

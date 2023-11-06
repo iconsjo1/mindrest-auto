@@ -27,26 +27,21 @@ module.exports = route => app => {
    })(role_id);
 
    const { rows } = isPositiveInteger(patient_id)
-    ? await db.query(
-       'SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND patient_id=$1 AND ' + clause,
-       [patient_id]
-      )
+    ? await db.query('SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND patient_id=$1 AND ' + clause, [
+       patient_id,
+      ])
     : isPositiveInteger(doctor_id)
     ? await db.query(
        `SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND doctor_id=$1 AND ${clause}
         ${getLimitClause(limit)}`,
        [doctor_id]
       )
-    : await db.query(
-       `SELECT * FROM public."V_Patient_Contact_Info" WHERE ${clause} ${getLimitClause(limit)}`
-      );
+    : await db.query(`SELECT * FROM public."V_Patient_Contact_Info" WHERE ${clause} ${getLimitClause(limit)}`);
 
    res.json({
     success: true,
     no_of_records: rows.length,
-    msg: `Patient contact information${
-     1 === rows.length ? ' was' : 's were'
-    } retrieved successfully.`,
+    msg: `Patient contact information${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
     data: rows,
    });
   } catch ({ message }) {

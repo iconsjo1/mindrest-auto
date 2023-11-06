@@ -34,10 +34,10 @@ module.exports = route => app => {
     expiresIn: '2d',
    });
 
-   const { rows } = await db.query(
-    'UPDATE public."Users" SET jwt_token = $1 WHERE id = $2 RETURNING ' + user_columns,
-    [token, user_id]
-   );
+   const { rows } = await db.query('UPDATE public."Users" SET jwt_token = $1 WHERE id = $2 RETURNING ' + user_columns, [
+    token,
+    user_id,
+   ]);
 
    res.json(
     0 < rows.length

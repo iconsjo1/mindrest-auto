@@ -5,8 +5,7 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id))
-    return res.status(404).json({ Success: false, msg: 'Service provider not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Service provider not found.' });
 
    const changed = [];
    let i = 1;

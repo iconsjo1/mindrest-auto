@@ -15,10 +15,7 @@ module.exports = route => app => {
    const { patient_id: id, limit } = req.query;
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query(
-       'SELECT * FROM public."Patient_Deposites" WHERE 1=1 AND patient_id=$1 AND ' + clause,
-       [id]
-      )
+    ? await db.query('SELECT * FROM public."Patient_Deposites" WHERE 1=1 AND patient_id=$1 AND ' + clause, [id])
     : await db.query(
        `SELECT * FROM public."Patient_Deposites"
         WHERE 1=1

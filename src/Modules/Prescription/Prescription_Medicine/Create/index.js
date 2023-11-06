@@ -7,9 +7,7 @@ module.exports = route => app => {
    const { prescription_id, medicine_list } = req.body;
 
    if (!isPositiveInteger(prescription_id))
-    return res
-     .status(400)
-     .json({ success: false, msg: 'prescription_id is not a positive integer.' });
+    return res.status(400).json({ success: false, msg: 'prescription_id is not a positive integer.' });
 
    if (
     !Array.isArray(medicine_list) ||
@@ -27,9 +25,7 @@ module.exports = route => app => {
       isSQLDate(m.end_date)
     )
    )
-    return res
-     .status(400)
-     .json({ success: false, msg: 'Medicine list is not submitted correctly.' });
+    return res.status(400).json({ success: false, msg: 'Medicine list is not submitted correctly.' });
 
    const fields = [
     'prescription_id',
@@ -69,9 +65,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: `Prescription medicine${
-     1 === insertedRows.length ? ' was' : 's were'
-    } created successfully.`,
+    msg: `Prescription medicine${1 === insertedRows.length ? ' was' : 's were'} created successfully.`,
     data: insertedRows.sort((a, b) => parseInt(b.id) - parseInt(a.id)),
    });
   } catch ({ message }) {

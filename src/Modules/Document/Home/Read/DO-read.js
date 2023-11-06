@@ -33,9 +33,7 @@ module.exports = route => app => {
 
    const { rows: dbdocument } = await db.query(
     `SELECT 
-        CONCAT(document_path, '${
-         '1=1' !== resizeCond ? '-' + required_size : ''
-        }.', document_extension) "Key",
+        CONCAT(document_path, '${'1=1' !== resizeCond ? '-' + required_size : ''}.', document_extension) "Key",
         document_mimetype mimetype
     FROM public."Documents"
    WHERE 1=1

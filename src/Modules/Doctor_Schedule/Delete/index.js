@@ -12,8 +12,7 @@ module.exports = route => app => {
    const clause = ROLES.DOCTOR === role_id ? 'doctor_id= ' + doctor_id : '1=1';
 
    const { id } = req.query;
-   if (!isPositiveInteger(id))
-    return res.status(404).json({ success: false, msg: 'Doctor schedule not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'Doctor schedule not found.' });
 
    const { rows } = await db.query(
     `DELETE FROM public."Doctor_Schedules" WHERE 1=1 AND ${clause} AND id = $1 RETURNING *`,

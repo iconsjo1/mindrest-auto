@@ -6,10 +6,9 @@ module.exports = route => app => {
    const { year } = req.query;
 
    const { rows } = isPositiveInteger(year)
-    ? await db.query(
-       'SELECT * FROM public."Holidays" WHERE 1=1 AND EXTRACT(YEAR FROM DATE)=$1' + orderBy('date'),
-       [year]
-      )
+    ? await db.query('SELECT * FROM public."Holidays" WHERE 1=1 AND EXTRACT(YEAR FROM DATE)=$1' + orderBy('date'), [
+       year,
+      ])
     : await db.query('SELECT * FROM public."Holidays" ' + orderBy('date'));
 
    res.json({

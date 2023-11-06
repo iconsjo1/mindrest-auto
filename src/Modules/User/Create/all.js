@@ -5,14 +5,10 @@ module.exports = route => app => {
    const { db, isEString } = res.locals.utils;
 
    const { email } = req.body;
-   if (!isEString(email))
-    return res.status(400).json({ success: false, msg: 'email can only be a string or empty' });
+   if (!isEString(email)) return res.status(400).json({ success: false, msg: 'email can only be a string or empty' });
 
    if (0 < email.length) {
-    const { rows: users } = await db.query(
-     'SELECT id FROM public."Users" WHERE 1=1 AND email = $1',
-     [email]
-    );
+    const { rows: users } = await db.query('SELECT id FROM public."Users" WHERE 1=1 AND email = $1', [email]);
 
     if (0 === users.length) {
      // Email is unique do insert
@@ -23,10 +19,7 @@ module.exports = route => app => {
 
      for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
-     const { rows } = await db.query(
-      `INSERT INTO public."Users"(${fields}) VALUES(${enc_values}) RETURNING *`,
-      values
-     );
+     const { rows } = await db.query(`INSERT INTO public."Users"(${fields}) VALUES(${enc_values}) RETURNING *`, values);
 
      return res.json({ success: true, msg: 'User was created successfully.', data: rows });
     }

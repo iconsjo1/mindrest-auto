@@ -5,13 +5,9 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { bill_id: id } = req.query;
-   if (!isPositiveInteger(id))
-    return res.status(404).json({ success: false, msg: 'Bill service not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'Bill service not found.' });
 
-   const { rows } = await db.query(
-    'DELETE FROM public."Bill_Services" WHERE 1=1 AND bill_id = $1 RETURNING *',
-    [id]
-   );
+   const { rows } = await db.query('DELETE FROM public."Bill_Services" WHERE 1=1 AND bill_id = $1 RETURNING *', [id]);
 
    res.json({
     Success: true,

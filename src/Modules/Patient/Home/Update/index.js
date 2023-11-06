@@ -13,8 +13,7 @@ module.exports = route => app => {
    const clause = ROLES.DOCTOR == role_id ? 'doctor_id=' + doctor_id : '1=1';
 
    const { id } = req.query;
-   if (!isPositiveInteger(id))
-    return res.status(404).json({ Success: false, msg: 'Patient was not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Patient was not found.' });
 
    const changed = [];
    let i = 1;

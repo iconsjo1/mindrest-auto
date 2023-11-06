@@ -10,11 +10,7 @@ const flatData = (req, _, next) => {
  if (/new-(patient|doctor)$/.test(req._parsedUrl.path)) next();
  else {
   for (let prop in req.body) {
-   if (
-    'object' === typeof req.body[prop] &&
-    null != req.body[prop] &&
-    !Array.isArray(req.body[prop])
-   )
+   if ('object' === typeof req.body[prop] && null != req.body[prop] && !Array.isArray(req.body[prop]))
     req.body = { ...req.body, [prop]: req.body[prop].value };
   }
   next();
@@ -67,9 +63,6 @@ app.listen(PORT, () => {
  console.table(
   Object.keys(routes)
    .sort((a, b) => b - a)
-   .reduce(
-    (acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k] } }),
-    {}
-   )
+   .reduce((acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k] } }), {})
  );
 });

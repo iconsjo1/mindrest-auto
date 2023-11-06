@@ -29,9 +29,7 @@ module.exports = route => app => {
    const { rows } = isPositiveInteger(id)
     ? await db.query(`SELECT * FROM public."Prescriptions" WHERE 1=1 AND ${clause} AND id=$1`, [id])
     : await db.query(
-       `SELECT * FROM public."Prescriptions" WHERE 1=1 AND ${clause}   ${orderBy(
-        'id'
-       )} ${getLimitClause(limit)}`
+       `SELECT * FROM public."Prescriptions" WHERE 1=1 AND ${clause}   ${orderBy('id')} ${getLimitClause(limit)}`
       );
 
    res.json({

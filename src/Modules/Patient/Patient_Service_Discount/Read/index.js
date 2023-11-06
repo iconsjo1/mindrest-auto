@@ -21,16 +21,11 @@ module.exports = route => app => {
    const { patient_id: id, limit } = req.query;
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query(
-       'SELECT * FROM public."V_Patient_Service_Discounts" WHERE 1=1 AND patient_id=$1 AND ' +
-        clause,
-       [id]
-      )
+    ? await db.query('SELECT * FROM public."V_Patient_Service_Discounts" WHERE 1=1 AND patient_id=$1 AND ' + clause, [
+       id,
+      ])
     : await db.query(
-       'SELECT * FROM public."V_Patient_Service_Discounts" WHERE 1=1 AND ' +
-        clause +
-        ' ' +
-        getLimitClause(limit)
+       'SELECT * FROM public."V_Patient_Service_Discounts" WHERE 1=1 AND ' + clause + ' ' + getLimitClause(limit)
       );
 
    res.json({

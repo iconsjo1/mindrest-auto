@@ -39,9 +39,7 @@ module.exports = route => app => {
        [doctor_id]
       )
     : await db.query(
-       `SELECT * FROM public."V_Doctor_Patients" WHERE ${condition} AND ${clause} ${getLimitClause(
-        limit
-       )}`
+       `SELECT * FROM public."V_Doctor_Patients" WHERE ${condition} AND ${clause} ${getLimitClause(limit)}`
       );
 
    res.json({

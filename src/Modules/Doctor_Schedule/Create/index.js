@@ -16,8 +16,7 @@ module.exports = route => app => {
      tt =>
       isValidObject(tt) &&
       isPositiveInteger(tt.week_day_id) &&
-      (null == tt.appointment_duration_in_minutes ||
-       isPositiveInteger(tt.appointment_duration_in_minutes)) &&
+      (null == tt.appointment_duration_in_minutes || isPositiveInteger(tt.appointment_duration_in_minutes)) &&
       Array.isArray(tt.times) &&
       0 < tt.times.length &&
       tt.times.every(
@@ -25,8 +24,7 @@ module.exports = route => app => {
         isValidObject(ts) &&
         isMilitarytime(ts.schedule_start_time) &&
         isMilitarytime(ts.schedule_end_time) &&
-        Number(ts.schedule_start_time.replace(':', '')) <=
-         Number(ts.schedule_end_time.replace(':', ''))
+        Number(ts.schedule_start_time.replace(':', '')) <= Number(ts.schedule_end_time.replace(':', ''))
       )
     )
    )

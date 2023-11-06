@@ -16,9 +16,7 @@ module.exports = route => app => {
      sd => isValidObject(sd) && isPositiveInteger(sd.service_id) && isPositiveNumber(sd.discount)
     )
    )
-    return res
-     .status(400)
-     .json({ success: false, msg: 'Service discount list is not submitted correctly.' });
+    return res.status(400).json({ success: false, msg: 'Service discount list is not submitted correctly.' });
 
    const fields = ['patient_id', 'service_id', 'discount'];
    const values = [patient_id];
@@ -39,9 +37,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: `Patient service discount${
-     1 === insertedRows.length ? ' was' : 's were'
-    } created successfully.`,
+    msg: `Patient service discount${1 === insertedRows.length ? ' was' : 's were'} created successfully.`,
     data: insertedRows.sort((a, b) => parseInt(b.id) - parseInt(a.id)),
    });
   } catch ({ message }) {

@@ -4,8 +4,7 @@ module.exports = route => app => {
   const { db, isPositiveInteger } = res.locals.utils;
   try {
    const { id } = req.query;
-   if (!isPositiveInteger(id))
-    return res.status(404).json({ Success: false, msg: 'Document category was not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Document category was not found.' });
 
    const changed = [];
    let i = 1;

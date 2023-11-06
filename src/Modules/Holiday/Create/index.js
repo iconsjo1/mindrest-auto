@@ -13,9 +13,7 @@ module.exports = route => app => {
     : [];
 
    if (0 === holidaysArray.length)
-    return res
-     .status(400)
-     .json({ success: false, msg: 'no holidays were successfully submitted.' });
+    return res.status(400).json({ success: false, msg: 'no holidays were successfully submitted.' });
 
    const values = [];
    const enc_values = [];

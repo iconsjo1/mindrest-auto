@@ -5,8 +5,7 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
    const { id } = req.query;
 
-   if (!isPositiveInteger(id))
-    return res.repl(404).json({ Success: false, msg: 'Marital status not found.' });
+   if (!isPositiveInteger(id)) return res.repl(404).json({ Success: false, msg: 'Marital status not found.' });
 
    let i = 1;
    const changed = [];

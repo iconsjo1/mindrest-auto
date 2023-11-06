@@ -23,17 +23,8 @@ module.exports = route => app => {
 
    const Date = isSQLDate(from) && isSQLDate(to) ? `AND date >='${from}' AND  date <='${to}'` : '';
    const { rows } = isPositiveInteger(id)
-    ? await db.query(
-       'SELECT * FROM public."V_Payments" WHERE 1=1 AND id=$1  AND ' + clause + ' ' + Date,
-       [id]
-      )
-    : await db.query(
-       'SELECT * FROM public."V_Payments" WHERE 1=1 AND ' +
-        clause +
-        ' ' +
-        Date +
-        getLimitClause(limit)
-      );
+    ? await db.query('SELECT * FROM public."V_Payments" WHERE 1=1 AND id=$1  AND ' + clause + ' ' + Date, [id])
+    : await db.query('SELECT * FROM public."V_Payments" WHERE 1=1 AND ' + clause + ' ' + Date + getLimitClause(limit));
 
    res.json({
     success: true,

@@ -10,9 +10,7 @@ module.exports = route => app => {
     return res.status(400).json({ success: false, msg: 'doctor_id must be a positive integer.' });
 
    if (!Array.isArray(holidays) || 0 === holidays.length || !holidays.every(isSQLDate))
-    return res
-     .status(400)
-     .json({ success: false, msg: 'holidays array was not submitted correctly.' });
+    return res.status(400).json({ success: false, msg: 'holidays array was not submitted correctly.' });
 
    const fields = ['doctor_id', 'date'];
    const values = [doctor_id];

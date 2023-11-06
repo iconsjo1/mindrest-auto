@@ -5,8 +5,7 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { idnumber: idNumber } = req.query;
-   if (!isPositiveInteger(idNumber))
-    return res.json({ success: false, msg: 'ID-NUMBER not a positive integer.' });
+   if (!isPositiveInteger(idNumber)) return res.json({ success: false, msg: 'ID-NUMBER not a positive integer.' });
 
    const hasMatch = await db
     .query({

@@ -23,8 +23,7 @@ module.exports = route => app => {
    })(role_id);
 
    const { id } = req.query;
-   if (!isPositiveInteger(id))
-    return res.status(404).json({ Success: false, msg: 'Doctor schedule not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor schedule not found.' });
 
    let i = 1;
    const changed = [];

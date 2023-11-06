@@ -19,8 +19,7 @@ module.exports = [
      rowMode,
     })
     .then(({ rows }) => {
-     if (0 === rows.length)
-      return res.status(401).json({ success: false, message: 'Token was not found.' });
+     if (0 === rows.length) return res.status(401).json({ success: false, message: 'Token was not found.' });
 
      res.locals.token = token;
      res.locals.user_id = parseInt(rows[0][0]);
@@ -61,9 +60,7 @@ module.exports = [
    })
    .then(({ rows }) => {
     if (0 === rows.length)
-     return res
-      .status(401)
-      .json({ success: false, message: 'You are not authorized to perform this action.' });
+     return res.status(401).json({ success: false, message: 'You are not authorized to perform this action.' });
 
     next();
    });
