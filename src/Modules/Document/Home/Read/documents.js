@@ -10,10 +10,12 @@ module.exports = route => app => {
     ? Array.from(new Set(ids.split('|').filter(isPositiveInteger)), id => parseInt(id, 10))
     : [];
 
+   const orderLimit = `${orderBy('id')} ${getLimitClause(limit)}`;
+
    const { rows } =
     0 < idsArray.length
-     ? await db.query('SELECT * FROM public."Documents" WHERE 1=1 AND id = ANY($1)', [idsArray])
-     : await db.query(`SELECT * FROM public."Documents" ${orderBy('id')} ${getLimitClause(limit)}`);
+     ? await db.query('SELECT * FROM public."Documents" WHERE 1=1 AND id = ANY($1) ' + orderLimit, [idsArray])
+     : await db.query('SELECT * FROM public."Documents" ' + orderLimit);
 
    res.json({
     success: true,

@@ -23,7 +23,13 @@ module.exports = route => app => {
    const required_sizelc = required_size?.toLowerCase();
 
    const resizeCond = ['small', 'medium', 'full'].includes(required_sizelc)
-    ? "true = is_resizable AND document_mimetype ilike 'ima%'"
+    ? `document_mimetype ilike 'ima%'
+       AND EXISTS(
+        SELECT 1
+        FROM public."Document_Categories" dc
+        WHERE d.document_category_id = dc.id
+        AND true = is_resizable
+       )`
     : '1=1';
 
    const s3 = new AWS.S3({
@@ -35,7 +41,7 @@ module.exports = route => app => {
     `SELECT 
         CONCAT(document_path, '${'1=1' !== resizeCond ? '-' + required_size : ''}.', document_extension) "Key",
         document_mimetype mimetype
-    FROM public."Documents"
+    FROM public."Documents" d
    WHERE 1=1
     AND id = $1
     AND ${resizeCond}`.replace(/\s+/g, ' '),
@@ -54,7 +60,7 @@ module.exports = route => app => {
    });
    res.end(Body, 'binary');
   } catch ({ message }) {
-   res.json({ success: false, message });
+   res.json({ success: false, message: message ?? 'File may not exists.' });
   }
  });
 };

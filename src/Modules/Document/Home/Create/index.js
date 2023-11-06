@@ -19,16 +19,15 @@ module.exports = route => app => {
   try {
    const {
     locals: {
-     utils: { db, isString, isPositiveInteger },
+     utils: { db, isString, isPositiveInteger, isBool },
      do: { bucket, folder, credentials },
     },
    } = res;
 
    const {
     file,
-    body: { document_category_id, is_resizable, document_filename: name, description },
+    body: { document_category_id, document_filename: name, description },
    } = req;
-   const canResize = '1' === is_resizable;
 
    if (!isPositiveInteger(document_category_id)) throw Error('category_id must be a positive integer.');
 
@@ -45,33 +44,32 @@ module.exports = route => app => {
     ...credentials,
     s3BucketEndpoint: true,
    });
+
    client = await db.connect();
 
-   const cat = await client
+   const is_resizable = await client
     .query({
-     text: 'SELECT category_name FROM public."Document_Categories" WHERE id=$1',
+     text: 'SELECT is_resizable FROM public."Document_Categories" WHERE id=$1',
      values: [document_category_id],
      rowMode,
     })
-    .then(({ rows }) => rows[0][0]);
+    .then(({ rows }) => (0 < rows.length ? rows[0][0] : null));
 
-   if (!isString(cat))
+   if (!isBool(is_resizable))
     throw Error('Category id={' + document_category_id + '} is going to violate foreign key constraint.');
 
    const document = {
     document_filename: name,
     document_mimetype: mimetype,
-    document_extension: ext.substring(1), // Omits first char '.'
-    description: description,
+    document_extension: ext.substring(1), // Omits the first char '.'
+    description,
     document_category_id,
-    is_resizable: canResize,
    };
 
    const docFields = Object.keys(document);
    const doc_encValues = docFields.map((_, i) => `$${i + 1}`);
 
-   await client.query('BEGIN;SAVEPOINT ' + SAVEPOINT);
-   transactionStarted = true;
+   await client.query('BEGIN;SAVEPOINT ' + SAVEPOINT).then(_ => (transactionStarted = true));
 
    const document_id = await client
     .query({
@@ -85,9 +83,12 @@ module.exports = route => app => {
 
    document.document_path = [folder, TODAY.getFullYear(), TODAY.getMonth() + 1, TODAY.getDate(), document_id].join('/');
 
-   let rows = [];
+   const { rows } = await client.query('UPDATE public."Documents" SET document_path=$1 WHERE id=$2 RETURNING *', [
+    document.document_path,
+    document_id,
+   ]);
 
-   if (true === canResize && /^ima/.test(mimetype) && 'Picture' === cat) {
+   if (true === is_resizable && /^ima/.test(mimetype)) {
     await Promise.all([
      s3
       .putObject({
@@ -111,12 +112,7 @@ module.exports = route => app => {
       })
       .promise(),
     ]);
-    const { rows: uploaded_document } = await client.query(
-     'UPDATE public."Documents" SET document_path=$1 WHERE id=$2 RETURNING *',
-     [document.document_path, document_id]
-    );
-    rows = uploaded_document;
-   } else {
+   } else
     await s3
      .putObject({
       Body: file.buffer,
@@ -125,15 +121,8 @@ module.exports = route => app => {
      })
      .promise();
 
-    const { rows: uploaded_document } = await client.query(
-     'UPDATE public."Documents" SET document_path=$1,is_resizable = false WHERE id=$2 RETURNING *',
-     [document.document_path, document_id]
-    );
-    rows = uploaded_document;
-   }
+   await client.query('COMMIT;').then(_ => (transactionStarted = false));
 
-   await client.query('COMMIT;');
-   transactionStarted = false;
    client.release();
 
    res.json({ success: true, msg: 'File was uploaded successfully.', data: rows });

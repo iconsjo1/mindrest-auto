@@ -26,24 +26,29 @@ module.exports = route => app => {
 
    await client.query('BEGIN;SAVEPOINT ' + SAVEPOINT).then(_ => (transactionStarted = true));
 
-   const deletedDocument = await client
-    .query('DELETE FROM public."Documents" WHERE 1=1 AND id = $1 RETURNING *', [id])
-    .then(({ rows }) => rows);
+   const { rows: deletedDocument } = await client.query(
+    `DELETE FROM public."Documents"
+            WHERE 1=1 AND id = $1
+            RETURNING document_path,
+                      document_extension,
+                      document_mimetype,
+                      document_category_id`.replace(/\s+/g, ' '),
+    [id]
+   );
 
    if (0 < deletedDocument.length) {
-    const [{ is_resizable, document_path, document_extension, document_mimetype, document_category_id }] =
-     deletedDocument;
+    const [{ document_path, document_extension, document_mimetype, document_category_id }] = deletedDocument;
 
-    const cat = await client
+    const is_resizable = await client
      .query({
-      text: 'SELECT category_name FROM public."Document_Categories" WHERE id=$1',
+      text: 'SELECT is_resizable FROM public."Document_Categories" WHERE id=$1',
       values: [document_category_id],
       rowMode: 'array',
      })
      .then(({ rows }) => rows[0][0]);
 
     try {
-     if ('Picture' === cat && true === is_resizable && /^ima/.test(document_mimetype)) {
+     if (true === is_resizable && /^ima/.test(document_mimetype)) {
       await Promise.all([
        s3
         .deleteObject({

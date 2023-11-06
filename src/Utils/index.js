@@ -2,6 +2,7 @@ const EMPTY_ALLOWED = true;
 const NO_EMPTY_ALLOWED = false;
 
 module.exports = {
+ isBool: val => require('./booleanCheck')(val),
  isPositiveInteger: val => require('./positiveIntegerCheck')(val),
  getLimitClause: limit => require('./getLimitClause')(limit),
  isValidObject: val => require('./objectCheck')(val),
