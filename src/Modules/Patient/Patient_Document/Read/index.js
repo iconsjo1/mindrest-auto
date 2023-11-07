@@ -4,26 +4,23 @@ module.exports = route => app => {
   try {
    const {
     locals: {
-     utils: { db, isPositiveInteger, isSQLDate, getLimitClause, ROLES },
+     utils: { db, isPositiveInteger, getLimitClause, ROLES },
      role_id,
-     patient_id,
+     patient_id: dbpatient_id,
     },
    } = res;
 
-   const clause = (r => {
-    switch (r) {
-     case ROLES.PATIENT:
-      return 'patient_id= ' + patient_id;
-     default:
-      return '1=1';
-    }
-   })(role_id);
+   const patientClause = ROLES.PATIENT === role_id ? 'patient_id= ' + dbpatient_id : '1=1';
 
-   const { patient_id: id, limit = -1 } = req.query;
+   const { patient_id, limit = -1 } = req.query;
 
-   const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."V_Patient_Documents" WHERE 1=1 AND patient_id=$1 AND ' + clause, [id])
-    : await db.query('SELECT * FROM public."V_Patient_Documents" WHERE 1=1 AND ' + clause + getLimitClause(limit));
+   const { rows } = isPositiveInteger(patient_id)
+    ? await db.query('SELECT * FROM public."V_Patient_Documents" WHERE 1=1 AND patient_id=$1 AND ' + patientClause, [
+       patient_id,
+      ])
+    : await db.query(
+       'SELECT * FROM public."V_Patient_Documents" WHERE 1=1 AND ' + patientClause + getLimitClause(limit)
+      );
 
    res.json({
     success: true,
