@@ -1,5 +1,6 @@
 module.exports = app => {
  require('./User')(app);
+
  app.use(require('../Utils/Auth'));
  [
   'Appointment',
@@ -28,6 +29,8 @@ module.exports = app => {
   'Lab',
   'Marital_Status',
   'Medicine',
+  'Package_Service',
+  'Package',
   'Patient',
   'Personnel_Title',
   'Doctor_Timeout',
