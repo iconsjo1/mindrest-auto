@@ -39,7 +39,7 @@ module.exports = route => app => {
    }
 
    const { rows: insertedRows } = await db.query(
-    `INSERT INTO public."Prescription_Tests"(${fields}) VALUES${rows} RETURNING *`,
+    `INSERT INTO public."Prescription_Lab_Tests"(${fields}) VALUES${rows} RETURNING *`,
     values
    );
 
