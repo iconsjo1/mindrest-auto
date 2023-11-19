@@ -29,8 +29,6 @@ module.exports = app => {
   'Lab',
   'Marital_Status',
   'Medicine',
-  'Package_Service',
-  'Package',
   'Patient',
   'Personnel_Title',
   'Doctor_Timeout',
