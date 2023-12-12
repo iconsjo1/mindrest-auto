@@ -7,7 +7,7 @@ module.exports = route => app => {
   try {
    const dispData = {};
 
-   const { db, isValidObject, isPositiveInteger, isPositiveNumber } = res.locals.utils;
+   const { db, isValidObject, isBool, isPositiveInteger, isPositiveNumber } = res.locals.utils;
    const { user, contact, patient, emergency_contact, service_discounts = [] } = req.body;
    if (
     !(
@@ -18,7 +18,11 @@ module.exports = route => app => {
      (Array.isArray(service_discounts) &&
       (0 === service_discounts.length ||
        service_discounts.every(
-        sd => isValidObject(sd) && isPositiveInteger(sd.service_id) && isPositiveNumber(sd.discount)
+        sd =>
+         isValidObject(sd) &&
+         isPositiveInteger(sd.service_id) &&
+         isPositiveNumber(sd.discount) &&
+         isBool(sd.is_percentage)
        )))
     )
    )
@@ -51,7 +55,7 @@ module.exports = route => app => {
 
    if (0 === service_discounts.length) dispData.service_discounts = service_discounts;
    else {
-    const fields = ['patient_id', 'service_id', 'discount'];
+    const fields = ['patient_id', 'service_id', 'discount', 'is_percentage'];
     const values = [patient_id];
     const enc_values = ['$1'];
 
@@ -59,8 +63,8 @@ module.exports = route => app => {
     let currentIndex = enc_values.length;
 
     for (const sd of service_discounts) {
-     rows.push(`(${enc_values},${Array.from({ length: 2 }, _ => `$${++currentIndex}`)})`);
-     values.push(sd.service_id, sd.discount);
+     rows.push(`(${enc_values},${Array.from({ length: 3 }, _ => `$${++currentIndex}`)})`);
+     values.push(sd.service_id, sd.discount, sd.is_percentage);
     }
 
     dispData.service_discounts = await client
