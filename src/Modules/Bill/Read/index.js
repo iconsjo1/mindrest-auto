@@ -2,12 +2,12 @@ module.exports = route => app => {
  // Read Bill[s]
  app.get(route, async (req, res) => {
   try {
-   const { db, isPositiveInteger, getLimitClause, orderBy } = res.locals.utils;
+   const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
    const { id, limit } = req.query;
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."Bills" WHERE 1=1 AND id=$1', [id])
-    : await db.query(`SELECT * FROM public."Bills" ${orderBy('id')} ${getLimitClause(limit)}`);
+    ? await db.query('SELECT * FROM public."V_Bills" WHERE 1=1 AND id=$1', [id])
+    : await db.query(`SELECT * FROM public."V_Bills" ${getLimitClause(limit)}`);
 
    res.json({
     success: true,
