@@ -31,12 +31,12 @@ module.exports = route => app => {
        patient_id,
       ])
     : isPositiveInteger(doctor_id)
-    ? await db.query(
-       `SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND doctor_id=$1 AND ${clause}
+      ? await db.query(
+         `SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND doctor_id=$1 AND ${clause}
         ${getLimitClause(limit)}`,
-       [doctor_id]
-      )
-    : await db.query(`SELECT * FROM public."V_Patient_Contact_Info" WHERE ${clause} ${getLimitClause(limit)}`);
+         [doctor_id]
+        )
+      : await db.query(`SELECT * FROM public."V_Patient_Contact_Info" WHERE ${clause} ${getLimitClause(limit)}`);
 
    res.json({
     success: true,
