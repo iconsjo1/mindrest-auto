@@ -46,23 +46,24 @@ app.listen(PORT, () => {
 
  console.log('Number of routes: %i', routes.length);
 
- routes = routes.reduce((acc, { path }) => {
-  acc[path] = Array.from(
-   new Set(
-    routes
-     .reduce((acc, { method, path: rf_path }) => {
+ routes = routes.reduce(
+  (acc, { path }) => ({
+   ...acc,
+   [path]: Array.from(
+    new Set(
+     routes.reduce((acc, { method, path: rf_path }) => {
       if (rf_path === path) acc.push(method);
       return acc;
      }, [])
-     .sort()
-   )
-  ).join(', ');
-  return acc;
- }, {});
+    )
+   ),
+  }),
+  {}
+ );
 
  console.table(
   Object.keys(routes)
    .sort((a, b) => b - a)
-   .reduce((acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k] } }), {})
+   .reduce((acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k].sort().join(', ') } }), {})
  );
 });

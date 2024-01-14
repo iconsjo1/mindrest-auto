@@ -6,7 +6,7 @@ pg.types.setTypeParser(1186, stringValue => stringValue); //1114 for interval
 
 module.exports = new pg.Pool({
  user: 'mclinic',
- password: '#6c9^s7QtEKdmQ-s',
+ password: '^bC7fUe^yS3O*v@P',
  host: 'icloudjo.com',
  database: 'mind-clinic',
  port: 5432,

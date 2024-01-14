@@ -15,20 +15,14 @@ module.exports = route => app => {
    if (!(isString(email) && isString(password)))
     return res.status(400).json({ success: false, msg: 'Credentials must be strings.' });
 
-   const {
-    rows: [signedIn],
-   } = await db.query(
+   const { rows: signedIn } = await db.query(
     `SELECT ${user_columns} FROM public."Users" WHERE 1=1 AND LOWER(email) = LOWER($1) AND password = $2`,
     [email, password]
    );
 
-   const { id: user_id, user_name } = signedIn;
+   if (0 === signedIn.length) throw Error('User email={' + email + '} WITH password does not exist.');
 
-   if (!isPositiveInteger(user_id))
-    return res.status(404).json({
-     success: false,
-     msg: 'User email={' + email + '} WITH password does not exist.',
-    });
+   const [{ id: user_id, user_name }] = signedIn;
 
    const token = jwt.sign({ user_id, user_name }, 'jwt-MIND-2023', {
     expiresIn: '2d',
