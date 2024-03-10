@@ -1,5 +1,5 @@
 module.exports = app => {
- require('./public/User')(app);
+ require('./User')(app);
 
  app.use(require('../Utils/Auth'));
  [
@@ -43,5 +43,5 @@ module.exports = app => {
   'Visit',
   'Vital_Sign',
   'Report',
- ].forEach(r => require('./public/' + r)(app));
+ ].forEach(r => require('./' + r)(app));
 };

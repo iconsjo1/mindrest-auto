@@ -5,7 +5,7 @@ const db = require('./pool');
 const PORT = 5040;
 
 // middleware
-app.use(cors());
+app.use([cors(), require('./Utils/Route_Logger')]);
 const flatData = (req, _, next) => {
  if (/new-(patient|doctor)$/.test(req._parsedUrl.path)) next();
  else {
