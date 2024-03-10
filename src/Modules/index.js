@@ -34,14 +34,15 @@ module.exports = app => {
   'Doctor_Timeout',
   'Prescription',
   'Relationship',
+  'Reservation',
+  'Report',
   'Role',
   'Role_Screen',
   'Screen',
-  'Session',
   'Service',
+  'Session',
   'Vendor',
   'Visit',
   'Vital_Sign',
-  'Report',
  ].forEach(r => require('./public/' + r)(app));
 };
