@@ -16,7 +16,7 @@ module.exports = route => app => {
    );
    res.json({
     success: true,
-    msg: 'Patient document created successfully.',
+    msg: 'Patient document was created successfully.',
     data: rows,
    });
   } catch ({ message }) {

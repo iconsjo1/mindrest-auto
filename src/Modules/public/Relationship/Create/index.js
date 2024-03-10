@@ -17,7 +17,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: 'Relationship created successfully.',
+    msg: 'Relationship was created successfully.',
     data: rows,
    });
   } catch ({ message }) {

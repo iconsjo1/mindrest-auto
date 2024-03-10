@@ -23,7 +23,7 @@ module.exports = route => app => {
    })(role_id);
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor schedule not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor schedule was not found.' });
 
    let i = 1;
    const changed = [];
@@ -33,7 +33,7 @@ module.exports = route => app => {
     `UPDATE public."Doctor_Schedules" SET ${changed} WHERE 1=1 AND ${clause} AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
-   res.json({ success: true, msg: 'Doctor schedule updated successfully.', data: rows });
+   res.json({ success: true, msg: 'Doctor schedule was updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

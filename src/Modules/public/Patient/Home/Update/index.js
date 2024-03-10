@@ -25,7 +25,7 @@ module.exports = route => app => {
    );
    res.json({
     success: true,
-    msg: 'Patient updated successfully.',
+    msg: 'Patient was updated successfully.',
     data: rows,
    });
   } catch ({ message }) {

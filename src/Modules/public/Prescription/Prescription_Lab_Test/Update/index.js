@@ -5,7 +5,8 @@ module.exports = route => app => {
    const { id } = req.query;
    const { db, isPositiveInteger } = res.locals.utils;
 
-   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Prescription lab test not found.' });
+   if (!isPositiveInteger(id))
+    return res.status(404).json({ Success: false, msg: 'Prescription lab test was not found.' });
 
    let i = 1;
    const changed = [];
@@ -18,7 +19,7 @@ module.exports = route => app => {
    );
    res.json({
     success: true,
-    msg: 'Prescription lab test updated successfully.',
+    msg: 'Prescription lab test was updated successfully.',
     data: rows,
    });
   } catch ({ message }) {

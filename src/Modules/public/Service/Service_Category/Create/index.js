@@ -16,7 +16,7 @@ module.exports = route => app => {
    );
    res.json({
     success: true,
-    msg: 'Service category created successfully.',
+    msg: 'Service category was created successfully.',
     data: rows,
    });
   } catch ({ message }) {

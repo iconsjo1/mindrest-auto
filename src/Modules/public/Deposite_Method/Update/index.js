@@ -5,7 +5,7 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Deposite method not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Deposite method was not found.' });
 
    let i = 1;
    const changed = [];
@@ -17,7 +17,7 @@ module.exports = route => app => {
    );
    res.json({
     success: true,
-    msg: 'Deposite method updated successfully.',
+    msg: 'Deposite method was updated successfully.',
     data: rows,
    });
   } catch ({ message }) {

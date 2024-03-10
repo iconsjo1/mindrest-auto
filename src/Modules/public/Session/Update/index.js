@@ -5,7 +5,7 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Session not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Session was not found.' });
 
    const changed = [];
    let i = 1;
@@ -16,7 +16,7 @@ module.exports = route => app => {
     id,
    ]);
 
-   res.json({ success: true, msg: 'Session updated successfully.', data: rows });
+   res.json({ success: true, msg: 'Session was updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

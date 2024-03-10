@@ -51,7 +51,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: `Bill service${1 === insertedRows.length ? ' was' : 's were'} created successfully.`,
+    msg: `Bill service${1 === insertedRows.length ? ' was' : 's were'} was created successfully.`,
     data: insertedRows.sort((a, b) => Number(b.id) - Number(a.id)),
    });
   } catch ({ message }) {

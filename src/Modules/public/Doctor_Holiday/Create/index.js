@@ -34,7 +34,7 @@ module.exports = route => app => {
    res.json({
     success: true,
     no_of_records: insertedRows.length,
-    msg: `Doctor Holiday${1 === insertedRows.length ? ' was' : 's were'} created successfully${
+    msg: `Doctor Holiday${1 === insertedRows.length ? ' was' : 's were'} was created successfully${
      0 === insertedRows.length ? ' [duplicate]' : ''
     }.`,
     data: insertedRows.sort((a, b) => Number(b.id) - Number(a.id)),

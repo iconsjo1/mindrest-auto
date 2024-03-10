@@ -15,7 +15,7 @@ module.exports = route => app => {
     values
    );
 
-   res.json({ success: true, msg: 'Session created successfully.', data: rows });
+   res.json({ success: true, msg: 'Session was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

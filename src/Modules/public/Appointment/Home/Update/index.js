@@ -12,7 +12,7 @@ module.exports = route => app => {
    const clause = ROLES.DOCTOR === role_id ? 'doctor_id=' + doctor_id : '1=1';
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Appointment not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Appointment was not found.' });
 
    let i = 1;
    const changed = [];
@@ -24,7 +24,7 @@ module.exports = route => app => {
    );
    res.json({
     success: true,
-    msg: 'Appointment updated successfully.',
+    msg: 'Appointment was updated successfully.',
     data: rows,
    });
   } catch ({ message }) {

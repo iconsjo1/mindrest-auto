@@ -6,7 +6,7 @@ module.exports = route => app => {
 
    const { patient_id: id } = req.query;
    if (!isPositiveInteger(id))
-    return res.status(404).json({ success: false, msg: 'Patient service discount not found.' });
+    return res.status(404).json({ success: false, msg: 'Patient service discount was not found.' });
 
    const { rows } = await db.query(
     'DELETE FROM public."Patient_Service_Discounts" WHERE 1=1 AND patient_id = $1 RETURNING *',
@@ -15,7 +15,7 @@ module.exports = route => app => {
 
    res.json({
     Success: true,
-    msg: `Patient service discount${1 === rows.length ? ' was' : 's were'} deleted successfully.`,
+    msg: `Patient service discount${1 === rows.length ? ' was' : 's were'} was deleted successfully.`,
     data: rows,
    });
   } catch ({ message }) {

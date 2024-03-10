@@ -5,7 +5,7 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
    const { id } = req.query;
 
-   if (!isPositiveInteger(id)) return res.repl(404).json({ Success: false, msg: 'Marital status not found.' });
+   if (!isPositiveInteger(id)) return res.repl(404).json({ Success: false, msg: 'Marital status was not found.' });
 
    let i = 1;
    const changed = [];
@@ -18,7 +18,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: 'Marital status updated successfully.',
+    msg: 'Marital status was updated successfully.',
     data: rows,
    });
   } catch ({ message }) {

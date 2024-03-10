@@ -17,7 +17,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: 'Emergency contact created successfully.',
+    msg: 'Emergency contact was created successfully.',
     data: rows,
    });
   } catch ({ message }) {

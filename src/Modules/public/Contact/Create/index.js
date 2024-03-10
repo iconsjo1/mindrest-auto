@@ -15,7 +15,7 @@ module.exports = route => app => {
     values
    );
 
-   res.json({ success: true, msg: 'Contact created successfully.', data: rows });
+   res.json({ success: true, msg: 'Contact was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

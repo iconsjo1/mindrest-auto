@@ -11,7 +11,7 @@ module.exports = route => app => {
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
    const { rows } = await db.query(`INSERT INTO public."Vendors"(${fields}) VALUES(${enc_values}) RETURNING *`, values);
-   res.json({ success: true, msg: 'Vendor created successfully.', data: rows });
+   res.json({ success: true, msg: 'Vendor was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

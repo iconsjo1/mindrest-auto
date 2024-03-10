@@ -14,7 +14,7 @@ module.exports = route => app => {
     `INSERT INTO public."Departments"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
-   res.json({ success: true, msg: 'Department created successfully.', data: rows });
+   res.json({ success: true, msg: 'Department was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

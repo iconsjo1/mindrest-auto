@@ -16,7 +16,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: 'Doctor reply created successfully.',
+    msg: 'Doctor reply was created successfully.',
     data: rows,
    });
   } catch ({ messge }) {

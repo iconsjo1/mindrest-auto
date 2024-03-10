@@ -5,7 +5,8 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'Prescription lab test not found.' });
+   if (!isPositiveInteger(id))
+    return res.status(404).json({ success: false, msg: 'Prescription lab test was not found.' });
 
    const { rows } = await db.query('DELETE FROM public."Prescription_Lab_Tests" WHERE 1=1 AND id = $1 RETURNING *', [
     id,
@@ -13,7 +14,7 @@ module.exports = route => app => {
 
    res.json({
     Success: true,
-    msg: 'Prescription lab test deleted successfully.',
+    msg: 'Prescription lab test was deleted successfully.',
     data: rows,
    });
   } catch ({ message }) {

@@ -12,7 +12,7 @@ module.exports = route => app => {
 
    const { rows } = await db.query(`INSERT INTO public."Cities"(${fields}) VALUES(${enc_values}) RETURNING *`, values);
 
-   res.json({ success: true, msg: 'City created successfully.', data: rows });
+   res.json({ success: true, msg: 'City was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

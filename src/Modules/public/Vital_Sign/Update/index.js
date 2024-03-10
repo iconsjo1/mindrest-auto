@@ -5,7 +5,7 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Vital sign not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Vital sign was not found.' });
 
    const changed = [];
    let i = 1;
@@ -18,7 +18,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: 'Vital sign updated successfully.',
+    msg: 'Vital sign was updated successfully.',
     data: rows,
    });
   } catch ({ message }) {

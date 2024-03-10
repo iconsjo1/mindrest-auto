@@ -16,7 +16,7 @@ module.exports = route => app => {
    );
    res.json({
     success: true,
-    msg: 'Deposite method created successfully.',
+    msg: 'Deposite method was created successfully.',
     data: rows,
    });
   } catch ({ message }) {

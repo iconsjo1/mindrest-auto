@@ -17,7 +17,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: 'Patient deposite created successfully.',
+    msg: 'Patient deposite was created successfully.',
     data: rows,
    });
   } catch ({ message }) {

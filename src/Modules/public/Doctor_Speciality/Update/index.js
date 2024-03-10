@@ -5,7 +5,7 @@ module.exports = route => app => {
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor speciality not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor speciality was not found.' });
 
    let i = 1;
    const changed = [];
@@ -17,7 +17,7 @@ module.exports = route => app => {
    );
    res.json({
     success: true,
-    msg: 'Doctor speciality updated successfully.',
+    msg: 'Doctor speciality was updated successfully.',
     data: rows,
    });
   } catch ({ message }) {

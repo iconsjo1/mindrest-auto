@@ -14,7 +14,7 @@ module.exports = route => app => {
     `INSERT INTO public."Appointments"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
-   res.json({ success: true, msg: 'Appointmrnt created successfully.', data: newAppointment.rows });
+   res.json({ success: true, msg: 'Appointmrnt was created successfully.', data: newAppointment.rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

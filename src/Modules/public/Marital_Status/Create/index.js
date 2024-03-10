@@ -17,7 +17,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    msg: 'Marital status created successfully.',
+    msg: 'Marital status was created successfully.',
     data: rows,
    });
   } catch ({ message }) {

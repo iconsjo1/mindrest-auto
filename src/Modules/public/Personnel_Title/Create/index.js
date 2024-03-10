@@ -16,7 +16,7 @@ module.exports = route => app => {
    );
    res.json({
     success: true,
-    msg: 'Personnel title created successfully.',
+    msg: 'Personnel title was created successfully.',
     data: newPersonnelTitle.rows,
    });
   } catch ({ message }) {
