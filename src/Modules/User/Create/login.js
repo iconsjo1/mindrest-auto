@@ -5,7 +5,7 @@ module.exports = route => app => {
  app.post(route, async (req, res) => {
   const {
    locals: {
-    utils: { db, isPositiveInteger, isString },
+    utils: { db,  isString },
     user_columns,
    },
   } = res;
