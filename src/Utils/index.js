@@ -17,4 +17,5 @@ module.exports = {
  rollback: async (savepoint, db) => await require('./rollback')(savepoint, db),
  ROLES: require('./roles'),
  route_logger: require('./Route_Logger'),
+ SQLfeatures: require('./SQLfeatures'),
 };
