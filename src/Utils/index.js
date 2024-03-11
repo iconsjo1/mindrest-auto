@@ -16,4 +16,5 @@ module.exports = {
  isTherapist: val => require('./isTherapistCondition')(val),
  rollback: async (savepoint, db) => await require('./rollback')(savepoint, db),
  ROLES: require('./roles'),
+ route_logger: require('./Route_Logger'),
 };

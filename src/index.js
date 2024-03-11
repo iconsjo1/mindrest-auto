@@ -4,8 +4,10 @@ const cors = require('cors');
 const db = require('./pool');
 const PORT = 5040;
 
+const { route_logger, ...utils } = require('../src/Utils');
+
 // middleware
-app.use([cors(), require('./Utils/Route_Logger')]);
+app.use([cors(), route_logger]);
 const flatData = (req, _, next) => {
  if (/new-(patient|doctor)$/.test(req._parsedUrl.path)) next();
  else {
@@ -21,7 +23,7 @@ app.post('*', [express.json(), flatData]);
 app.put('*', [express.json(), flatData]);
 
 app.use((_, res, next) => {
- res.locals.utils = { db, ...require('../src/Utils') };
+ res.locals.utils = { db, ...utils };
  res.set('Access-Control-Allow-Origin', '*');
  next();
 });
@@ -49,14 +51,14 @@ app.listen(PORT, () => {
  routes = routes.reduce(
   (acc, { path }) => ({
    ...acc,
-   [path]: Array.from(
-    new Set(
+   [path]: [
+    ...new Set(
      routes.reduce((acc, { method, path: rf_path }) => {
       if (rf_path === path) acc.push(method);
       return acc;
      }, [])
-    )
-   ),
+    ),
+   ],
   }),
   {}
  );
