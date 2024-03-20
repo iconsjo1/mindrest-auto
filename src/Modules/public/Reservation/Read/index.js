@@ -2,7 +2,7 @@ module.exports = route => app => {
  // Read Reservation[s]
  app.get(route, async (req, res) => {
   try {
-   const { role_id, doctor_id: DBdoctor_id } = res.locals;
+   const { role_id, doctor_id: DBdoctor_id, therapist_id: DBtherapist } = res.locals;
    const { db, SQLfeatures, orderBy, getLimitClause, ROLES } = res.locals.utils;
 
    const { id, patient_id, doctor_id, limit } = req.query;
@@ -10,6 +10,8 @@ module.exports = route => app => {
    const qfilters = { id, doctor_id, patient_id };
 
    if (ROLES.DOCTOR === role_id) qfilters['doctor_id'] = DBdoctor_id;
+
+   if (ROLES.THERAPIST === role_id) qfilters['doctor_id'] = DBtherapist;
 
    const { filters, values } = SQLfeatures.IDFilters(qfilters);
 
