@@ -31,11 +31,11 @@ module.exports = {
   }
 
   const filterSet = ['1=1'];
-  for (let i = 0; i < filters.length; i++) {
-   const [k, v] = filters[i];
+  for (let i = 0, keys = Object.keys(filters); i < keys.length; i++) {
+   const k = keys[i];
 
    filterSet.push(`${k} = $${++objIndex}`);
-   valueSet.push(v);
+   valueSet.push(filters[k]);
   }
 
   return { sets: sets, values: valueSet, filters: filterSet.join(' AND ') };
