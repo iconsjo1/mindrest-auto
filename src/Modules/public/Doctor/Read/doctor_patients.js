@@ -2,50 +2,30 @@ module.exports = route => app => {
  // Read Doctor Patients[s]
  app.get(route, async (req, res) => {
   try {
-   const { doctor_id, patient_id, therapist, limit } = req.query;
+   const { therapist, limit, ...qfilters } = req.query;
 
-   const {
-    locals: {
-     utils: { db, isPositiveInteger, getLimitClause, ROLES, isTherapist },
-     role_id,
-     doctor_id: diddb,
-     therapist_id,
-    },
-   } = res;
+   const { role_id, doctor_id, therapist_id } = res.locals;
+   const { db, getLimitClause, ROLES, isTherapist, SQLfeatures } = res.locals.utils;
 
-   const clause = (r => {
-    switch (r) {
-     case ROLES.DOCTOR:
-      return 'doctor_id= ' + diddb;
-     case ROLES.THERAPIST:
-      return 'doctor_id= ' + therapist_id;
-     default:
-      return '1=1';
-    }
-   })(role_id);
+   if (role_id === ROLES.DOCTOR) qfilters.doctor_id = doctor_id;
+   else if (role_id === ROLES.THERAPIST) qfilters.doctor_id = therapist_id;
+
+   let { filters, values } = SQLfeatures.IDFilters(qfilters);
 
    const { condition, msg } = isTherapist(therapist);
+   filters += ` AND ${condition}`;
 
-   const { rows } = isPositiveInteger(patient_id)
-    ? await db.query(
-       `SELECT * FROM public."V_Doctor_Patients" WHERE 1=1 AND patient_id=$1 AND ${condition} AND ${clause}`,
-       [patient_id]
-      )
-    : isPositiveInteger(doctor_id)
-      ? await db.query(
-         `SELECT * FROM public."V_Doctor_Patients" WHERE 1=1 AND doctor_id=$1 AND ${condition} AND ${clause} ${getLimitClause(
-          limit
-         )}`,
-         [doctor_id]
-        )
-      : await db.query(
-         `SELECT * FROM public."V_Doctor_Patients" WHERE ${condition} AND ${clause} ${getLimitClause(limit)}`
-        );
+   const { rows } = await db.query(
+    `SELECT * FROM public."V_Doctor_Patients" WHERE ${filters} ${getLimitClause(limit)}`,
+    values
+   );
+
+   if (![ROLES.DOCTOR, ROLES.THERAPIST].includes(role_id)) rows.forEach(r => delete r.case_history);
 
    res.json({
     success: true,
     no_of_records: rows.length,
-    msg: `${msg}Doctor patient${1 === rows.length ? '' : 's'} retrieved successfully.`,
+    msg: `${msg}Doctor patient${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
     data: rows,
    });
   } catch ({ message }) {
