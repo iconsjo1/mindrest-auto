@@ -4,16 +4,16 @@ module.exports = route => app => {
   try {
    const { therapist, limit, ...qfilters } = req.query;
 
-   const { role_id, doctor_id: diddb, therapist_id } = res.locals;
+   const { role_id, doctor_id, therapist_id } = res.locals;
    const { db, getLimitClause, ROLES, isTherapist, SQLfeatures } = res.locals.utils;
 
-   if (role_id === ROLES.DOCTOR) qfilters.doctor_id = diddb;
+   if (role_id === ROLES.DOCTOR) qfilters.doctor_id = doctor_id;
    else if (role_id === ROLES.THERAPIST) qfilters.doctor_id = therapist_id;
 
    let { filters, values } = SQLfeatures.IDFilters(qfilters);
 
    const { condition, msg } = isTherapist(therapist);
-   filters += ' AND ' + condition;
+   filters += ` AND ${condition}`;
 
    const { rows } = await db.query(
     `SELECT * FROM public."V_Doctor_Patients" WHERE ${filters} ${getLimitClause(limit)}`,
