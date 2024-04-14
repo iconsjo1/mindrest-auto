@@ -14,6 +14,7 @@ module.exports = app => {
   'Deposite_Method',
   'Doctor',
   'Doctor_Holiday',
+  'Doctor_Meeting',
   'Doctor_Reply',
   'Doctor_Schedule',
   'Doctor_Speciality',
