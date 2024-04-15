@@ -2,8 +2,8 @@ module.exports = route => app => {
  // Create Doctor Meeting
  app.post(route, async (req, res) => {
   try {
-   const { meeting_columns, ROLES, doctor_id, therapist_id, role_id } = res.locals;
-   const { db } = res.locals.utils;
+   const { meeting_columns, doctor_id, therapist_id, role_id } = res.locals;
+   const { db, ROLES } = res.locals.utils;
 
    if (ROLES.THERAPIST === role_id) req.body.requester_id = therapist_id;
    else if (ROLES.DOCTOR === role_id) req.body.requester_id = doctor_id;

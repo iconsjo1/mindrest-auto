@@ -2,8 +2,8 @@ module.exports = route => app => {
  // Create Doctor Todo
  app.post(route, async (req, res) => {
   try {
-   const { todo_columns, ROLES, doctor_id, therapist_id, role_id } = res.locals;
-   const { db } = res.locals.utils;
+   const { todo_columns, doctor_id, therapist_id, role_id } = res.locals;
+   const { db, ROLES } = res.locals.utils;
 
    if (ROLES.THERAPIST === role_id) req.body.doctor_id = therapist_id;
    else if (ROLES.DOCTOR === role_id) req.body.doctor_id = doctor_id;
