@@ -1,23 +1,23 @@
 module.exports = route => app => {
- // Create Doctor Meeting
+ // Create Doctor Todo
  app.post(route, async (req, res) => {
   try {
-   const { meeting_columns, ROLES, doctor_id, therapist_id, role_id } = res.locals;
+   const { todo_columns, ROLES, doctor_id, therapist_id, role_id } = res.locals;
    const { db } = res.locals.utils;
 
-   if (ROLES.THERAPIST === role_id) req.body.requester_id = therapist_id;
-   else if (ROLES.DOCTOR === role_id) req.body.requester_id = doctor_id;
+   if (ROLES.THERAPIST === role_id) req.body.doctor_id = therapist_id;
+   else if (ROLES.DOCTOR === role_id) req.body.doctor_id = doctor_id;
 
    const fields = Object.keys(req.body);
    const enc_values = fields.map((_, i) => `$${i + 1}`);
 
    const { rows } = await db.query(
-    `INSERT INTO public."Doctor_Meetings"(${fields}) VALUES(${enc_values}) RETURNING ${meeting_columns}`,
+    `INSERT INTO public."Doctor_Todos"(${fields}) VALUES(${enc_values}) RETURNING ${todo_columns}`,
     Object.values(req.body)
    );
    res.json({
     success: true,
-    msg: 'Doctor meeting was created successfully.',
+    msg: 'Doctor todo was created successfully.',
     data: rows,
    });
   } catch ({ message }) {
