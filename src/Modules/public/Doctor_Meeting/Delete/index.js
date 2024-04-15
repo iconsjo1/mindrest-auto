@@ -2,12 +2,16 @@ module.exports = route => app => {
  // Delete Doctor Meeting
  app.delete(route, async (req, res) => {
   try {
+   const { meeting_columns } = res.locals;
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
    if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'Doctor meeting was not found.' });
 
-   const { rows } = await db.query('DELETE FROM public."Doctor_Meetings" WHERE 1=1 AND id = $1 RETURNING *', [id]);
+   const { rows } = await db.query(
+    'DELETE FROM public."Doctor_Meetings" WHERE 1=1 AND id = $1 RETURNING ' + meeting_columns,
+    [id]
+   );
 
    res.json({
     Success: true,

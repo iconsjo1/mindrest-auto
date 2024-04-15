@@ -2,6 +2,7 @@ module.exports = route => app => {
  // Update Doctor Meeting
  app.put(route, async (req, res) => {
   try {
+   const { meeting_columns } = res.locals;
    const { db, isPositiveInteger } = res.locals.utils;
 
    const { id } = req.query;
@@ -10,7 +11,7 @@ module.exports = route => app => {
    const changed = Object.keys(req.body).map((k, i) => `${k} = $${++i}`);
 
    const { rows } = await db.query(
-    `UPDATE public."Doctor_Meetings" SET ${changed} WHERE 1=1 AND id=$${changed.length + 1} RETURNING *`,
+    `UPDATE public."Doctor_Meetings" SET ${changed} WHERE 1=1 AND id=$${changed.length + 1} RETURNING ${meeting_columns}`,
     [...Object.values(req.body), id]
    );
 
