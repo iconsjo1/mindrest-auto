@@ -9,7 +9,7 @@ module.exports = app => {
   'City',
   'Contact',
   'Country',
-  'Currency',
+  'currency',
   'Department',
   'Deposite_Method',
   'Doctor',
