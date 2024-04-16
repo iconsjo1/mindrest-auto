@@ -8,7 +8,7 @@ module.exports = route => app => {
    if (ROLES.THERAPIST === role_id) req.body.doctor_id = therapist_id;
    else if (ROLES.DOCTOR === role_id) req.body.doctor_id = doctor_id;
 
-   const fields = Object.keys(req.body);
+   const fields = Object.keys(req.body).map(k => `"${k}"`);
    const enc_values = fields.map((_, i) => `$${i + 1}`);
 
    const { rows } = await db.query(

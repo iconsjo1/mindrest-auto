@@ -12,7 +12,7 @@ module.exports = route => app => {
    const { id } = req.query;
    if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor todo was not found.' });
 
-   const changed = Object.keys(req.body).map((k, i) => `${k} = $${++i}`);
+   const changed = Object.keys(req.body).map((k, i) => `"${k}" = $${++i}`);
 
    const { rows } = await db.query(
     `UPDATE public."Doctor_Todos" SET ${changed} WHERE 1=1 AND id=$${changed.length + 1} AND ${doctorClause} RETURNING ${todo_columns}`,

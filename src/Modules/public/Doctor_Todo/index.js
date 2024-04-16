@@ -1,9 +1,8 @@
 module.exports = app => {
  const route = '/REST/doctor_todos';
  const todo_columns_med = (_, res, next) => {
-  res.locals.todo_columns = [
-   '*',
-  ];
+  res.locals.todo_columns = ['*'];
+
   next();
  };
 
