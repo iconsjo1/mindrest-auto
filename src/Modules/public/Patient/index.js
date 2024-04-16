@@ -9,6 +9,7 @@ const routes = {
  deposite: '/REST/patient_deposites',
  document: '/REST/patient_documents',
  discount: '/REST/patient_service_discounts',
+ note: '/REST/patients_notes',
 };
 
 module.exports = app => {
@@ -18,6 +19,7 @@ module.exports = app => {
   deposite,
   document,
   discount,
+  note,
  } = routes;
 
  require('./Home')({
@@ -30,4 +32,5 @@ module.exports = app => {
  require('./Patient_Deposite')(deposite)(app);
  require('./Patient_Document')(document)(app);
  require('./Patient_Service_Discount')(discount)(app);
+ require('./Patients_Notes')(note)(app);
 };
