@@ -7,8 +7,8 @@ module.exports = route => app => {
    const { id, limit } = req.query;
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."Patients_Notes" WHERE 1=1 AND id=$1', [id])
-    : await db.query('SELECT * FROM public."Patients_Notes" ' + getLimitClause(limit));
+    ? await db.query('SELECT * FROM public."V_Patients_Notes" WHERE 1=1 AND id=$1', [id])
+    : await db.query('SELECT * FROM public."V_Patients_Notes" ' + getLimitClause(limit));
 
    res.json({
     success: true,
