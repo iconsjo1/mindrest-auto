@@ -4,10 +4,10 @@ module.exports = route => app => {
   try {
    const { db, isPositiveInteger, getLimitClause } = res.locals.utils;
 
-   const { id, limit } = req.query;
+   const { patient_id, limit } = req.query;
 
-   const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."V_Patients_Notes" WHERE 1=1 AND id=$1', [id])
+   const { rows } = isPositiveInteger(patient_id)
+    ? await db.query('SELECT * FROM public."V_Patients_Notes" WHERE 1=1 AND patient_id=$1', [patient_id])
     : await db.query('SELECT * FROM public."V_Patients_Notes" ' + getLimitClause(limit));
 
    res.json({
