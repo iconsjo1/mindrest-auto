@@ -2,9 +2,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const db = require('./pool');
-const PORT = 5040;
 
-const { route_logger, ...utils } = require('../src/Utils');
+const { route_logger, APPPORT: PORT, ...utils } = require('../src/Utils');
 
 // middleware
 app.use([cors(), route_logger]);

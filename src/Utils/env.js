@@ -16,4 +16,7 @@ module.exports = {
   ADMINISTRATION: 26,
   PATIENT: 14,
  },
+ STORY: {
+  APPOINTMENT: 1,
+ },
 };
