@@ -10,11 +10,11 @@ module.exports = route => app => {
 
    for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
 
-   const newAppointment = await db.query(
+   const { rows } = await db.query(
     `INSERT INTO public."Appointments"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
-   res.json({ success: true, msg: 'Appointmrnt was created successfully.', data: newAppointment.rows });
+   res.json({ success: true, msg: 'Appointmrnt was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

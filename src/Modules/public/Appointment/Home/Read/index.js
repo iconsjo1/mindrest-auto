@@ -2,31 +2,20 @@ module.exports = route => app => {
  // Read Appoinment[s]
  app.get(route, async (req, res) => {
   try {
-   const {
-    locals: {
-     utils: { db, isPositiveInteger, getLimitClause, ROLES, orderBy },
-     role_id,
-     doctor_id,
-     therapist_id,
-    },
-   } = res;
+   const { db, SQLfeatures, getLimitClause, ROLES, orderBy } = res.locals.utils;
+   const { role_id, doctor_id, therapist_id } = res.locals;
 
-   const clause = (r => {
-    switch (r) {
-     case ROLES.DOCTOR:
-      return 'doctor_id= ' + doctor_id;
-     case ROLES.THERAPIST:
-      return 'doctor_id= ' + therapist_id;
-     default:
-      return '1=1';
-    }
-   })(role_id);
+   const { limit, offset, ...ids } = req.query;
 
-   const { id, limit } = req.query;
+   if (role_id === ROLES.DOCTOR) ids.doctor_id = doctor_id;
+   else if (role_id === ROLES.THERAPIST) ids.doctor_id = therapist_id;
 
-   const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."Appointments" WHERE 1=1 AND id=$1 AND ' + clause, [id])
-    : await db.query(`SELECT * FROM public."Appointments" WHERE  ${clause} ${orderBy('id')} ${getLimitClause(limit)}`);
+   const { filters, values } = SQLfeatures.IDFilters(ids);
+
+   const { rows } = await db.query(
+    `SELECT * FROM public."Appointments" WHERE  ${filters} ${orderBy('id')} ${getLimitClause(limit)}`,
+    values
+   );
 
    res.json({
     success: true,
