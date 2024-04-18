@@ -1,4 +1,5 @@
 module.exports = {
+ FUNCTIONALAUDIT: true,
  APPPORT: 5040,
  DBCONNECTIONS: {
   MAIN: {
@@ -19,4 +20,5 @@ module.exports = {
  STORY: {
   APPOINTMENT: 1,
  },
+ TELLER: { COLUMNS: ['user_id', 'table_id'], ENC: ['$1', '$2'] },
 };

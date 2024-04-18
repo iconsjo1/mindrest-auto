@@ -3,7 +3,7 @@ const app = express();
 const cors = require('cors');
 const db = require('./pool');
 
-const { route_logger, APPPORT: PORT, ...utils } = require('../src/Utils');
+const { FUNCTIONALAUDIT, APPPORT: PORT, route_logger, ...utils } = require('../src/Utils');
 
 // middleware
 app.use([cors(), route_logger]);
@@ -28,7 +28,7 @@ app.use((_, res, next) => {
 });
 
 // routs
-
+app.audit = FUNCTIONALAUDIT;
 require('./Modules')(app);
 
 app.listen(PORT, () => {

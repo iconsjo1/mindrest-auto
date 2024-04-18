@@ -1,10 +1,11 @@
 const EMPTY_ALLOWED = true;
 const NO_EMPTY_ALLOWED = false;
-const { APPPORT, ROLES, ...env } = require('./env');
+const { FUNCTIONALAUDIT, APPPORT, ROLES, ...env } = require('./env');
 
 module.exports = {
  ROLES,
  APPPORT,
+ FUNCTIONALAUDIT,
  env,
  isBool: val => require('./booleanCheck')(val),
  isPositiveInteger: val => require('./positiveIntegerCheck')(val),
