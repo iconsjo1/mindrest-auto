@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const { ROLES } = require('.');
-// const pool = require('../pool');
 
 const rowMode = 'array';
 

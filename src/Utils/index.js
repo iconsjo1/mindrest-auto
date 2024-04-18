@@ -1,7 +1,11 @@
 const EMPTY_ALLOWED = true;
 const NO_EMPTY_ALLOWED = false;
+const { APPPORT, ROLES, ...env } = require('./env');
 
 module.exports = {
+ ROLES,
+ APPPORT,
+ env,
  isBool: val => require('./booleanCheck')(val),
  isPositiveInteger: val => require('./positiveIntegerCheck')(val),
  getLimitClause: limit => require('./getLimitClause')(limit),
@@ -15,7 +19,6 @@ module.exports = {
  isMilitarytime: time => require('./militaryTimeCheck')(time),
  isTherapist: val => require('./isTherapistCondition')(val),
  rollback: async (savepoint, db) => await require('./rollback')(savepoint, db),
- ROLES: require('./roles'),
  route_logger: require('./Route_Logger'),
  SQLfeatures: require('./SQLfeatures'),
 };
