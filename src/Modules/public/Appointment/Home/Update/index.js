@@ -2,26 +2,22 @@ module.exports = route => app => {
  // Update Appointment
  app.put(route, async (req, res) => {
   try {
-   const {
-    locals: {
-     utils: { db, isPositiveInteger, ROLES },
-     role_id,
-     doctor_id,
-    },
-   } = res;
-   const clause = ROLES.DOCTOR === role_id ? 'doctor_id=' + doctor_id : '1=1';
+   const { db, isPositiveInteger, SQLfeatures, ROLES } = res.locals.utils;
+   const { role_id, doctor_id } = res.locals;
 
    const { id } = req.query;
    if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Appointment was not found.' });
 
-   let i = 1;
-   const changed = [];
-   for (let prop in req.body) changed.push(`${prop} = $${i++}`);
+   const updateFilters = { id };
 
-   const { rows } = await db.query(
-    `UPDATE public."Appointments" SET ${changed} WHERE 1=1 AND id=$${i} AND ${clause} RETURNING *`,
-    [...Object.values(req.body), id]
-   );
+   if (ROLES.DOCTOR === role_id) updateFilters.doctor_id = doctor_id;
+
+   delete req.body.is_deleted; // Manual operation is prohibited.
+
+   const { sets, values, filters } = SQLfeatures.update({ filters: updateFilters, ...req.body });
+
+   const { rows } = await db.query(`UPDATE public."Appointments" SET ${sets} WHERE ${filters} RETURNING *`, values);
+
    res.json({
     success: true,
     msg: 'Appointment was updated successfully.',

@@ -1,6 +1,7 @@
-module.exports = route => app => {
- require('./Read')(route)(app);
- require('./Create')(route)(app);
- require('./Update')(route)(app);
- require('./Delete')(route)(app);
-};
+module.exports =
+ ({ appointment, appointmentMark }) =>
+ app => {
+  require('./Create')(appointment)(app);
+  require('./Update')(appointment)(app);
+  require('./Patch')(appointmentMark)(app);
+ };

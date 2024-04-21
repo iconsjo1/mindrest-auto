@@ -21,4 +21,12 @@ module.exports = {
   APPOINTMENT: 1,
  },
  TELLER: { COLUMNS: ['user_id', 'table_id'], ENC: ['$1', '$2'] },
+ EVENT: {
+  TYPE: {
+   UPDATE: 1,
+   DELETE: 2,
+  },
+  COLUMNS: ['teller_id', 'user_id', 'event_type_id'],
+  ENC: ['$1', '$2', '$3'],
+ },
 };

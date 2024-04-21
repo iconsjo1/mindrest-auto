@@ -1,5 +1,8 @@
 module.exports = route => app => {
  // Create Appointmrnt
+ const rowMode = 'array';
+ const handleResult = ({ rows }) => (0 < rows.length ? parseInt(rows[0][0], 10) : 0);
+
  app.post(route, async (req, res) => {
   let client = null;
   let begun = false;
@@ -21,23 +24,24 @@ module.exports = route => app => {
    client = await db.connect();
    await client.query('BEGIN').then(() => (begun = true));
 
-   const { rows: appointment } = await client.query(
-    `INSERT INTO public."Appointments"(${fields}) VALUES(${enc_values}) RETURNING *`,
-    values
-   );
+   const appointmentID = await client
+    .query({ text: `INSERT INTO public."Appointments"(${fields}) VALUES(${enc_values}) RETURNING id`, values, rowMode })
+    .then(handleResult);
 
    const tellerID = await client
     .query({
      text: `INSERT INTO story."Tellers"(${TELLER.COLUMNS}) SELECT ${TELLER.ENC} RETURNING id`,
      values: [user_id, STORY.APPOINTMENT],
-     rowMode: 'array',
+     rowMode,
     })
-    .then(({ rows }) => (0 < rows.length ? parseInt(rows[0][0], 10) : 0));
+    .then(handleResult);
 
-   if (isPositiveInteger(tellerID)) {
-    await client.query('UPDATE public."Appointments" SET teller_id = $1 WHERE id = $2', [tellerID, appointment.id]);
-    appointment[0].teller_id = tellerID;
-   }
+   if (!isPositiveInteger(tellerID)) throw Error('Error occured while auditing.');
+
+   const { rows: appointment } = await client.query(
+    'UPDATE public."Appointments" SET teller_id = $1 WHERE id = $2 RETURNING *',
+    [tellerID, appointmentID]
+   );
 
    await client.query('COMMIT').then(() => (begun = false));
    res.json({ success: true, msg: 'Appointmrnt was created successfully.', data: appointment });
