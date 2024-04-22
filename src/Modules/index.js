@@ -1,4 +1,8 @@
 module.exports = app => {
+ // story
+ require('./story')(app);
+
+ // public
  require('./public/User')(app);
 
  app.use(require('../Utils/Auth'));

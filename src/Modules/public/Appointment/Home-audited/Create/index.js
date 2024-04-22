@@ -8,18 +8,16 @@ module.exports = route => app => {
   let begun = false;
 
   try {
-   const { user_id } = res.locals;
    const {
     db,
     isPositiveInteger,
-    env: { STORY, TELLER },
+    env: { EVENT, TELLER },
    } = res.locals.utils;
 
+   const { user_id } = res.locals;
    const fields = Object.keys(req.body);
    const values = Object.values(req.body);
-   const enc_values = [];
-
-   for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
+   const enc_values = values.map((_, i) => `$${i + 1}`);
 
    client = await db.connect();
    await client.query('BEGIN').then(() => (begun = true));
@@ -28,19 +26,19 @@ module.exports = route => app => {
     .query({ text: `INSERT INTO public."Appointments"(${fields}) VALUES(${enc_values}) RETURNING id`, values, rowMode })
     .then(handleResult);
 
-   const tellerID = await client
-    .query({
-     text: `INSERT INTO story."Tellers"(${TELLER.COLUMNS}) SELECT ${TELLER.ENC} RETURNING id`,
-     values: [user_id, STORY.APPOINTMENT],
-     rowMode,
-    })
-    .then(handleResult);
+   const teller = await client.query({ text: TELLER.QUERY, rowMode }).then(handleResult);
 
-   if (!isPositiveInteger(tellerID)) throw Error('Error occured while auditing.');
+   if (!isPositiveInteger(teller)) throw Error('Error occured while auditing.');
+
+   await client.query(`INSERT INTO story."Events"(${EVENT.COLUMNS}) SELECT ${EVENT.ENC}`, [
+    teller,
+    user_id,
+    EVENT.TYPE.INSERT,
+   ]);
 
    const { rows: appointment } = await client.query(
-    'UPDATE public."Appointments" SET teller_id = $1 WHERE id = $2 RETURNING *',
-    [tellerID, appointmentID]
+    'UPDATE public."Appointments" SET teller = $1 WHERE id = $2 RETURNING *',
+    [teller, appointmentID]
    );
 
    await client.query('COMMIT').then(() => (begun = false));

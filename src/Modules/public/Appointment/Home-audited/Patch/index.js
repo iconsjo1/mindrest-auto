@@ -23,9 +23,9 @@ module.exports = route => app => {
     [id]
    );
 
-   if (0 < rows.length && null != rows[0].teller_id)
+   if (0 < rows.length && null != rows[0].teller)
     await client.query(`INSERT INTO story."Events"(${EVENT.COLUMNS}) SELECT ${EVENT.ENC}`, [
-     rows[0].teller_id,
+     rows[0].teller,
      user_id,
      EVENT.TYPE.DELETE,
     ]);

@@ -17,16 +17,14 @@ module.exports = {
   ADMINISTRATION: 26,
   PATIENT: 14,
  },
- STORY: {
-  APPOINTMENT: 1,
- },
- TELLER: { COLUMNS: ['user_id', 'table_id'], ENC: ['$1', '$2'] },
+ TELLER: { QUERY: `SELECT NEXTVAL('story."SQ_Tellers"')` },
  EVENT: {
   TYPE: {
-   UPDATE: 1,
-   DELETE: 2,
+   INSERT: 1,
+   UPDATE: 2,
+   DELETE: 3,
   },
-  COLUMNS: ['teller_id', 'user_id', 'event_type_id'],
+  COLUMNS: ['teller', 'user_id', 'event_type_id'],
   ENC: ['$1', '$2', '$3'],
  },
 };
