@@ -6,9 +6,9 @@ const routes = {
 module.exports = app => {
  const { appointment, state } = routes;
 
- require('./Home-Common')(appointment.appointment)(app);
  require('./Appointment_state')(state)(app);
 
- if (true === app.audit) require('./Home-audited')(appointment)(app);
- else require('./Home')(appointment)(app);
+ require('./Home/Common')(appointment.appointment)(app);
+ if (true === app.audit) require('./Home/audit')(appointment)(app);
+ else require('./Home/no-audit')(appointment)(app);
 };
