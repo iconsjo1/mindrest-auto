@@ -13,6 +13,7 @@ module.exports = route => app => {
    if (ROLES.DOCTOR === role_id) updateFilters.doctor_id = doctor_id;
 
    delete req.body.is_deleted; // Manual operation is prohibited.
+   delete req.body.teller; // Manual operation is prohibited.
 
    const { sets, values, filters } = SQLfeatures.update({ filters: updateFilters, ...req.body });
 
