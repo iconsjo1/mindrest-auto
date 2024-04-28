@@ -10,6 +10,9 @@ module.exports = route => app => {
    const { id } = req.query;
    if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Patient was not found.' });
 
+   delete req.body.is_deleted; // Manual operation is prohibited.
+   delete req.body.teller; // Manual operation is prohibited.
+
    const changed = [];
    let i = 1;
    for (let prop in req.body) changed.push(`${prop} = $${i++}`);

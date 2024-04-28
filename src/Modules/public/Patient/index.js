@@ -1,7 +1,7 @@
 const routes = {
  patient: {
   idnum: '/REST/patients/unique_idnumber',
-  patients: '/REST/patients',
+  patients: { patients: '/REST/patients', patientsMark: '/REST/mark-patients' },
   newPatiant: '/REST/new-patient',
   pcontactInfo: '/REST/patient_contact_info',
  },

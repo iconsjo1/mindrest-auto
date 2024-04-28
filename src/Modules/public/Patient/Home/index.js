@@ -1,8 +1,8 @@
 module.exports =
- ({ idnum, patients, pcontactInfo, newPatiant }) =>
+ ({ idnum, patients: { patients, patientsMark }, pcontactInfo, newPatiant }) =>
  app => {
-  require('./Read')({ idnum, patients, pcontactInfo })(app);
-  require('./Create')({ patients, newPatiant })(app);
-  require('./Update')(patients)(app);
-  require('./Delete')(patients)(app);
+  require('./Common')({ idnum, patients, pcontactInfo })(app);
+
+  if (true === app.audit) require('./audit')({ patients, patientsMark, newPatiant })(app);
+  else require('./no-audit')({ patients, patientsMark, newPatiant })(app);
  };
