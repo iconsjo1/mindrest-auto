@@ -2,13 +2,8 @@ module.exports = route => app => {
  // Update Patient
  app.put(route, async (req, res) => {
   try {
-   const {
-    locals: {
-     utils: { db, isPositiveInteger, ROLES },
-     role_id,
-     doctor_id,
-    },
-   } = res;
+   const { db, isPositiveInteger, ROLES } = res.locals.utils;
+   const { role_id, doctor_id } = res.locals;
 
    const clause = ROLES.DOCTOR == role_id ? 'doctor_id=' + doctor_id : '1=1';
 

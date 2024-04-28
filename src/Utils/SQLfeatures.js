@@ -65,8 +65,15 @@ module.exports = {
     yield setPrefixComma(i) + `(${keyEnc}`;
 
     for (let j = 0; j < fields.length; j++) {
-     values.push(arrobj[i][fields[j]]);
-     yield setPrefixComma(j) + '$' + ++sanitizingIndex;
+     const v = arrobj[i][fields[j]];
+     const yret = setPrefixComma(j);
+
+     if ('%DEFAULT%' === v) {
+      yield `${yret} DEFAULT`;
+     } else {
+      values.push(v);
+      yield `${yret}$${++sanitizingIndex}`;
+     }
     }
 
     yield ')';

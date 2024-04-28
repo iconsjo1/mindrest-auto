@@ -2,12 +2,12 @@ module.exports = route => app => {
  // Create Patient [ALL DATA]
  app.post(route, async (req, res) => {
   let client = null;
+  let begun = false;
 
-  const SAVEPOINT = 'fresh';
   try {
    const dispData = {};
 
-   const { db, isValidObject, isBool, isPositiveInteger, isPositiveNumber } = res.locals.utils;
+   const { db, isValidObject, SQLfeatures, isEObjArray } = res.locals.utils;
    const { user, contact, patient, emergency_contact, service_discounts = [] } = req.body;
    if (
     !(
@@ -15,15 +15,16 @@ module.exports = route => app => {
      isValidObject(contact) ||
      isValidObject(patient) ||
      isValidObject(emergency_contact) ||
-     (Array.isArray(service_discounts) &&
-      (0 === service_discounts.length ||
-       service_discounts.every(
-        sd =>
-         isValidObject(sd) &&
-         isPositiveInteger(sd.service_id) &&
-         isPositiveNumber(sd.discount) &&
-         isBool(sd.is_percentage)
-       )))
+     isEObjArray(service_discounts, sd => {
+      const { isValidObject, isPositiveInteger, isPositiveNumber, isBool } = res.locals.utils;
+
+      return (
+       isValidObject(sd) &&
+       isPositiveInteger(sd.service_id) &&
+       isPositiveNumber(sd.discount) &&
+       isBool(sd.is_percentage)
+      );
+     })
     )
    )
     throw Error('Incorrect submittion of data.');
@@ -37,7 +38,7 @@ module.exports = route => app => {
    const getRows = oneRow => (false === oneRow ? ({ rows }) => rows[0] : ({ rows }) => rows);
 
    client = await db.connect();
-   await client.query('BEGIN;SAVEPOINT ' + SAVEPOINT);
+   await client.query('BEGIN').then(() => (begun = true));
 
    const [userSQL, userValues] = dbSQLInsert(user, 'Users');
    dispData.user = await client.query(userSQL, userValues).then(getRows(false));
@@ -55,17 +56,10 @@ module.exports = route => app => {
 
    if (0 === service_discounts.length) dispData.service_discounts = service_discounts;
    else {
-    const fields = ['patient_id', 'service_id', 'discount', 'is_percentage'];
-    const values = [patient_id];
-    const enc_values = ['$1'];
-
-    const rows = [];
-    let currentIndex = enc_values.length;
-
-    for (const sd of service_discounts) {
-     rows.push(`(${enc_values},${Array.from({ length: 3 }, _ => `$${++currentIndex}`)})`);
-     values.push(sd.service_id, sd.discount, sd.is_percentage);
-    }
+    const { fields, rows, values } = SQLfeatures.bulkInsert(
+     service_discounts.map(sd => ({ ...sd, is_percentage: sd.is_percentage ?? '%DEFAULT%' })),
+     { patient_id }
+    );
 
     dispData.service_discounts = await client
      .query(`INSERT INTO public."Patient_Service_Discounts"(${fields}) VALUES${rows} RETURNING *`, values)
@@ -73,21 +67,22 @@ module.exports = route => app => {
 
     dispData.service_discounts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
    }
-   await client.query('COMMIT;');
-   client.release();
+   await client.query('COMMIT').then(() => (begun = false));
 
    res.json({ success: true, msg: 'New patient was created successfully.', data: dispData });
   } catch ({ message }) {
-   if (null != client) {
-    try {
-     await client.query('ROLLBACK TO SAVEPOINT ' + SAVEPOINT);
-    } catch ({ message: rollMessage }) {
-     message = rollMessage;
-    } finally {
-     client.release();
-    }
-   }
    res.json({ success: false, message });
+  } finally {
+   if (null != client) {
+    if (true === begun) {
+     try {
+      await client.query('ROLLBACK');
+     } catch ({ message }) {
+      throw Error(message);
+     }
+    }
+    client.release();
+   }
   }
  });
 };
