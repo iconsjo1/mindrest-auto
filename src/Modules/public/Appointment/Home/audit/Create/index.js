@@ -1,7 +1,7 @@
 module.exports = route => app => {
  // Create Appointmrnt
  const rowMode = 'array';
- const handleResult = ({ rows }) => (0 < rows.length ? parseInt(rows[0][0], 10) : 0);
+ const getScalar = ({ rows }) => (0 < rows.length ? parseInt(rows[0][0], 10) : 0);
 
  app.post(route, async (req, res) => {
   let client = null;
@@ -24,9 +24,9 @@ module.exports = route => app => {
 
    const appointmentID = await client
     .query({ text: `INSERT INTO public."Appointments"(${fields}) VALUES(${enc_values}) RETURNING id`, values, rowMode })
-    .then(handleResult);
+    .then(getScalar);
 
-   const teller = await client.query({ text: TELLER.QUERY, rowMode }).then(handleResult);
+   const teller = await client.query({ text: TELLER.QUERY, rowMode }).then(getScalar);
 
    if (!isPositiveInteger(teller)) throw Error('Error occured while auditing.');
 

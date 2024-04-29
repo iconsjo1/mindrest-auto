@@ -30,7 +30,7 @@ module.exports = route => app => {
      EVENT.TYPE.DELETE,
     ]);
 
-   await client.query('COMMIT').then(() => (begun = true));
+   await client.query('COMMIT').then(() => (begun = false));
    res.json({
     Success: true,
     msg: 'Appointment was marked deleted successfully.',

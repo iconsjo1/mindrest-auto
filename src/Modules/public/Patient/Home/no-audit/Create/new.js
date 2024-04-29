@@ -10,12 +10,13 @@ module.exports = route => app => {
    const { db, isValidObject, SQLfeatures, isEObjArray } = res.locals.utils;
 
    const { user, contact, patient, emergency_contact, service_discounts = [] } = req.body;
+
    if (
     !(
-     isValidObject(user) ||
-     isValidObject(contact) ||
-     isValidObject(patient) ||
-     isValidObject(emergency_contact) ||
+     isValidObject(user) &&
+     isValidObject(contact) &&
+     (null == patient || isValidObject(patient)) &&
+     isValidObject(emergency_contact) &&
      isEObjArray(service_discounts, sd => {
       const { isValidObject, isPositiveInteger, isPositiveNumber, isBool } = res.locals.utils;
 
@@ -23,7 +24,7 @@ module.exports = route => app => {
        isValidObject(sd) &&
        isPositiveInteger(sd.service_id) &&
        isPositiveNumber(sd.discount) &&
-       isBool(sd.is_percentage)
+       (null == sd.is_percentag || isBool(sd.is_percentage))
       );
      })
     )
