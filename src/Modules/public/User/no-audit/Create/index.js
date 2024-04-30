@@ -1,6 +1,6 @@
 module.exports =
- ({ all, logout }) =>
+ ({ all, login }) =>
  app => {
+  require('./login')(login)(app);
   require('./all')(all)(app);
-  require('./logout')(logout)(app);
  };

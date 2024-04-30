@@ -4,18 +4,20 @@ const routes = {
  all: '/REST/users',
  login: '/REST/user/login',
  logout: '/REST/user-logout',
+ usersMark: '/REST/mark-users',
 };
 
 module.exports = app => {
- const { all, login, logout } = routes;
+ const { all, login, logout, usersMark } = routes;
 
  app.post(all, auth);
  app.delete(logout, auth);
  app.delete(all, auth);
  app.get(all, auth);
  app.put(all, auth);
+ app.patch(usersMark, auth);
 
- app.use([all, login, logout], (_, res, next) => {
+ app.use([all, login, logout, usersMark], (_, res, next) => {
   res.locals.user_columns = [
    'id',
    'title_id',
@@ -33,8 +35,7 @@ module.exports = app => {
   next();
  });
 
- require('./Read')(all)(app);
- require('./Create')({ all, login })(app);
- require('./Update')(all)(app);
- require('./Delete')({ all, logout })(app);
+ require('./Common')(all)(app);
+ if (true === app.audit) require('./audit')(routes)(app);
+ else require('./no-audit')(routes)(app);
 };

@@ -15,34 +15,31 @@ module.exports = route => app => {
 
      const fields = Object.keys(req.body);
      const values = Object.values(req.body);
-     const enc_values = [];
-
-     for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
+     const enc_values = values.map((_, i) => `$${++i}`);
 
      const { rows } = await db.query(`INSERT INTO public."Users"(${fields}) VALUES(${enc_values}) RETURNING *`, values);
 
      return res.json({ success: true, msg: 'User was created successfully.', data: rows });
     }
     // Email is not unique and/or it may be used.
-    const { id: user_id } = users[0];
+    const [{ id: user_id }] = users;
 
     const { rows: notuniqueuser } = await db.query(
      `SELECT id,
-             'Paitient'
-            FROM public."Patients" 
-           WHERE user_id = $1
-        UNION
-        SELECT id,
-               'Doctor'
-              FROM public."Doctors"
-             WHERE user_id =$1 AND FALSE = is_therapist
-        UNION
-        SELECT id,
-               'Therapist' type
-              FROM public."Doctors" 
-             WHERE user_id =$1 AND TRUE = is_therapist`.replace(/\s+/g, ' '),
+                'Patient' AS type
+           FROM public."Patients"
+          WHERE user_id = $1
+         UNION ALL
+         SELECT id,
+                CASE
+                  WHEN is_therapist THEN 'Therapist'
+                  ELSE 'Doctor'
+                END
+           FROM public."Doctors"
+          WHERE user_id = $1`.replace(/\s+/g, ' '),
      [user_id]
     );
+
     res.json({
      success: false,
      msg: `email is not unique and user_id={${user_id}} ${

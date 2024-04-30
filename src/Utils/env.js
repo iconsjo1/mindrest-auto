@@ -23,6 +23,8 @@ module.exports = {
    INSERT: 1,
    UPDATE: 2,
    DELETE: 3,
+   LOGIN: 4,
+   LOGOUT: 5,
   },
   COLUMNS: ['teller', 'user_id', 'event_type_id'],
   ENC: ['$1', '$2', '$3'],
