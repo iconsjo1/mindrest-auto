@@ -25,18 +25,16 @@ module.exports = route => app => {
     const [{ id: user_id }] = users;
 
     const { rows: notuniqueuser } = await db.query(
-     `SELECT id,
-                'Patient' AS type
-           FROM public."Patients"
-          WHERE user_id = $1
-         UNION ALL
-         SELECT id,
-                CASE
+     `SELECT id, 'Patient' AS type
+       FROM public."Patients"
+       WHERE user_id = $1
+      UNION ALL
+      SELECT id, CASE 
                   WHEN is_therapist THEN 'Therapist'
                   ELSE 'Doctor'
-                END
-           FROM public."Doctors"
-          WHERE user_id = $1`.replace(/\s+/g, ' '),
+                 END
+      FROM public."Doctors"
+      WHERE user_id = $1`.replace(/\s+/g, ' '),
      [user_id]
     );
 
