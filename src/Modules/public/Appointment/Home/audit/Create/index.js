@@ -1,7 +1,5 @@
 module.exports = route => app => {
  // Create Appointmrnt
- const rowMode = 'array';
- const getScalar = ({ rows }) => (0 < rows.length ? parseInt(rows[0][0], 10) : 0);
 
  app.post(route, async (req, res) => {
   let client = null;
@@ -15,34 +13,31 @@ module.exports = route => app => {
    } = res.locals.utils;
 
    const { user_id } = res.locals;
-   const fields = Object.keys(req.body);
-   const values = Object.values(req.body);
-   const enc_values = values.map((_, i) => `$${i + 1}`);
 
    client = await db.connect();
    await client.query('BEGIN').then(() => (begun = true));
 
-   const appointmentID = await client
-    .query({ text: `INSERT INTO public."Appointments"(${fields}) VALUES(${enc_values}) RETURNING id`, values, rowMode })
-    .then(getScalar);
+   req.body.teller = await client.query({ text: TELLER.QUERY, rowMode: 'array' }).then(({ rows }) => rows[0][0]);
 
-   const teller = await client.query({ text: TELLER.QUERY, rowMode }).then(getScalar);
-
-   if (!isPositiveInteger(teller)) throw Error('Error occured while auditing.');
+   if (!isPositiveInteger(req.body.teller)) throw Error('Error occured while auditing.');
 
    await client.query(`INSERT INTO story."Events"(${EVENT.COLUMNS}) SELECT ${EVENT.ENC}`, [
-    teller,
+    req.body.teller,
     user_id,
     EVENT.TYPE.INSERT,
    ]);
 
-   const { rows: appointment } = await client.query(
-    'UPDATE public."Appointments" SET teller = $1 WHERE id = $2 RETURNING *',
-    [teller, appointmentID]
+   const fields = Object.keys(req.body);
+   const values = Object.values(req.body);
+   const enc_values = values.map((_, i) => `$${i + 1}`);
+
+   const { rows } = await client.query(
+    `INSERT INTO public."Appointments"(${fields}) VALUES(${enc_values}) RETURNING *`,
+    values
    );
 
    await client.query('COMMIT').then(() => (begun = false));
-   res.json({ success: true, msg: 'Appointmrnt was created successfully.', data: appointment });
+   res.json({ success: true, msg: 'Appointmrnt was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   } finally {
