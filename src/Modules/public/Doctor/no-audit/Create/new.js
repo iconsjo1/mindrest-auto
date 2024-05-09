@@ -2,14 +2,14 @@ module.exports = route => app => {
  // Create Patient [ALL DATA]
  app.post(route, async (req, res) => {
   let client = null;
-
-  const SAVEPOINT = 'fresh';
+  let begun = false;
   try {
    const dispData = {};
 
    const { db, isValidObject } = res.locals.utils;
    const { user, contact, doctor } = req.body;
-   if (!(isValidObject(user) || isValidObject(contact) || isValidObject(doctor)))
+
+   if (!isValidObject(user) || !isValidObject(contact) || !isValidObject(doctor))
     throw Error('Incorrect submittion of data.');
 
    const dbSQLInsert = (data, tableName) => {
@@ -22,7 +22,7 @@ module.exports = route => app => {
    const getRow = ({ rows }) => rows[0];
 
    client = await db.connect();
-   await client.query('BEGIN;SAVEPOINT ' + SAVEPOINT);
+   await client.query('BEGIN').then(() => (begun = true));
 
    const [userSQL, userValues] = dbSQLInsert(user, 'Users');
    dispData.user = await client.query(userSQL, userValues).then(getRow);
@@ -33,21 +33,20 @@ module.exports = route => app => {
    const [doctorSQL, doctorValues] = dbSQLInsert({ ...doctor, user_id: dispData.user.id }, 'Doctors');
    dispData.doctor = await client.query(doctorSQL, doctorValues).then(getRow);
 
-   await client.query('COMMIT;');
-   client.release();
+   await client.query('COMMIT').then(() => (begun = false));
 
    res.json({ success: true, msg: 'New doctor was created successfully.', data: dispData });
-  } catch ({ message }) {
+  } finally {
    if (null != client) {
-    try {
-     await client.query('ROLLBACK TO SAVEPOINT ' + SAVEPOINT);
-    } catch ({ message: rollMessage }) {
-     message = rollMessage;
-    } finally {
-     client.release();
+    if (true === begun) {
+     try {
+      await client.query('ROLLBACK');
+     } catch ({ message }) {
+      throw Error(message);
+     }
     }
+    client.release();
    }
-   res.json({ success: false, message });
   }
  });
 };

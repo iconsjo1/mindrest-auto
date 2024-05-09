@@ -1,5 +1,5 @@
 module.exports = route => app => {
- // Update Contact
+ // Update Doctor
  app.put(route, async (req, res) => {
   let client = null;
   let begun = false;
@@ -13,7 +13,7 @@ module.exports = route => app => {
    const { user_id } = res.locals;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Contact was not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor was not found.' });
 
    const updateFilters = { id };
 
@@ -25,7 +25,7 @@ module.exports = route => app => {
    client = await db.connect();
    await client.query('BEGIN').then(() => (begun = true));
 
-   const { rows } = await client.query(`UPDATE public."Contacts" SET ${sets} WHERE ${filters} RETURNING *`, values);
+   const { rows } = await client.query(`UPDATE public."Doctors" SET ${sets} WHERE ${filters} RETURNING *`, values);
 
    if (0 < rows.length && null != rows[0].teller)
     await client.query(`INSERT INTO story."Events"(${EVENT.COLUMNS}) SELECT ${EVENT.ENC}`, [
@@ -37,7 +37,7 @@ module.exports = route => app => {
    await client.query('COMMIT').then(() => (begun = false));
    res.json({
     success: true,
-    msg: 'Contact was updated successfully.',
+    msg: 'Doctor was updated successfully.',
     data: rows,
    });
   } catch ({ message }) {

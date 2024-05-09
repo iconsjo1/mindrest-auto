@@ -1,12 +1,11 @@
 module.exports = route => app => {
  // Create Patient [ALL DATA]
- const rowMode = 'array';
  app.post(route, async (req, res) => {
   let client = null;
   let begun = false;
-  let nextTeller = null;
+
   try {
-   const { user_id: DBuserId } = res.locals;
+   const { user_id } = res.locals;
    const {
     db,
     isValidObject,
@@ -19,38 +18,31 @@ module.exports = route => app => {
    const { user, contact, patient, emergency_contact, service_discounts = [] } = req.body;
    const dispData = {};
 
-   const TABLES = {
-    USERS: 'Users',
-    CONTACTS: 'Contacts',
-    PATIENTS: 'Patients',
-    ECONTACTS: 'Emergency_Contacts',
-   };
-
-   const getTeller = async client => {
-    const teller = await client.query({ text: TELLER.QUERY, rowMode }).then(({ rows }) => rows[0][0]);
+   const getTeller = async () => {
+    const teller = await client.query({ text: TELLER.QUERY, rowMode: 'array' }).then(({ rows }) => rows[0][0]);
 
     if (!isPositiveInteger(teller)) throw Error('Error occured while auditing.');
     await client.query(`INSERT INTO story."Events"(${EVENT.COLUMNS}) SELECT ${EVENT.ENC}`, [
      teller,
-     DBuserId,
+     user_id,
      EVENT.TYPE.INSERT,
     ]);
 
     return teller;
    };
 
-   const dbSQLInsert = (data, tableName) => {
+   const dbSQLInsert = async (data, tableName) => {
+    data.teller = await getTeller();
+
     const fields = Object.keys(data);
     const values = Object.values(data);
     const enc_values = values.map((_, i) => `$${++i}`);
-    return [`INSERT INTO public."${tableName}"(${fields}) VALUES(${enc_values}) RETURNING id`, values];
+
+    return [`INSERT INTO public."${tableName}"(${fields}) VALUES(${enc_values}) RETURNING *`, values];
    };
-   const dbSQLUpdate = (pk, teller, tableName) => [
-    `UPDATE public."${tableName}" SET teller = $1 WHERE id = $2 RETURNING *`,
-    [teller, pk],
-   ];
+
    const getRows = oneRow => (false === oneRow ? ({ rows }) => rows[0] : ({ rows }) => rows);
-   const getRowId = ({ rows }) => rows[0][0];
+
    if (
     !(
      isValidObject(user) &&
@@ -74,57 +66,26 @@ module.exports = route => app => {
    client = await db.connect();
    await client.query('BEGIN').then(() => (begun = true));
 
-   //#region "User"
-   const [userInsert, userValues] = dbSQLInsert(user, TABLES.USERS);
-   const user_id = await client.query({ text: userInsert, values: userValues, rowMode }).then(getRowId);
+   const [userInsert, userValues] = await dbSQLInsert(user, 'Users');
+   dispData.user = await client.query(userInsert, userValues).then(getRows(false));
 
-   nextTeller = await getTeller(client);
+   const [contactInsert, contactValues] = await dbSQLInsert({ ...contact, user_id: dispData.user.id }, 'Contacts');
+   dispData.contact = await client.query(contactInsert, contactValues).then(getRows(false));
 
-   const [userSQL, userTellerValues] = dbSQLUpdate(user_id, nextTeller, TABLES.USERS);
-   dispData.user = await client.query(userSQL, userTellerValues).then(getRows(false));
-   //#endregion
+   const [patientInsert, patientValues] = await dbSQLInsert({ ...patient, user_id: dispData.user.id }, 'Patients');
+   dispData.patient = await client.query(patientInsert, patientValues).then(getRows(false));
 
-   //#region "Contacts"
-   const [contactInsert, contactValues] = dbSQLInsert({ ...contact, user_id }, TABLES.CONTACTS);
-   const contact_id = await client.query({ text: contactInsert, values: contactValues, rowMode }).then(getRowId);
-
-   nextTeller = await getTeller(client);
-
-   const [contactSQL, contactTellerValues] = dbSQLUpdate(contact_id, nextTeller, TABLES.CONTACTS);
-   dispData.contact = await client.query(contactSQL, contactTellerValues).then(getRows(false));
-
-   //#endregion
-
-   //#region "Patients"
-
-   const [patientInsert, patientValues] = dbSQLInsert({ ...patient, user_id }, TABLES.PATIENTS);
-
-   const patient_id = await client.query({ text: patientInsert, values: patientValues, rowMode }).then(getRowId);
-
-   nextTeller = await getTeller(client);
-
-   const [patientSQL, patientTellerValues] = dbSQLUpdate(patient_id, nextTeller, TABLES.PATIENTS);
-   dispData.patient = await client.query(patientSQL, patientTellerValues).then(getRows(false));
-
-   //#endregion
-
-   //#region "Emergency Contacts"
-
-   const [econtactInsert, econtactValues] = dbSQLInsert({ ...emergency_contact, patient_id }, TABLES.ECONTACTS);
-   const emergency_id = await client.query({ text: econtactInsert, values: econtactValues, rowMode }).then(getRowId);
-
-   nextTeller = await getTeller(client);
-
-   const [eContactSQL, eContactTellerValues] = dbSQLUpdate(emergency_id, nextTeller, TABLES.ECONTACTS);
-   dispData.emergency_contact = await client.query(eContactSQL, eContactTellerValues).then(getRows(false));
-
-   //#endregion
+   const [econtactInsert, econtactValues] = await dbSQLInsert(
+    { ...emergency_contact, patient_id: dispData.patient.id },
+    'Emergency_Contacts'
+   );
+   dispData.emergency_contact = await client.query(econtactInsert, econtactValues).then(getRows(false));
 
    if (0 === service_discounts.length) dispData.service_discounts = service_discounts;
    else {
     const { fields, rows, values } = SQLfeatures.bulkInsert(
      service_discounts.map(sd => ({ ...sd, is_percentage: sd.is_percentage ?? '%DEFAULT%' })),
-     { patient_id }
+     { patient_id: dispData.patient.id }
     );
 
     dispData.service_discounts = await client

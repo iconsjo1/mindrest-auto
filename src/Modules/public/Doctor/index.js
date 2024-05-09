@@ -1,15 +1,14 @@
-const routes = {
- all: '/REST/doctors',
- contact_info: '/REST/doctor_contact_info',
- doctor_patients: '/REST/doctor_patients',
- newDoctor: '/REST/new-doctor',
-};
-
 module.exports = app => {
- const { all, contact_info, doctor_patients, newDoctor } = routes;
+ const { all, contact_info, doctor_patients, newDoctor, markDoctors } = {
+  all: '/REST/doctors',
+  contact_info: '/REST/doctor_contact_info',
+  doctor_patients: '/REST/doctor_patients',
+  newDoctor: '/REST/new-doctor',
+  markDoctors: '/REST/mark-doctors',
+ };
 
- require('./Read')({ all, contact_info, doctor_patients })(app);
- require('./Create')({ all, newDoctor })(app);
- require('./Update')(all)(app);
- require('./Delete')(all)(app);
+ require('./common')({ all, contact_info, doctor_patients })(app);
+
+ if (true === app.audit) require('./audit')({ all, newDoctor, markDoctors })(app);
+ else require('./no-audit')({ all, newDoctor, markDoctors })(app);
 };
