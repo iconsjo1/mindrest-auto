@@ -20,7 +20,7 @@ module.exports = route => app => {
    if (!isEString(email)) return res.status(400).json({ success: false, msg: 'email can only be a string or empty' });
 
    client = await db.connect();
-   client.query('BEGIN').then(() => (begun = true));
+   await client.query('BEGIN').then(() => (begun = true));
 
    req.body.teller = await client.query({ text: TELLER.QUERY, rowMode }).then(getScalar);
 

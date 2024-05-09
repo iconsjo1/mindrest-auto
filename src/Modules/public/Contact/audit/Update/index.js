@@ -1,38 +1,43 @@
 module.exports = route => app => {
- // Patch Users [IS_DELETED]
- app.patch(route, async (req, res) => {
+ // Update Contact
+ app.put(route, async (req, res) => {
   let client = null;
   let begun = false;
   try {
    const {
-    isPositiveInteger,
     db,
+    isPositiveInteger,
+    SQLfeatures,
     env: { EVENT },
    } = res.locals.utils;
    const { user_id } = res.locals;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'User was not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Appointment was not found.' });
+
+   const updateFilters = { id };
+
+   delete req.body.is_deleted; // Manual operation is prohibited.
+   delete req.body.teller; // Manual operation is prohibited.
+
+   const { sets, values, filters } = SQLfeatures.update({ filters: updateFilters, ...req.body });
 
    client = await db.connect();
    await client.query('BEGIN').then(() => (begun = true));
 
-   const { rows } = await client.query(
-    'UPDATE public."Users" SET is_deleted = true WHERE 1=1 AND id = $1 RETURNING *',
-    [id]
-   );
+   const { rows } = await client.query(`UPDATE public."Contacts" SET ${sets} WHERE ${filters} RETURNING *`, values);
 
    if (0 < rows.length && null != rows[0].teller)
     await client.query(`INSERT INTO story."Events"(${EVENT.COLUMNS}) SELECT ${EVENT.ENC}`, [
      rows[0].teller,
      user_id,
-     EVENT.TYPE.DELETE,
+     EVENT.TYPE.UPDATE,
     ]);
 
    await client.query('COMMIT').then(() => (begun = false));
    res.json({
-    Success: true,
-    msg: 'User was marked deleted successfully.',
+    success: true,
+    msg: 'Contact was updated successfully.',
     data: rows,
    });
   } catch ({ message }) {

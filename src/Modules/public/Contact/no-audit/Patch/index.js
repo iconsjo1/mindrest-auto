@@ -1,5 +1,5 @@
 module.exports = route => app => {
- // Patch Users [IS_DELETED]
+ // Patch Contacts [IS_DELETED]
  app.patch(route, async (req, res) => {
   try {
    const { isPositiveInteger, db } = res.locals.utils;

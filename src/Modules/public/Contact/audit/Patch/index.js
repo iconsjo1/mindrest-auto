@@ -1,5 +1,5 @@
 module.exports = route => app => {
- // Patch Users [IS_DELETED]
+ // Patch Contact [IS_DELETED]
  app.patch(route, async (req, res) => {
   let client = null;
   let begun = false;
@@ -12,13 +12,13 @@ module.exports = route => app => {
    const { user_id } = res.locals;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'User was not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'Contact was not found.' });
 
    client = await db.connect();
    await client.query('BEGIN').then(() => (begun = true));
 
    const { rows } = await client.query(
-    'UPDATE public."Users" SET is_deleted = true WHERE 1=1 AND id = $1 RETURNING *',
+    'UPDATE public."Contacts" SET is_deleted = true WHERE 1=1 AND id = $1 RETURNING *',
     [id]
    );
 
@@ -32,7 +32,7 @@ module.exports = route => app => {
    await client.query('COMMIT').then(() => (begun = false));
    res.json({
     Success: true,
-    msg: 'User was marked deleted successfully.',
+    msg: 'Contact was marked deleted successfully.',
     data: rows,
    });
   } catch ({ message }) {

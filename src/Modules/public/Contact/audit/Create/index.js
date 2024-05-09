@@ -1,5 +1,5 @@
 module.exports = route => app => {
- // Create Patient
+ // Create Contact
 
  app.post(route, async (req, res) => {
   let client = null;
@@ -30,12 +30,12 @@ module.exports = route => app => {
    const enc_values = values.map((_, i) => `$${++i}`);
 
    const { rows } = await client.query(
-    `INSERT INTO public."Patients"(${fields}) VALUES(${enc_values}) RETURNING *`,
+    `INSERT INTO public."Contacts"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
 
    await client.query('COMMIT').then(() => (begun = false));
-   res.json({ success: true, msg: 'Patient was created successfully.', data: rows });
+   res.json({ success: true, msg: 'Contact was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   } finally {
