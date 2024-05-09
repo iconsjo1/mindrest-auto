@@ -1,7 +1,10 @@
-const route = '/REST/emergency_contacts';
 module.exports = app => {
- require('./Read')(route)(app);
- require('./Create')(route)(app);
- require('./Update')(route)(app);
- require('./Delete')(route)(app);
+ const routes = { all: '/REST/econtacts', markEcontact: '/REST/mark-econtacts' };
+
+ const { all, markEcontact } = routes;
+
+ require('./common')(all)(app);
+
+ if (true === app.audit) require('./audit')({ all, markEcontact })(app);
+ else require('./no-audit')({ all, markEcontact })(app);
 };
