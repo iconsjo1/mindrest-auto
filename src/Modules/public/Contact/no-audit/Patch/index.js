@@ -5,7 +5,7 @@ module.exports = route => app => {
    const { isPositiveInteger, db } = res.locals.utils;
 
    const { id } = req.query;
-   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'User was not found.' });
+   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'Contact was not found.' });
 
    const { rows } = await db.query('UPDATE public."Users" SET is_deleted = true WHERE 1=1 AND id = $1 RETURNING *', [
     id,
@@ -13,7 +13,7 @@ module.exports = route => app => {
 
    res.json({
     Success: true,
-    msg: 'User was marked deleted successfully.',
+    msg: 'Contact was marked deleted successfully.',
     data: rows,
    });
   } catch ({ message }) {
