@@ -1,6 +1,5 @@
 module.exports = route => app => {
  // Create Doctor
-
  app.post(route, async (req, res) => {
   let client = null;
   let begun = false;
