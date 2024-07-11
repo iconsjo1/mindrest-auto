@@ -5,7 +5,7 @@ module.exports = {
   MAIN: {
    USER: 'mclinic',
    PASSWORD: '^bC7fUe^yS3O*v@P',
-   HOST: 'icloudjo.com',
+   HOST: '173.249.12.159',
    DATABASE: 'mind-clinic',
    PORT: 5432,
   },
