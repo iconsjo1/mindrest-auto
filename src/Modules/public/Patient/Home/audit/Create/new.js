@@ -42,20 +42,19 @@ module.exports = route => app => {
    };
 
    const getRows = oneRow => (false === oneRow ? ({ rows }) => rows[0] : ({ rows }) => rows);
-
+   
    if (
     !(
      isValidObject(user) &&
      isValidObject(contact) &&
      (null == patient || isValidObject(patient)) &&
-     isValidObject(emergency_contact) &&
+     //   isValidObject(emergency_contact)
      isEObjArray(service_discounts, sd => {
       const { isValidObject, isPositiveInteger, isPositiveNumber, isBool } = res.locals.utils;
-
       return (
        isValidObject(sd) &&
        isPositiveInteger(sd.service_id) &&
-       isPositiveNumber(sd.discount) &&
+       (null == sd.discount || isPositiveNumber(sd.discount)) &&
        (null == sd.is_percentag || isBool(sd.is_percentage))
       );
      })
@@ -75,11 +74,11 @@ module.exports = route => app => {
    const [patientInsert, patientValues] = await dbSQLInsert({ ...patient, user_id: dispData.user.id }, 'Patients');
    dispData.patient = await client.query(patientInsert, patientValues).then(getRows(false));
 
-   const [econtactInsert, econtactValues] = await dbSQLInsert(
-    { ...emergency_contact, patient_id: dispData.patient.id },
-    'Emergency_Contacts'
-   );
-   dispData.emergency_contact = await client.query(econtactInsert, econtactValues).then(getRows(false));
+   //    const [econtactInsert, econtactValues] = await dbSQLInsert(
+   //     { ...emergency_contact, patient_id: dispData.patient.id },
+   //     'Emergency_Contacts'
+   //    );
+   //    dispData.emergency_contact = await client.query(econtactInsert, econtactValues).then(getRows(false));
 
    if (0 === service_discounts.length) dispData.service_discounts = service_discounts;
    else {
