@@ -42,7 +42,7 @@ module.exports = route => app => {
    };
 
    const getRows = oneRow => (false === oneRow ? ({ rows }) => rows[0] : ({ rows }) => rows);
-   
+
    if (
     !(
      isValidObject(user) &&

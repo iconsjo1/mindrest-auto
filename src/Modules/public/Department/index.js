@@ -1,8 +1,8 @@
-const route = '/REST/departments';
-
 module.exports = app => {
- require('./Read')(route)(app);
- require('./Create')(route)(app);
- require('./Update')(route)(app);
- require('./Delete')(route)(app);
+ const { all, markDepartment } = { all: '/REST/departments', markDepartment: '/REST/mark-departments' };
+
+ require('./common')(all)(app);
+
+ if (true === app.audit) require('./audit')({ all, markDepartment })(app);
+ else require('./no-audit')({ all, markDepartment })(app);
 };
