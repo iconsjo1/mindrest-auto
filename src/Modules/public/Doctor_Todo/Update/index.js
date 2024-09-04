@@ -6,8 +6,8 @@ module.exports = route => app => {
    const { db, isPositiveInteger, ROLES } = res.locals.utils;
 
    let doctorClause = '1=1';
-   if (ROLES.THERAPIST === role_id) doctorClause += 'doctor_id = ' + therapist_id;
-   else if (ROLES.DOCTOR === role_id) doctorClause += 'doctor_id = ' + doctor_id;
+   if (ROLES.THERAPIST === role_id) doctorClause += ' AND doctor_id = ' + therapist_id;
+   else if (ROLES.DOCTOR === role_id) doctorClause += ' AND doctor_id = ' + doctor_id;
 
    const { id } = req.query;
    if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor todo was not found.' });
