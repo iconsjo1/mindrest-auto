@@ -9,6 +9,7 @@ module.exports = app => {
    'meeting_start',
    'meeting_slots',
    'UPPER(meeting_range) "end"',
+   'note'
   ];
   next();
  };

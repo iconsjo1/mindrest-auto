@@ -6,8 +6,8 @@ module.exports = route => app => {
    const { db, isPositiveInteger, ROLES } = res.locals.utils;
 
    let requesterClause = '1=1';
-   if (ROLES.THERAPIST === role_id) requesterClause += 'requester_id = ' + therapist_id;
-   else if (ROLES.DOCTOR === role_id) requesterClause += 'requester_id = ' + doctor_id;
+   if (ROLES.THERAPIST === role_id) requesterClause += ' AND requester_id = ' + therapist_id;
+   else if (ROLES.DOCTOR === role_id) requesterClause += ' AND requester_id = ' + doctor_id;
 
    const { id } = req.query;
    if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Doctor meeting was not found.' });
