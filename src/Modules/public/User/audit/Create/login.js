@@ -21,7 +21,7 @@ module.exports = route => app => {
     return res.status(400).json({ success: false, msg: 'Credentials must be strings.' });
 
    const { rows: signedIn } = await db.query(
-    `SELECT ${user_columns}, teller FROM public."Users" WHERE 1=1 AND LOWER(email) = LOWER($1) AND password = $2`,
+    `SELECT ${user_columns}, teller FROM public."Users" WHERE 1=1 AND LOWER(email) = LOWER($1) AND password = $2 AND is_deleted =false`,
     [email, password]
    );
 
