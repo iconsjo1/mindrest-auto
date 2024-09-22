@@ -12,7 +12,11 @@ module.exports = route => app => {
     SQLfeatures,
     isPositiveInteger,
     isEObjArray,
-    env: { EVENT, TELLER },
+    env: {
+     EVENT,
+     TELLER,
+     ERP: { CUSTOMER },
+    },
    } = res.locals.utils;
 
    const { user, contact, patient, emergency_contact, service_discounts = [] } = req.body;
@@ -93,6 +97,9 @@ module.exports = route => app => {
 
     dispData.service_discounts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
    }
+
+   dispData.customer_data = await CUSTOMER.create(dispData.user.customer_ref, user.country_id);
+
    await client.query('COMMIT').then(() => (begun = false));
 
    res.json({ success: true, msg: 'New patient was created successfully.', data: dispData });

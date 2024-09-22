@@ -1,3 +1,7 @@
+const baseERPURL = 'https://erprest.iconsjo.space/REST';
+
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
 module.exports = {
  FUNCTIONALAUDIT: true,
  APPPORT: 5040,
@@ -29,5 +33,33 @@ module.exports = {
   },
   COLUMNS: ['teller', 'user_id', 'event_type_id'],
   ENC: ['$1', '$2', '$3'],
+ },
+ ERP: {
+  CUSTOMER: {
+   create: (ref, country_id) =>
+    fetch(baseERPURL + '/customers', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({
+      customer_ref: ref,
+      customer_type: 'Individual',
+      customer_group: 'Individual',
+      territory:
+       country_id === countries.JORDAN
+        ? 'Jordan'
+        : country_id === countries.SAUDI
+          ? 'Saudi Arabia'
+          : 'Rest Of The World',
+     }),
+    }).then(resp => resp.json()),
+  },
+  SERVICE: {
+   create: ref =>
+    fetch(baseERPURL + '/items', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ item_code: ref, item_group: 'Services' }),
+    }).then(resp => resp.json()),
+  },
  },
 };
