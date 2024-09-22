@@ -1,6 +1,10 @@
 const baseERPURL = 'https://erprest.iconsjo.space/REST';
 
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const countries = {
+ JORDAN: 111,
+ SAUDI: 190,
+};
 
 module.exports = {
  FUNCTIONALAUDIT: true,

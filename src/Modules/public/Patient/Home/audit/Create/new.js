@@ -19,7 +19,7 @@ module.exports = route => app => {
     },
    } = res.locals.utils;
 
-   const { user, contact, patient, emergency_contact, service_discounts = [] } = req.body;
+   const { user, contact, patient,  service_discounts = [] } = req.body;
    const dispData = {};
 
    const getTeller = async () => {
