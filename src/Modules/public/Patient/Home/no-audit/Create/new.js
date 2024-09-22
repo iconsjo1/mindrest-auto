@@ -77,7 +77,7 @@ module.exports = route => app => {
 
     dispData.service_discounts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
    }
-   dispData.customer_data = await CUSTOMER.create(dispData.user.customer_ref, user.country_id);
+   dispData.customer_data = await CUSTOMER.create(dispData.user.customer_ref, contact.country_id);
 
    await client.query('COMMIT').then(() => (begun = false));
 
