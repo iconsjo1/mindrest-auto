@@ -5,9 +5,10 @@ module.exports = {
   MAIN: {
    USER: 'mclinic',
    PASSWORD: '^bC7fUe^yS3O*v@P',
-   HOST: '173.249.12.159',
-   DATABASE: 'mind-clinic',
+   HOST: 'uranus.iconsjo.space',
+   DATABASE: 'mind-clinic_dev',
    PORT: 5432,
+   MAX: 30,
   },
  },
  ROLES: {

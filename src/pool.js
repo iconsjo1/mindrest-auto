@@ -14,4 +14,5 @@ module.exports = new pg.Pool({
  host: SELECTEDDB.HOST,
  database: SELECTEDDB.DATABASE,
  port: SELECTEDDB.PORT,
+ max: SELECTEDDB.MAX,
 });
