@@ -24,4 +24,5 @@ module.exports = {
  rollback: async (savepoint, db) => await require('./rollback')(savepoint, db),
  route_logger: require('./Route_Logger'),
  SQLfeatures: require('./SQLfeatures'),
+ pgRowMode: (query, values) => require('./rowMode')(query, values),
 };

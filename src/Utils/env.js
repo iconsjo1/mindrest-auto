@@ -38,6 +38,10 @@ module.exports = {
   COLUMNS: ['teller', 'user_id', 'event_type_id'],
   ENC: ['$1', '$2', '$3'],
  },
+ BILLEDAPPOINTMENTS: {
+  COMPLETED: 1,
+  CONFIRMED: 2,
+ },
  ERP: {
   CUSTOMER: {
    create: (ref, country_id) =>
@@ -63,6 +67,14 @@ module.exports = {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ item_code: ref, item_group: 'Services' }),
+    }).then(resp => resp.json()),
+  },
+  INVOICE: {
+   create: (ref, rate) =>
+    fetch(baseERPURL + '/sales_invoice', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify([{ item_code: ref, qty: 1, rate }]),
     }).then(resp => resp.json()),
   },
  },
