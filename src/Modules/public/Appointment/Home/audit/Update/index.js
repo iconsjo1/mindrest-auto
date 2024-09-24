@@ -9,11 +9,7 @@ module.exports = route => app => {
     isPositiveInteger,
     SQLfeatures,
     ROLES,
-    env: {
-     EVENT,
-     BILLEDAPPOINTMENTS: { COMPLETED, CONFIRMED },
-     INVOICE,
-    },
+    env: { EVENT },
    } = res.locals.utils;
    const { role_id, doctor_id, user_id } = res.locals;
 
@@ -23,7 +19,7 @@ module.exports = route => app => {
    const updatingWhere = { id };
    if (ROLES.DOCTOR === role_id) updatingWhere.doctor_id = doctor_id;
 
-   const { patient_id, service_id, teller, is_deleted, ...restBody } = req.body;
+   const { bill_id, patient_id, service_id, teller, is_deleted, ...restBody } = req.body;
 
    const dispData = {};
 
@@ -54,38 +50,6 @@ module.exports = route => app => {
      user_id,
      EVENT.TYPE.UPDATE,
     ]);
-    const billables = [COMPLETED, CONFIRMED];
-
-    if (
-     billables.includes(parseInt(restBody.appointment_state_id, 10)) &&
-     !billables.includes(selectedAppointment[0].appointment_state_id)
-    ) {
-     const { rows: serviceDiscounts } = await client.query(
-      `WITH s AS (
-          SELECT id, service_ref, service_charge
-          FROM "Services"
-       )
-       SELECT 
-          service_ref,
-          service_charge,
-          service_charge 
-          - CASE is_percentage
-             WHEN true THEN service_charge * (1 - discount / 100::numeric)
-             WHEN false THEN discount
-             ELSE 0 
-            END AS discount
-       FROM "Appointments" a
-       JOIN s ON a.service_id = s.id
-       LEFT JOIN "Patient_Service_Discounts" psd USING(patient_id, service_id)
-       WHERE a.id = $1`,
-      [id]
-     );
-     if (0 === serviceDiscounts.length) throw Error('Error retriving discount data');
-
-     const [{ service_ref, service_charge, discount }] = serviceDiscounts;
-
-     dispData.invoice = await INVOICE.create(service_ref, discount ?? service_charge);
-    }
    }
 
    await client.query('COMMIT').then(() => (begun = false));

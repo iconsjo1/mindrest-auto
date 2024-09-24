@@ -17,9 +17,13 @@ module.exports = route => app => {
     .query(`INSERT INTO public."Services"(${fields}) VALUES(${enc_values}) RETURNING *`, values)
     .then(async ({ rows }) => {
      if (0 === rows.length) throw Error('Cannot insert service.');
+
+     const erpService = await SERVICE.create(rows[0].service_ref);
+     if (erpService.hasOwnProperty('exception')) throw Error(erpService.invoice.exception);
+
      return {
       service: rows[0],
-      service_ref: await SERVICE.create(rows[0].service_ref),
+      service_ref: erpService,
      };
     });
 

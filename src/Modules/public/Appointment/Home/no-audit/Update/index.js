@@ -8,14 +8,13 @@ module.exports = route => app => {
    const { id } = req.query;
    if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Appointment was not found.' });
 
-   const updateFilters = { id };
+   const updateWhere = { id };
 
-   if (ROLES.DOCTOR === role_id) updateFilters.doctor_id = doctor_id;
+   if (ROLES.DOCTOR === role_id) updateWhere.doctor_id = doctor_id;
 
-   delete req.body.is_deleted; // Manual operation is prohibited.
-   delete req.body.teller; // Manual operation is prohibited.
+   const { bill_id, patient_id, service_id, teller, is_deleted, ...restBody } = req.body;
 
-   const { sets, values, filters } = SQLfeatures.update({ filters: updateFilters, ...req.body });
+   const { sets, values, filters } = SQLfeatures.update({ filters: updateWhere, ...restBody });
 
    const { rows } = await db.query(`UPDATE public."Appointments" SET ${sets} WHERE ${filters} RETURNING *`, values);
 
