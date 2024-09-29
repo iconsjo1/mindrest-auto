@@ -15,8 +15,8 @@ module.exports = route => app => {
    } = res;
    const clause = (r => {
     switch (r) {
-     case ROLES.DOCTOR:
-      return `doctor_id=  '${id}'`;
+    //  case ROLES.DOCTOR:
+    //   return `doctor_id=  '${id}'`;
      case ROLES.THERAPIST:
       return `doctor_id= '${therapist_id}'`;
      case ROLES.PATIENT:
