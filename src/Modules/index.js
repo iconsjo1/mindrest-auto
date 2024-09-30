@@ -6,6 +6,7 @@ module.exports = app => {
  require('./public/User')(app);
 
  app.use(require('../Utils/Auth'));
+ require('./ERP/report')(app);
  [
   'Appointment',
   'Bill',

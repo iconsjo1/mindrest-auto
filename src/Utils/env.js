@@ -74,6 +74,7 @@ module.exports = {
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ customer: cust, items: [{ item_code: ref, qty: 1, rate }] }),
     }).then(resp => resp.json()),
+   read: ref => fetch(`${baseERPURL}/sales_invoice?invoice_name=${ref}`).then(resp => resp.json()),
   },
  },
 };
