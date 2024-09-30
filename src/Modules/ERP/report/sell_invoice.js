@@ -30,7 +30,7 @@ module.exports = route => app => {
 
    res.json({
     success: true,
-    data: invoices,
+    data: invoices.map(item => item.data),
    });
   } catch ({ message }) {
    res.json({ success: false, message });
