@@ -24,24 +24,20 @@ module.exports = route => app => {
         u.customer_ref,
         c.country_id,
         s.service_ref,
-        COALESCE(
-           s.service_charge -
-           CASE is_percentage
-              WHEN true THEN s.service_charge * (1 - psd.discount / 100::numeric)
-              WHEN false THEN psd.discount
-              ELSE 0
-           END,
-           s.service_charge
-        ) rate
+        s.service_charge - CASE is_percentage
+          WHEN true THEN s.service_charge * (1 - psd.discount / 100::numeric)
+          WHEN false THEN psd.discount
+          ELSE 0
+        END rate
      FROM
-       public."Users" u
-       LEFT JOIN public."Contacts" c ON c.user_id = u.id
-       JOIN public."Patients" p ON p.user_id = u.id
-       JOIN public."Appointments" a ON a.patient_id = p.id
-       JOIN s ON a.service_id = s.id
-       LEFT JOIN public."Patient_Service_Discounts" psd USING(patient_id, service_id)
+        public."Users" u
+        LEFT JOIN public."Contacts" c ON c.user_id = u.id
+        JOIN public."Patients" p ON p.user_id = u.id
+        JOIN public."Appointments" a ON a.patient_id = p.id
+        JOIN s ON a.service_id = s.id
+        LEFT JOIN public."Patient_Service_Discounts" psd USING(patient_id, service_id)
      WHERE a.id = $1
-       AND a.bill_id ISNULL`,
+        AND a.bill_id ISNULL`,
     [appointment_id]
    );
 
@@ -61,7 +57,6 @@ module.exports = route => app => {
     if (null == item_data) {
      await SERVICE.create(service_ref).then(newServe => {
       if ('exception' in newServe) throw Error(newServe.exception);
-      return newServe.item_data;
      });
     }
    });
