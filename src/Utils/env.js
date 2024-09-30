@@ -1,7 +1,7 @@
 const baseERPURL = 'https://erprest.iconsjo.space/REST';
-
+// const baseERPURL = 'https://localhost:6130/REST';
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-const countries = {
+const COUNTRIES = {
  JORDAN: 111,
  SAUDI: 190,
 };
@@ -38,10 +38,6 @@ module.exports = {
   COLUMNS: ['teller', 'user_id', 'event_type_id'],
   ENC: ['$1', '$2', '$3'],
  },
- BILLEDAPPOINTMENTS: {
-  COMPLETED: 1,
-  CONFIRMED: 2,
- },
  ERP: {
   CUSTOMER: {
    create: (ref, country_id) =>
@@ -53,13 +49,14 @@ module.exports = {
       customer_type: 'Individual',
       customer_group: 'Individual',
       territory:
-       country_id === countries.JORDAN
+       country_id === COUNTRIES.JORDAN
         ? 'Jordan'
-        : country_id === countries.SAUDI
+        : country_id === COUNTRIES.SAUDI
           ? 'Saudi Arabia'
           : 'Rest Of The World',
      }),
     }).then(resp => resp.json()),
+   read: ref => fetch(`${baseERPURL}/customers?customer_ref=${ref}`).then(resp => resp.json()),
   },
   SERVICE: {
    create: ref =>
@@ -68,13 +65,14 @@ module.exports = {
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ item_code: ref, item_group: 'Services' }),
     }).then(resp => resp.json()),
+   read: ref => fetch(`${baseERPURL}/items?item_name=${ref}`).then(resp => resp.json()),
   },
   INVOICE: {
-   create: (ref, rate) =>
+   create: (cust, ref, rate) =>
     fetch(baseERPURL + '/sales_invoice', {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify([{ item_code: ref, qty: 1, rate }]),
+     body: JSON.stringify({ customer: cust, items: [{ item_code: ref, qty: 1, rate }] }),
     }).then(resp => resp.json()),
   },
  },

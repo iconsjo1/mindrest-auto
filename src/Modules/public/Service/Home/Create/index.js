@@ -18,7 +18,7 @@ module.exports = route => app => {
     .then(async ({ rows }) => {
      if (0 === rows.length) throw Error('Cannot insert service.');
 
-     const erpService = await SERVICE.create(rows[0].service_ref);
+     const erpService = await SERVICE.create(rows[0].service_ref).then(({ item_data }) => item_data);
      if (erpService.hasOwnProperty('exception')) throw Error(erpService.invoice.exception);
 
      return {
