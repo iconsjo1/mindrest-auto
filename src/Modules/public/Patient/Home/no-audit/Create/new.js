@@ -7,15 +7,7 @@ module.exports = route => app => {
   try {
    const dispData = {};
 
-   const {
-    db,
-    isValidObject,
-    SQLfeatures,
-    isEObjArray,
-    env: {
-     ERP: { CUSTOMER },
-    },
-   } = res.locals.utils;
+   const { db, isValidObject, SQLfeatures, isEObjArray } = res.locals.utils;
 
    const { user, contact, patient, emergency_contact, service_discounts = [] } = req.body;
 
@@ -77,7 +69,6 @@ module.exports = route => app => {
 
     dispData.service_discounts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
    }
-   dispData.customer_data = await CUSTOMER.create(dispData.user.customer_ref, contact.country_id);
 
    await client.query('COMMIT').then(() => (begun = false));
 

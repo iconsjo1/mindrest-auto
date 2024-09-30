@@ -9,7 +9,6 @@ module.exports = app => {
  [
   'Appointment',
   'Bill',
-  'Bill_Service',
   'Branches',
   'City',
   'Contact',
