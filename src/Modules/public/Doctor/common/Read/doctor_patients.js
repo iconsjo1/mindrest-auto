@@ -7,8 +7,8 @@ module.exports = route => app => {
    const { role_id, doctor_id, therapist_id } = res.locals;
    const { db, getLimitClause, ROLES, isTherapist, SQLfeatures } = res.locals.utils;
 
-   if (role_id === ROLES.DOCTOR) qfilters.doctor_id = doctor_id;
-   else if (role_id === ROLES.THERAPIST) qfilters.doctor_id = therapist_id;
+   //    if (role_id === ROLES.DOCTOR) qfilters.doctor_id = doctor_id;
+   if (role_id === ROLES.THERAPIST) qfilters.doctor_id = therapist_id;
 
    let { filters, values } = SQLfeatures.IDFilters(qfilters);
 
