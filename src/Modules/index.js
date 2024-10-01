@@ -17,7 +17,7 @@ module.exports = app => {
   'currency',
   'Department',
   'Deposite_Method',
-  'Deposite_Method_Types',
+  'Deposite_Method_Type',
   'Doctor',
   'Doctor_Holiday',
   'Doctor_Meeting',

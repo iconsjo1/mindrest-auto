@@ -2,17 +2,36 @@ module.exports = route => app => {
  // Create Deposite Method
  app.post(route, async (req, res) => {
   try {
-   const { db } = res.locals.utils;
+   const {
+    db,
+    pgRowMode,
+    env: {
+     ERP: { PAYMENTMODE },
+    },
+   } = res.locals.utils;
+   const { type_id, ...restBody } = req.body;
+   const fields = Object.keys(restBody);
+   const $enc = fields.map((_, i) => `$${i + 1}`);
 
-   const fields = Object.keys(req.body);
-   const values = Object.values(req.body);
-   const enc_values = [];
+   const paymentModeType = await db
+    .query(pgRowMode('SELECT method_type FROM public."Deposite_Method_Types" WHERE id = $1', [type_id]))
+    .then(({ rows }) => {
+     if (0 === rows.length) throw Error('Type does not exist.');
+     return rows[0][0];
+    });
 
-   for (let i = 0; i < values.length; enc_values.push(`$${++i}`));
+   await PAYMENTMODE.read(paymentModeType).then(async ({ paymentmode_data }) => {
+    if ('exp_type' in paymentmode_data)
+     await PAYMENTMODE.create(restBody.metod, paymentModeType).then(({ success, paymentmode_data }) => {
+      if (false === success) throw Error(paymentmode_data.message);
+
+      if ('exception' in paymentmode_data) throw Error(paymentmode_data.exception);
+     });
+   });
 
    const { rows } = await db.query(
-    `INSERT INTO public."Deposite_Methods"(${fields}) VALUES(${enc_values}) RETURNING *`,
-    values
+    `INSERT INTO public."Deposite_Methods"(${fields}) VALUES(${$enc}) RETURNING *`,
+    Object.values(restBody)
    );
    res.json({
     success: true,

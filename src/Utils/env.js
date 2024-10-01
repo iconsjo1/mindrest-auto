@@ -76,5 +76,14 @@ module.exports = {
     }).then(resp => resp.json()),
    read: ref => fetch(`${baseERPURL}/sales_invoice?invoice_name=${ref}`).then(resp => resp.json()),
   },
+  PAYMENTMODE: {
+   create: (mode, type) =>
+    fetch(baseERPURL + '/Mode of Payment', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ mode_of_payment: mode, type }),
+    }).then(resp => resp.json()),
+   read: mode => fetch(`${baseERPURL}/Mode of Payment?mode_of_payment=${mode}`).then(resp => resp.json()),
+  },
  },
 };
