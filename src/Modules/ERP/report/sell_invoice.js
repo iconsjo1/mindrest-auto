@@ -25,8 +25,8 @@ module.exports = route => app => {
      )
     )
     .then(({ rows }) => rows.flat());
-
-   const invoices = await Promise.all(bills.map(async b => await INVOICE.read(b)));
+    
+   const invoices = await Promise.all(bills.map(INVOICE.read));
 
    res.json({
     success: true,
