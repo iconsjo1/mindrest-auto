@@ -15,7 +15,7 @@ module.exports = route => app => {
    if (!isPositiveInteger(patient_id)) throw Error('patient_id should be positive integer.');
 
    const { rows: bills } = await db.query(
-    `SELECT invoice_ref  ,bill_id,appointment_id,appointment_date,service_name FROM public."V_Doctor_Patients" a
+    `SELECT  ROW_NUMBER() OVER(ORDER BY bill_id) AS ser,invoice_ref  ,bill_id,appointment_id,appointment_date,service_name,patient_name FROM public."V_Doctor_Patients" a
     JOIN public."Bills" b ON b.id =a.bill_id 
         WHERE patient_id =$1 `,
     [patient_id]
