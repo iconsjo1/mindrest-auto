@@ -97,7 +97,7 @@ module.exports = {
      throw Error(
       'exception' in invoice_data
        ? invoice_data.exception
-       : isString(invoice_data._server_messages)
+       : 'string' === typeof invoice_data._server_messages
          ? JSON.parse(invoice_data._server_messages)[0].message
          : invoice_data._server_messages[0].message
      );
@@ -113,6 +113,34 @@ module.exports = {
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ mode_of_payment: mode, type }),
     }).then(resp => resp.json()),
+   read: mode => fetch(`${baseERPURL}/Mode of Payment?mode_of_payment=${mode}`).then(resp => resp.json()),
+  },
+  PAYMENTENTRY: {
+   create: function () {
+    return fetch(baseERPURL + '/Payment Entry', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({
+      mode_of_payment: this.mode,
+      party_type: 'Customer',
+      party: this.customer,
+      paid_amount: this.amount,
+      received_amount: this.amount,
+      paid_to: this.account,
+      docstatus: 1,
+      custom_package_name: 'test package custom',
+      references: [
+       {
+        reference_name: this.invoice_ref,
+        reference_doctype: 'Sales Invoice',
+        total_amount: this.amount,
+        outstanding_amount: this.amount,
+        allocated_amount: this.amount,
+       },
+      ],
+     }),
+    }).then(resp => resp.json());
+   },
    read: mode => fetch(`${baseERPURL}/Mode of Payment?mode_of_payment=${mode}`).then(resp => resp.json()),
   },
  },
