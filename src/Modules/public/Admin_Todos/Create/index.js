@@ -4,7 +4,7 @@ module.exports = route => app => {
   try {
    const { db } = res.locals.utils;
 
-   const fields = Object.keys(req.body);
+   const fields = Object.keys(req.body).map(f => `"${f}"`);
    const values = Object.values(req.body);
    const enc_values = [];
 
