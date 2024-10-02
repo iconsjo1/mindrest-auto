@@ -9,12 +9,15 @@ module.exports = route => app => {
      ERP: { PAYMENTMODE },
     },
    } = res.locals.utils;
-   const { type_id, ...restBody } = req.body;
-   const fields = Object.keys(restBody);
+   const fields = Object.keys(req.body);
    const $enc = fields.map((_, i) => `$${i + 1}`);
 
    const paymentModeType = await db
-    .query(pgRowMode('SELECT method_type FROM public."Deposite_Method_Types" WHERE id = $1', [type_id]))
+    .query(
+     pgRowMode('SELECT method_type FROM public."Deposite_Method_Types" WHERE id = $1', [
+      req.body.deposite_method_types_id,
+     ])
+    )
     .then(({ rows }) => {
      if (0 === rows.length) throw Error('Type does not exist.');
      return rows[0][0];
@@ -31,7 +34,7 @@ module.exports = route => app => {
 
    const { rows } = await db.query(
     `INSERT INTO public."Deposite_Methods"(${fields}) VALUES(${$enc}) RETURNING *`,
-    Object.values(restBody)
+    Object.values(req.body)
    );
    res.json({
     success: true,
