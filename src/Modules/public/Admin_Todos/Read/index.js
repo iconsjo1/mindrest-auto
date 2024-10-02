@@ -6,10 +6,10 @@ module.exports = route => app => {
    const { id, user_id, limit } = req.query;
 
    const { rows } = isPositiveInteger(id)
-    ? await db.query('SELECT * FROM public."Admin_Todos" WHERE 1=1 AND id=$1', [id])
+    ? await db.query('SELECT * FROM public."V_Admin_Todos" WHERE 1=1 AND id=$1', [id])
     : isPositiveInteger(user_id)
-      ? await db.query('SELECT * FROM public."Admin_Todos" WHERE 1=1 AND user_id=$1', [user_id])
-      : await db.query(`SELECT * FROM public."Admin_Todos" ${getLimitClause(limit)}`);
+      ? await db.query('SELECT * FROM public."V_Admin_Todos" WHERE 1=1 AND user_id=$1', [user_id])
+      : await db.query(`SELECT * FROM public."V_Admin_Todos" ${getLimitClause(limit)}`);
 
    res.json({
     success: true,
