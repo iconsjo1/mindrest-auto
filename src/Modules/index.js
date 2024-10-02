@@ -7,6 +7,7 @@ module.exports = app => {
 
  app.use(require('../Utils/Auth'));
  [
+  'Admin_Todos',
   'Appointment',
   'Bill',
   'Bill_Service',

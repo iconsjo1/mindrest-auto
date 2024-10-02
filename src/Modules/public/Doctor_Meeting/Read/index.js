@@ -8,8 +8,8 @@ module.exports = route => app => {
 
    const { role_id, doctor_id, therapist_id } = res.locals;
 
-//    if (ROLES.DOCTOR === role_id) ids.doctor_id = doctor_id;
-    if (ROLES.THERAPIST === role_id) ids.doctor_id = therapist_id;
+   //    if (ROLES.DOCTOR === role_id) ids.doctor_id = doctor_id;
+   if (ROLES.THERAPIST === role_id) ids.doctor_id = therapist_id;
 
    const { filters, values } = SQLfeatures.IDFilters(ids);
 
