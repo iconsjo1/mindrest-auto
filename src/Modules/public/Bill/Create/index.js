@@ -61,14 +61,7 @@ module.exports = route => app => {
     }
    });
 
-   const invoice = await INVOICE.create(customer_ref, service_ref, rate).then(({ success, invoice_data }) => {
-    if (false === success) throw Error(invoice_data.message);
-
-    if ('exc_type' in invoice_data)
-     throw Error('exception' in invoice_data ? invoice_data.exception : invoice_data._server_messages[0].message);
-
-    return invoice_data;
-   });
+   const invoice = await INVOICE.create(customer_ref, service_ref, rate);
 
    bodyRest.invoice_ref = invoice.name;
 

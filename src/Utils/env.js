@@ -68,12 +68,42 @@ module.exports = {
    read: ref => fetch(`${baseERPURL}/items?item_name=${ref}`).then(resp => resp.json()),
   },
   INVOICE: {
-   create: (cust, ref, rate) =>
-    fetch(baseERPURL + '/sales_invoice', {
+   create: async (cust, ref, rate) => {
+    const { success: newSuccess, invoice_data: newinvoice_data } = await fetch(baseERPURL + '/sales_invoice', {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ customer: cust, items: [{ item_code: ref, qty: 1, rate }] }),
-    }).then(resp => resp.json()),
+    }).then(resp => resp.json());
+
+    if (false === newSuccess) throw Error(newinvoice_data.message);
+    if ('exc_type' in newinvoice_data)
+     throw Error(
+      'exception' in newinvoice_data
+       ? newinvoice_data.exception
+       : 'string' === typeof newinvoice_data._server_messages
+         ? JSON.parse(newinvoice_data._server_messages)[0].message
+         : newinvoice_data._server_messages[0].message
+     );
+
+    const { success, invoice_data } = await fetch(baseERPURL + '/sales_invoice?invoice_name=' + newinvoice_data.name, {
+     method: 'PUT',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({ docstatus: 1 }), //submitted
+    }).then(resp => resp.json());
+
+    if (false === success) throw Error(invoice_data.message);
+
+    if ('exc_type' in invoice_data)
+     throw Error(
+      'exception' in invoice_data
+       ? invoice_data.exception
+       : isString(invoice_data._server_messages)
+         ? JSON.parse(invoice_data._server_messages)[0].message
+         : invoice_data._server_messages[0].message
+     );
+
+    return invoice_data;
+   },
    read: ref => fetch(`${baseERPURL}/sales_invoice?invoice_name=${ref}`).then(resp => resp.json()),
   },
   PAYMENTMODE: {
