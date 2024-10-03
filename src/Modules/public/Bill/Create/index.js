@@ -45,21 +45,17 @@ module.exports = route => app => {
 
    const [{ customer_ref, country_id, service_ref, rate }] = erpCustomerDBData;
 
-   await CUSTOMER.read(customer_ref).then(async ({ cust_data }) => {
-    if (null == cust_data) {
-     await CUSTOMER.create(customer_ref, country_id).then(newCust => {
-      if ('exception' in newCust) throw Error(newCust.exception);
-     });
-    }
-   });
+   try {
+    await CUSTOMER.read(customer_ref);
+   } catch {
+    await CUSTOMER.create(customer_ref, country_id);
+   }
 
-   await SERVICE.read(service_ref).then(async ({ item_data }) => {
-    if (null == item_data) {
-     await SERVICE.create(service_ref).then(newServe => {
-      if ('exception' in newServe) throw Error(newServe.exception);
-     });
-    }
-   });
+   try {
+    await SERVICE.read(service_ref);
+   } catch {
+    await SERVICE.create(service_ref);
+   }
 
    const invoice = await INVOICE.create(customer_ref, service_ref, rate);
 
@@ -74,6 +70,7 @@ module.exports = route => app => {
    const {
     rows: [bill],
    } = await client.query(`INSERT INTO public."Bills"(${fields}) VALUES(${$enc}) RETURNING *`, Object.values(bodyRest));
+
    const {
     rows: [appointment],
    } = await client.query('UPDATE public."Appointments" SET bill_id = $1 WHERE id = $2 RETURNING *', [

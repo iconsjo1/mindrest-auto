@@ -40,8 +40,8 @@ module.exports = {
  },
  ERP: {
   CUSTOMER: {
-   create: (ref, country_id) =>
-    fetch(baseERPURL + '/customers', {
+   create: async (ref, country_id) => {
+    const newCustomer = await fetch(baseERPURL + '/customers', {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({
@@ -55,69 +55,87 @@ module.exports = {
           ? 'Saudi Arabia'
           : 'Rest Of The World',
      }),
-    }).then(resp => resp.json()),
-   read: ref => fetch(`${baseERPURL}/customers?customer_ref=${ref}`).then(resp => resp.json()),
+    }).then(resp => resp.json());
+
+    if (false === newCustomer.success) throw Error(newCustomer.message);
+
+    return newCustomer.cust_data;
+   },
+   read: async ref => {
+    const customer = await fetch(`${baseERPURL}/customers?customer_ref=${ref}`).then(resp => resp.json());
+    if (false === customer.success) throw Error(customer.message);
+
+    return customer.cust_data;
+   },
   },
   SERVICE: {
-   create: ref =>
-    fetch(baseERPURL + '/items', {
+   create: async ref => {
+    const item = await fetch(baseERPURL + '/items', {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ item_code: ref, item_group: 'Services' }),
-    }).then(resp => resp.json()),
-   read: ref => fetch(`${baseERPURL}/items?item_name=${ref}`).then(resp => resp.json()),
+    }).then(resp => resp.json());
+    if (false === item.success) throw Error(item.message);
+
+    return item.item_data;
+   },
+   read: async ref => {
+    const item = await fetch(`${baseERPURL}/items?item_name=${ref}`).then(resp => resp.json());
+    if (false === item.success) throw Error(item.message);
+
+    return item.item_data;
+   },
   },
   INVOICE: {
    create: async (cust, ref, rate) => {
-    const { success: newSuccess, invoice_data: newinvoice_data } = await fetch(baseERPURL + '/sales_invoice', {
+    const newInvoice = await fetch(baseERPURL + '/sales_invoice', {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ customer: cust, items: [{ item_code: ref, qty: 1, rate }] }),
     }).then(resp => resp.json());
 
-    if (false === newSuccess) throw Error(newinvoice_data.message);
-    if ('exc_type' in newinvoice_data)
-     throw Error(
-      'exception' in newinvoice_data
-       ? newinvoice_data.exception
-       : 'string' === typeof newinvoice_data._server_messages
-         ? JSON.parse(newinvoice_data._server_messages)[0].message
-         : newinvoice_data._server_messages[0].message
-     );
+    if (false === newInvoice.success) throw Error(newInvoice.message);
 
-    const { success, invoice_data } = await fetch(baseERPURL + '/sales_invoice?invoice_name=' + newinvoice_data.name, {
+    const updatedInvoice = await fetch(baseERPURL + '/sales_invoice?invoice_name=' + newinvoice_data.name, {
      method: 'PUT',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ docstatus: 1 }), //submitted
     }).then(resp => resp.json());
 
-    if (false === success) throw Error(invoice_data.message);
+    if (false === updatedInvoice.success) throw Error(updatedInvoice.message);
 
-    if ('exc_type' in invoice_data)
-     throw Error(
-      'exception' in invoice_data
-       ? invoice_data.exception
-       : 'string' === typeof invoice_data._server_messages
-         ? JSON.parse(invoice_data._server_messages)[0].message
-         : invoice_data._server_messages[0].message
-     );
-
-    return invoice_data;
+    return updatedInvoice.nvoice_data;
    },
-   read: ref => fetch(`${baseERPURL}/sales_invoice?invoice_name=${ref}`).then(resp => resp.json()),
+   read: async ref => {
+    const invoice = await fetch(`${baseERPURL}/sales_invoice?invoice_name=${ref}`).then(resp => resp.json());
+
+    if (false === invoice.success) throw Error(invoice.message);
+    return invoice.invoice_data;
+   },
   },
   PAYMENTMODE: {
-   create: (mode, type) =>
-    fetch(baseERPURL + '/Mode of Payment', {
+   create: async (mode, type) => {
+    const paymentmode = await fetch(baseERPURL + '/Mode of Payment', {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ mode_of_payment: mode, type }),
-    }).then(resp => resp.json()),
-   read: mode => fetch(`${baseERPURL}/Mode of Payment?mode_of_payment=${mode}`).then(resp => resp.json()),
+    }).then(resp => resp.json());
+
+    if (false === paymentmode.success) throw Error(paymentmode.message);
+
+    return paymentmode.paymentmode_data;
+   },
+   read: async mode => {
+    const paymentmode = await fetch(`${baseERPURL}/Mode of Payment?mode_of_payment=${mode}`).then(resp => resp.json());
+
+    if (false === paymentmode.success) throw Error(paymentmode.message);
+
+    return paymentmode.paymentmode_data;
+   },
   },
   PAYMENTENTRY: {
-   create: function () {
-    return fetch(baseERPURL + '/Payment Entry', {
+   create: async function () {
+    const paymentEntry = await fetch(baseERPURL + '/Payment Entry', {
      method: 'POST',
      headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({
@@ -140,8 +158,18 @@ module.exports = {
       ],
      }),
     }).then(resp => resp.json());
+
+    if (false === paymentEntry.success) throw Error(paymentEntry.message);
+
+    return paymentEntry.paymententry_data;
    },
-   read: mode => fetch(`${baseERPURL}/Mode of Payment?mode_of_payment=${mode}`).then(resp => resp.json()),
+   read: async entry => {
+    const entries = await fetch(`${baseERPURL}/Payment Entry'?payment_name=${entry}`).then(resp => resp.json());
+
+    if (false === entries.success) throw Error(entries.message);
+
+    return entries.paymententry_data;
+   },
   },
  },
 };

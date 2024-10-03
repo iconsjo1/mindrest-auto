@@ -4,7 +4,6 @@ module.exports = route => app => {
   try {
    const {
     db,
-    isString,
     env: {
      ERP: { PAYMENTENTRY },
     },
@@ -29,22 +28,8 @@ module.exports = route => app => {
    if (0 === entryIdentifiers.length) throw Error('Failed to retrieve payment entry identifiers.');
 
    const [{ method_name, customer_ref, invoice_ref }] = entryIdentifiers;
-   const entry = { account, amount, method_name, customer_ref, invoice_ref };
 
-   const payment_entry = await PAYMENTENTRY.create.call(entry).then(({ success, paymententry_data }) => {
-    if (false === success) throw new Error(paymententry_data.message);
-
-    if ('exc_type' in paymententry_data)
-     throw Error(
-      'exception' in paymententry_data
-       ? paymententry_data.exception
-       : isString(paymententry_data._server_messages)
-         ? JSON.parse(paymententry_data._server_messages)[0].message
-         : paymententry_data._server_messages[0].message
-     );
-
-    return paymententry_data;
-   });
+   const payment_entry = await PAYMENTENTRY.create.call({ account, amount, method_name, customer_ref, invoice_ref });
 
    const insertFields = {
     bill_id,

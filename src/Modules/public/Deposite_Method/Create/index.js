@@ -23,14 +23,11 @@ module.exports = route => app => {
      return rows[0][0];
     });
 
-   await PAYMENTMODE.read(paymentModeType).then(async ({ paymentmode_data }) => {
-    if ('exp_type' in paymentmode_data)
-     await PAYMENTMODE.create(restBody.metod, paymentModeType).then(({ success, paymentmode_data }) => {
-      if (false === success) throw Error(paymentmode_data.message);
-
-      if ('exception' in paymentmode_data) throw Error(paymentmode_data.exception);
-     });
-   });
+   try {
+    await PAYMENTMODE.read(paymentModeType);
+   } catch {
+    await PAYMENTMODE.create(restBody.metod, paymentModeType);
+   }
 
    const { rows } = await db.query(
     `INSERT INTO public."Deposite_Methods"(${fields}) VALUES(${$enc}) RETURNING *`,
