@@ -13,20 +13,20 @@ module.exports = route => app => {
 
    const { rows: entryIdentifiers } = await db.query(
     `SELECT 
-             (SELECT dm.method_name 
-              FROM public."Deposite_Methods" dm 
-              WHERE dm.id = $2) method_name, 
-             b.invoice_ref, 
-             u.customer_ref
-           FROM public."Appointments" a
-           JOIN public."Bills" b ON a.bill_id = b.id
-           JOIN public."Patients" p ON a.patient_id = p.id
-           JOIN public."Users" u ON p.user_id = u.id
-           WHERE b.id = $1`,
+        (SELECT dm.method_name 
+         FROM public."Deposite_Methods" dm 
+         WHERE dm.id = $2) method_name, 
+        b.invoice_ref, 
+        u.customer_ref
+     FROM public."Appointments" a
+     JOIN public."Bills" b ON a.bill_id = b.id
+     JOIN public."Patients" p ON a.patient_id = p.id
+     JOIN public."Users" u ON p.user_id = u.id
+     WHERE b.id = $1`,
     [bill_id, method_id]
    );
 
-   if (0 === entryIdentifiers.length) throw new Error('Failed to retrieve payment entry identifiers.');
+   if (0 === entryIdentifiers.length) throw Error('Failed to retrieve payment entry identifiers.');
 
    const [{ method_name, customer_ref, invoice_ref }] = entryIdentifiers;
    const entry = { account, amount, method_name, customer_ref, invoice_ref };
@@ -35,7 +35,7 @@ module.exports = route => app => {
     if (false === success) throw new Error(paymententry_data.message);
 
     if ('exc_type' in paymententry_data)
-     throw new Error(
+     throw Error(
       'exception' in paymententry_data
        ? paymententry_data.exception
        : isString(paymententry_data._server_messages)
