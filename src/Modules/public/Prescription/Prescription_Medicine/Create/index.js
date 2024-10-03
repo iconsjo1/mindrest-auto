@@ -22,7 +22,7 @@ module.exports = route => app => {
       (null == m.afternoon || isPositiveNumber(m.afternoon)) &&
       (null == m.evening || isPositiveNumber(m.evening)) &&
       (null == m.anytime || isPositiveNumber(m.anytime)) &&
-      isPositiveInteger(m.medicine_to_food_id) &&
+      (null == m.medicine_to_food_id || isPositiveNumber(m.medicine_to_food_id)) &&
       isSQLDate(m.start_date) &&
       isSQLDate(m.end_date)
     )
