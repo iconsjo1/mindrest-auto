@@ -5,6 +5,10 @@ const COUNTRIES = {
  JORDAN: 111,
  SAUDI: 190,
 };
+const headers = {
+ Accept: 'application/json',
+ 'Content-Type': 'application/json',
+};
 
 module.exports = {
  FUNCTIONALAUDIT: true,
@@ -43,7 +47,7 @@ module.exports = {
    create: async (ref, country_id) => {
     const newCustomer = await fetch(baseERPURL + '/customers', {
      method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
+     headers,
      body: JSON.stringify({
       customer_ref: ref,
       customer_type: 'Individual',
@@ -62,7 +66,7 @@ module.exports = {
     return newCustomer.cust_data;
    },
    read: async ref => {
-    const customer = await fetch(`${baseERPURL}/customers?customer_ref=${ref}`).then(resp => resp.json());
+    const customer = await fetch(`${baseERPURL}/customers?customer_ref=${ref}`, { headers }).then(resp => resp.json());
     if (false === customer.success) throw Error(customer.message);
 
     return customer.cust_data;
@@ -72,7 +76,7 @@ module.exports = {
    create: async ref => {
     const item = await fetch(baseERPURL + '/items', {
      method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
+     headers,
      body: JSON.stringify({ item_code: ref, item_group: 'Services' }),
     }).then(resp => resp.json());
     if (false === item.success) throw Error(item.message);
@@ -90,24 +94,25 @@ module.exports = {
    create: async (cust, ref, rate) => {
     const newInvoice = await fetch(baseERPURL + '/sales_invoice', {
      method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
+     headers,
      body: JSON.stringify({ customer: cust, items: [{ item_code: ref, qty: 1, rate }] }),
     }).then(resp => resp.json());
-
     if (false === newInvoice.success) throw Error(newInvoice.message);
 
-    const updatedInvoice = await fetch(baseERPURL + '/sales_invoice?invoice_name=' + newinvoice_data.name, {
+    const updatedInvoice = await fetch(baseERPURL + '/sales_invoice?invoice_name=' + newInvoice.invoice_data.name, {
      method: 'PUT',
-     headers: { 'Content-Type': 'application/json' },
+     headers,
      body: JSON.stringify({ docstatus: 1 }), //submitted
     }).then(resp => resp.json());
 
     if (false === updatedInvoice.success) throw Error(updatedInvoice.message);
 
-    return updatedInvoice.nvoice_data;
+    return updatedInvoice.invoice_data;
    },
    read: async ref => {
-    const invoice = await fetch(`${baseERPURL}/sales_invoice?invoice_name=${ref}`).then(resp => resp.json());
+    const invoice = await fetch(`${baseERPURL}/sales_invoice?invoice_name=${ref}`, { headers }).then(resp =>
+     resp.json()
+    );
 
     if (false === invoice.success) throw Error(invoice.message);
     return invoice.invoice_data;
@@ -117,7 +122,7 @@ module.exports = {
    create: async (mode, type) => {
     const paymentmode = await fetch(baseERPURL + '/Mode of Payment', {
      method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
+     headers,
      body: JSON.stringify({ mode_of_payment: mode, type }),
     }).then(resp => resp.json());
 
@@ -126,9 +131,11 @@ module.exports = {
     return paymentmode.paymentmode_data;
    },
    read: async mode => {
-    const paymentmode = await fetch(`${baseERPURL}/Mode of Payment?mode_of_payment=${mode}`).then(resp => resp.json());
+    const paymentmode = await fetch(`${baseERPURL}/Mode of Payment?mode_of_payment=${mode}`, { headers }).then(resp =>
+     resp.json()
+    );
 
-    if (false === paymentmode.success) throw Error(paymentmode.message);
+    if (false === paymentmode.success) throw Error(paymentmode);
 
     return paymentmode.paymentmode_data;
    },
@@ -137,7 +144,7 @@ module.exports = {
    create: async function () {
     const paymentEntry = await fetch(baseERPURL + '/Payment Entry', {
      method: 'POST',
-     headers: { 'Content-Type': 'application/json' },
+     headers,
      body: JSON.stringify({
       mode_of_payment: this.mode,
       party_type: 'Customer',
@@ -164,7 +171,9 @@ module.exports = {
     return paymentEntry.paymententry_data;
    },
    read: async entry => {
-    const entries = await fetch(`${baseERPURL}/Payment Entry'?payment_name=${entry}`).then(resp => resp.json());
+    const entries = await fetch(`${baseERPURL}/Payment Entry'?payment_name=${entry}`, { headers }).then(resp =>
+     resp.json()
+    );
 
     if (false === entries.success) throw Error(entries.message);
 
