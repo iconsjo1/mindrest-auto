@@ -120,7 +120,7 @@ module.exports = {
   },
   PAYMENTMODE: {
    create: async (mode, type) => {
-    const paymentmode = await fetch(baseERPURL + '/Mode of Payment', {
+    const paymentmode = await fetch(baseERPURL + '/payment_modes', {
      method: 'POST',
      headers,
      body: JSON.stringify({ mode_of_payment: mode, type }),
@@ -131,7 +131,7 @@ module.exports = {
     return paymentmode.paymentmode_data;
    },
    read: async mode => {
-    const paymentmode = await fetch(`${baseERPURL}/Mode of Payment?mode_of_payment=${mode}`, { headers }).then(resp =>
+    const paymentmode = await fetch(`${baseERPURL}/payment_modes?mode_of_payment=${mode}`, { headers }).then(resp =>
      resp.json()
     );
 
@@ -142,7 +142,7 @@ module.exports = {
   },
   PAYMENTENTRY: {
    create: async function () {
-    const paymentEntry = await fetch(baseERPURL + '/Payment Entry', {
+    const paymentEntry = await fetch(baseERPURL + '/payment_entries', {
      method: 'POST',
      headers,
      body: JSON.stringify({
@@ -171,7 +171,7 @@ module.exports = {
     return paymentEntry.paymententry_data;
    },
    read: async entry => {
-    const entries = await fetch(`${baseERPURL}/Payment Entry'?payment_name=${entry}`, { headers }).then(resp =>
+    const entries = await fetch(`${baseERPURL}/payment_entries'?payment_name=${entry}`, { headers }).then(resp =>
      resp.json()
     );
 

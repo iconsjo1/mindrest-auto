@@ -25,7 +25,7 @@ module.exports = route => app => {
    const $enc = fields.map((_, i) => `$${i + 1}`);
 
    try {
-    const x = await PAYMENTMODE.read(paymentModeType);
+    await PAYMENTMODE.read(req.body.method);
    } catch {
     await PAYMENTMODE.create(req.body.method, paymentModeType);
    }
