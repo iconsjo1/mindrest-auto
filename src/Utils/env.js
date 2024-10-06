@@ -1,10 +1,7 @@
 const baseERPURL = 'https://erprest.iconsjo.space/REST';
 // const baseERPURL = 'https://localhost:6130/REST';
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-const COUNTRIES = {
- JORDAN: 111,
- SAUDI: 190,
-};
+
 const headers = {
  Accept: 'application/json',
  'Content-Type': 'application/json',
@@ -43,81 +40,6 @@ module.exports = {
   ENC: ['$1', '$2', '$3'],
  },
  ERP: {
-  CUSTOMER: {
-   create: async (ref, country_id) => {
-    const newCustomer = await fetch(baseERPURL + '/customers', {
-     method: 'POST',
-     headers,
-     body: JSON.stringify({
-      customer_ref: ref,
-      customer_type: 'Individual',
-      customer_group: 'Individual',
-      territory:
-       country_id === COUNTRIES.JORDAN
-        ? 'Jordan'
-        : country_id === COUNTRIES.SAUDI
-          ? 'Saudi Arabia'
-          : 'Rest Of The World',
-     }),
-    }).then(resp => resp.json());
-
-    if (false === newCustomer.success) throw Error(newCustomer.message);
-
-    return newCustomer.cust_data;
-   },
-   read: async ref => {
-    const customer = await fetch(`${baseERPURL}/customers?customer_ref=${ref}`, { headers }).then(resp => resp.json());
-    if (false === customer.success) throw Error(customer.message);
-
-    return customer.cust_data;
-   },
-  },
-  SERVICE: {
-   create: async ref => {
-    const item = await fetch(baseERPURL + '/items', {
-     method: 'POST',
-     headers,
-     body: JSON.stringify({ item_code: ref, item_group: 'Services' }),
-    }).then(resp => resp.json());
-    if (false === item.success) throw Error(item.message);
-
-    return item.item_data;
-   },
-   read: async ref => {
-    const item = await fetch(`${baseERPURL}/items?item_name=${ref}`).then(resp => resp.json());
-    if (false === item.success) throw Error(item.message);
-
-    return item.item_data;
-   },
-  },
-  INVOICE: {
-   create: async (cust, ref, rate) => {
-    const newInvoice = await fetch(baseERPURL + '/sales_invoice', {
-     method: 'POST',
-     headers,
-     body: JSON.stringify({ customer: cust, items: [{ item_code: ref, qty: 1, rate }] }),
-    }).then(resp => resp.json());
-    if (false === newInvoice.success) throw Error(newInvoice.message);
-
-    const updatedInvoice = await fetch(baseERPURL + '/sales_invoice?invoice_name=' + newInvoice.invoice_data.name, {
-     method: 'PUT',
-     headers,
-     body: JSON.stringify({ docstatus: 1 }), //submitted
-    }).then(resp => resp.json());
-
-    if (false === updatedInvoice.success) throw Error(updatedInvoice.message);
-
-    return updatedInvoice.invoice_data;
-   },
-   read: async ref => {
-    const invoice = await fetch(`${baseERPURL}/sales_invoice?invoice_name=${ref}`, { headers }).then(resp =>
-     resp.json()
-    );
-
-    if (false === invoice.success) throw Error(invoice.message);
-    return invoice.invoice_data;
-   },
-  },
   PAYMENTENTRY: {
    create: async function () {
     const paymentEntry = await fetch(baseERPURL + '/payment_entries', {
