@@ -5,9 +5,10 @@ module.exports = route => app => {
    const {
     db,
     pgRowMode,
-    env: {
-     ERP: { PAYMENTMODE },
-    },
+    // env: {
+    //  ERP: { PAYMENTMODE },
+    // },
+    ERPnext,
    } = res.locals.utils;
 
    const paymentModeType = await db
@@ -24,11 +25,13 @@ module.exports = route => app => {
    const fields = Object.keys(req.body);
    const $enc = fields.map((_, i) => `$${i + 1}`);
 
-   try {
-    await PAYMENTMODE.read(req.body.method);
-   } catch {
-    await PAYMENTMODE.create(req.body.method, paymentModeType);
-   }
+   //    try {
+   //     await PAYMENTMODE.read(req.body.method);
+   //    } catch {
+   //     await PAYMENTMODE.create(req.body.method, paymentModeType);
+   //    }
+   const paymentMode = new ERPnext.PaymentMode();
+   await paymentMode.safeCreateERP(req.body.method, paymentModeType);
 
    const { rows } = await db.query(
     `INSERT INTO public."Deposite_Methods"(${fields}) VALUES(${$enc}) RETURNING *`,
