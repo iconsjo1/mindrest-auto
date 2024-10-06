@@ -7,9 +7,10 @@ module.exports = route => app => {
    const {
     db,
     isPositiveInteger,
-    env: {
-     ERP: { CUSTOMER, INVOICE, SERVICE },
-    },
+    //  env: {
+    //   ERP: { INVOICE },
+    //  },
+    ERPnext,
    } = res.locals.utils;
 
    const { appointment_id, ...bodyRest } = req.body;
@@ -45,21 +46,16 @@ module.exports = route => app => {
 
    const [{ customer_ref, country_id, service_ref, rate }] = erpCustomerDBData;
 
-   try {
-    await CUSTOMER.read(customer_ref);
-   } catch {
-    await CUSTOMER.create(customer_ref, country_id);
-   }
+   const erpCustomer = new ERPnext.Customer(customer_ref);
+   await erpCustomer.safeCreateERP(country_id);
 
-   try {
-    await SERVICE.read(service_ref);
-   } catch {
-    await SERVICE.create(service_ref);
-   }
+   const erpService = new ERPnext.Service(service_ref);
+   await erpService.safeCreateERP();
 
-   const invoice = await INVOICE.create(customer_ref, service_ref, rate);
+   const erpBill = new ERPnext.Bill();
+   const invoice = await erpBill.CreateERP(customer_ref, service_ref, rate);
 
-   bodyRest.invoice_ref = invoice.name;
+   bodyRest.invoice_ref = erpBill.ref;
 
    const fields = Object.keys(bodyRest);
    const $enc = fields.map((_, i) => `$${i + 1}`);
