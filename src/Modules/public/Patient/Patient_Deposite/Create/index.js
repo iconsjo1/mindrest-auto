@@ -2,17 +2,15 @@ module.exports = route => app => {
  // Create Patient Deposite
  app.post(route, async (req, res) => {
   try {
-   const {
-    db,
-    env: {
-     ERP: { PAYMENTENTRY },
-    },
-   } = res.locals.utils;
+   const { db, isString, isPositiveNumber, isPositiveInteger, ERPnext } = res.locals.utils;
    const { account, method_id, bill_id, amount } = req.body;
+
+   if (!(isString(account) || [method_id, bill_id].every(isPositiveInteger) || isPositiveNumber(amount)))
+    return res.status(400).json('illigal set of parameters.');
 
    const { rows: entryIdentifiers } = await db.query(
     `SELECT 
-        (SELECT dm.method_name 
+        (SELECT dm.method
          FROM public."Deposite_Methods" dm 
          WHERE dm.id = $2) method_name, 
         b.invoice_ref, 
@@ -27,15 +25,20 @@ module.exports = route => app => {
 
    if (0 === entryIdentifiers.length) throw Error('Failed to retrieve payment entry identifiers.');
 
-   const [{ method_name, customer_ref, invoice_ref }] = entryIdentifiers;
+   const [{ method, customer_ref, invoice_ref }] = entryIdentifiers;
 
-   const payment_entry = await PAYMENTENTRY.create.call({ account, amount, method_name, customer_ref, invoice_ref });
+   const erpPaymentEntry = new ERPnext.PaymentEntry(account, amount, method, customer_ref);
+   erpPaymentEntry.addReference(invoice_ref, amount);
+
+   const payment_entry = await erpPaymentEntry.CreateERP();
 
    const insertFields = {
     bill_id,
     method_id,
+    deposite_amount: amount,
     deposite_ref: payment_entry.name,
    };
+
    const fields = Object.keys(insertFields);
    const $enc = fields.map((_, i) => `$${i + 1}`);
 

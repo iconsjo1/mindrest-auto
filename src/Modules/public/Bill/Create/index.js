@@ -4,14 +4,7 @@ module.exports = route => app => {
   let client = null;
   let begun = false;
   try {
-   const {
-    db,
-    isPositiveInteger,
-    //  env: {
-    //   ERP: { INVOICE },
-    //  },
-    ERPnext,
-   } = res.locals.utils;
+   const { db, isPositiveInteger, ERPnext } = res.locals.utils;
 
    const { appointment_id, ...bodyRest } = req.body;
    if (!isPositiveInteger(appointment_id)) throw Error('Appointment id is not a positive integer.');

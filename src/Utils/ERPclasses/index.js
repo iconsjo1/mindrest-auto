@@ -3,4 +3,5 @@ module.exports = {
  Customer: require('./Customer'),
  Service: require('./Service'),
  Bill: require('./Bill'),
+ PaymentEntry: require('./PaymentEntry'),
 };
