@@ -8,12 +8,13 @@ class PaymentMode extends ERPFetch {
  async safeCreateERP(mode, type) {
   try {
    this.query = 'mode_of_payment=' + mode;
+
    await super.fetchERP({ method: 'GET' });
   } catch {
    this.query = null;
    await super.fetchERP({
     method: 'POST',
-    body: JSON.stringify({ mode_of_payment, mode, type }),
+    body: JSON.stringify({ mode_of_payment: mode, type }),
    });
   }
  }

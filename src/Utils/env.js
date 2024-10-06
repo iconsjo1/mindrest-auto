@@ -118,28 +118,6 @@ module.exports = {
     return invoice.invoice_data;
    },
   },
-  PAYMENTMODE: {
-   create: async (mode, type) => {
-    const paymentmode = await fetch(baseERPURL + '/payment_modes', {
-     method: 'POST',
-     headers,
-     body: JSON.stringify({ mode_of_payment: mode, type }),
-    }).then(resp => resp.json());
-
-    if (false === paymentmode.success) throw Error(paymentmode.message);
-
-    return paymentmode.paymentmode_data;
-   },
-   read: async mode => {
-    const paymentmode = await fetch(`${baseERPURL}/payment_modes?mode_of_payment=${mode}`, { headers }).then(resp =>
-     resp.json()
-    );
-
-    if (false === paymentmode.success) throw Error(paymentmode);
-
-    return paymentmode.paymentmode_data;
-   },
-  },
   PAYMENTENTRY: {
    create: async function () {
     const paymentEntry = await fetch(baseERPURL + '/payment_entries', {

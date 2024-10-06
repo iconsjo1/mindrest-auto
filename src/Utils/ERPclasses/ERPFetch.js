@@ -20,7 +20,7 @@ class ERPFetch {
   else this.#query += _query;
  }
  get url() {
-  return '?' === this.#query ? this.#url + this.#query : this.#url;
+  return '?' !== this.#query ? this.#url + this.#query : this.#url;
  }
  async fetchERP(fetchOptions) {
   const { success, ...rest } = await fetch(this.url, { headers: this.#headers, ...fetchOptions }).then(resp =>

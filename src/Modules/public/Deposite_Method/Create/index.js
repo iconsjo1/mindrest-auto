@@ -2,14 +2,7 @@ module.exports = route => app => {
  // Create Deposite Method
  app.post(route, async (req, res) => {
   try {
-   const {
-    db,
-    pgRowMode,
-    // env: {
-    //  ERP: { PAYMENTMODE },
-    // },
-    ERPnext,
-   } = res.locals.utils;
+   const { db, pgRowMode, ERPnext } = res.locals.utils;
 
    const paymentModeType = await db
     .query(
@@ -25,12 +18,8 @@ module.exports = route => app => {
    const fields = Object.keys(req.body);
    const $enc = fields.map((_, i) => `$${i + 1}`);
 
-   //    try {
-   //     await PAYMENTMODE.read(req.body.method);
-   //    } catch {
-   //     await PAYMENTMODE.create(req.body.method, paymentModeType);
-   //    }
    const paymentMode = new ERPnext.PaymentMode();
+
    await paymentMode.safeCreateERP(req.body.method, paymentModeType);
 
    const { rows } = await db.query(
