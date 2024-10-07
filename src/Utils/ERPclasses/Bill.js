@@ -36,7 +36,10 @@ class Bill extends ERPFetch {
 
  static async readManyERP(invoices) {
   return Promise.all(
-   invoices.map(Bill.readERP)
+   invoices.map(inv => {
+    const bill = new Bill(inv);
+    bill.readERP(inv);
+   })
   );
  }
 }
