@@ -29,17 +29,14 @@ class Bill extends ERPFetch {
   });
   return submittedInvoice;
  }
- readERP() {
-  this.query = 'invoice_name=' + this.#ref;
+ readERP(ref) {
+  this.query = 'invoice_name=' + (null == ref ? this.#ref : ref);
   return super.fetchERP({ method: 'GET' });
  }
 
  static async readManyERP(invoices) {
   return Promise.all(
-   invoices.map(inv => {
-    const bill = new Bill(inv);
-    return bill.readERP();
-   })
+   invoices.map(Bill.readERP())
   );
  }
 }
