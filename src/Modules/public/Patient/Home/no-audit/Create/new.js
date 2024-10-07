@@ -7,16 +7,17 @@ module.exports = route => app => {
   try {
    const dispData = {};
 
-   const { db, isValidObject, SQLfeatures, isEObjArray } = res.locals.utils;
+   const { db, isValidObject, SQLfeatures, isEObjArray, isPositiveInteger } = res.locals.utils;
 
-   const { user, contact, patient, emergency_contact, service_discounts = [] } = req.body;
+   const { user, contact, patient, emergency_contact = [], idsdoctors = [], service_discounts = [] } = req.body;
 
    if (
     !(
      isValidObject(user) &&
      isValidObject(contact) &&
      (null == patient || isValidObject(patient)) &&
-     isValidObject(emergency_contact) &&
+     // isValidObject(emergency_contact)
+     !(!Array.isArray(idsdoctors) || idsdoctors.length == 0 || !idsdoctors.every(id => isPositiveInteger(id))) &&
      isEObjArray(service_discounts, sd => {
       const { isValidObject, isPositiveInteger, isPositiveNumber, isBool } = res.locals.utils;
 
@@ -53,9 +54,10 @@ module.exports = route => app => {
 
    const { id: patient_id } = dispData.patient;
 
-   const [econtactSQL, econtactValues] = dbSQLInsert({ ...emergency_contact, patient_id }, 'Emergency_Contacts');
-   dispData.emergency_contact = await client.query(econtactSQL, econtactValues).then(getRows(false));
-
+   if (emergency_contact.length > 0) {
+    const [econtactSQL, econtactValues] = dbSQLInsert({ ...emergency_contact, patient_id }, 'Emergency_Contacts');
+    dispData.emergency_contact = await client.query(econtactSQL, econtactValues).then(getRows(false));
+   }
    if (0 === service_discounts.length) dispData.service_discounts = service_discounts;
    else {
     const { fields, rows, values } = SQLfeatures.bulkInsert(
@@ -69,6 +71,14 @@ module.exports = route => app => {
 
     dispData.service_discounts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
    }
+   dispData.doctor_incharges = await client
+    .query('INSERT INTO public."Doctor_Incharges"(patient_id,doctor_id) SELECT $1, unnest($2::int[]) RETURNING *', [
+     patient_id,
+     idsdoctors,
+    ])
+    .then(getRows(true));
+
+   dispData.doctor_incharges.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
    await client.query('COMMIT').then(() => (begun = false));
 
    res.json({ success: true, msg: 'New patient was created successfully.', data: dispData });

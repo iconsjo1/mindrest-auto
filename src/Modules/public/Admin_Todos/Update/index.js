@@ -10,7 +10,7 @@ module.exports = route => app => {
    let i = 1;
    const changed = [];
    for (let prop in req.body) changed.push(`"${prop}" = $${i++}`);
-    console.log(`UPDATE public."Admin_Todos" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`)
+   console.log(`UPDATE public."Admin_Todos" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`);
    const { rows } = await db.query(`UPDATE public."Admin_Todos" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`, [
     ...Object.values(req.body),
     id,
