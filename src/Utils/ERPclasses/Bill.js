@@ -36,7 +36,7 @@ class Bill extends ERPFetch {
 
  static async readManyERP(invoices) {
   return Promise.all(
-   invoices.map(Bill.readERP())
+   invoices.map(Bill.readERP)
   );
  }
 }
