@@ -15,16 +15,14 @@ class Bill extends ERPFetch {
  async CreateERP(customer, service, rate) {
   this.query = null;
 
-  const { name } = await super.fetchERP({
-   method: 'POST',
+  const { name } = await super.fetchERP('POST', {
    body: JSON.stringify({ customer, items: [{ item_code: service, qty: 1, rate }] }),
   });
 
   this.#ref = name;
   this.query = 'invoice_name=' + name;
 
-  const submittedInvoice = await super.fetchERP({
-   method: 'PUT',
+  const submittedInvoice = await super.fetchERP('PUT', {
    body: JSON.stringify({ docstatus: 1 }), //submitted,
   });
   return submittedInvoice;
@@ -32,7 +30,7 @@ class Bill extends ERPFetch {
  readERP() {
   this.query = 'invoice_name=' + this.#ref;
 
-  return super.fetchERP({ method: 'GET' });
+  return super.fetchERP('GET');
  }
 
  static readManyERP(invoices) {

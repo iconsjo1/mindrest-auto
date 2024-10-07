@@ -36,8 +36,7 @@ class Customer extends ERPFetch {
   } catch {
    this.territory = country_id;
 
-   await super.fetchERP({
-    method: 'POST',
+   await super.fetchERP('POST', {
     body: JSON.stringify({
      customer_ref: this.#ref,
      customer_type: 'Individual',
@@ -49,7 +48,7 @@ class Customer extends ERPFetch {
  }
  readERP() {
   this.query = 'customer_ref=' + this.#ref;
-  return super.fetchERP({ method: 'GET' });
+  return super.fetchERP('GET');
  }
 }
 module.exports = Customer;

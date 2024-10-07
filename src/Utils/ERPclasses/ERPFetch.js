@@ -22,10 +22,11 @@ class ERPFetch {
  get url() {
   return '?' !== this.#query ? this.#url + this.#query : this.#url;
  }
- async fetchERP(fetchOptions) {
-  const { success, ...rest } = await fetch(this.url, { headers: this.#headers, ...fetchOptions }).then(resp =>
-   resp.json()
-  );
+ async fetchERP(method, fetchOptions) {
+  const { success, ...rest } = await fetch(
+   this.url,
+   Object.assign({ method, headers: this.#headers }, fetchOptions)
+  ).then(resp => resp.json());
 
   if (false === success) throw Error(rest.message);
 
