@@ -33,5 +33,9 @@ class Bill extends ERPFetch {
   this.query = 'invoice_name=' + this.#ref;
   return super.fetchERP({ method: 'GET' });
  }
+
+ static async readManyERP(invoices) {
+  return Promise.all(invoices.map(() => this.readERP()));
+ }
 }
 module.exports = Bill;
