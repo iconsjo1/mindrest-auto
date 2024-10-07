@@ -36,7 +36,7 @@ class Bill extends ERPFetch {
  }
 
  static readManyERP(invoices) {
-  return Promise.all(invoices.map(inv => new Bill(inv).readERP(inv)));
+  return Promise.all(invoices.map(inv => new Bill(inv).readERP()));
  }
 }
 module.exports = Bill;
