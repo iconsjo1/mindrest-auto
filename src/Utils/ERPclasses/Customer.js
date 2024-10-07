@@ -31,11 +31,9 @@ class Customer extends ERPFetch {
 
  async safeCreateERP(country_id) {
   try {
-   this.query = 'customer_ref=' + this.#ref;
-
-   await super.fetchERP({ method: 'GET' });
-  } catch {
+   await this.readERP();
    this.query = null;
+  } catch {
    this.territory = country_id;
 
    await super.fetchERP({

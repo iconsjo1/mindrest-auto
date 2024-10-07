@@ -10,12 +10,9 @@ class Service extends ERPFetch {
 
  async safeCreateERP() {
   try {
-   this.query = 'item_name=' + this.#ref;
-
-   await super.fetchERP({ method: 'GET' });
-  } catch {
+   await this.readERP();
    this.query = null;
-
+  } catch {
    await super.fetchERP({
     method: 'POST',
     body: JSON.stringify({ item_code: this.#ref, item_group: 'Services' }),

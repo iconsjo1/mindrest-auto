@@ -20,6 +20,7 @@ class PaymentEntry extends ERPFetch {
  addReference(invoice_ref) {
   this.#references.push(new PaymentEntryReference(invoice_ref, this.#amount));
  }
+
  async CreateERP() {
   this.query = null;
 
@@ -39,19 +40,18 @@ class PaymentEntry extends ERPFetch {
   });
   return entry;
  }
- readERP(entry, customer, invoice) {
+ readERP(filters) {
   const queries = [];
 
-  switch (arguments.length) {
-   case 3:
-    queries.push('invoice_ref=' + invoice); // Fallthrough
-   case 2:
-    queries.push('party=' + customer); // Fallthrough
-   case 1:
-    queries.push('payment_name=' + entry);
-  }
+  if ('invoice_ref' in filters) queries.push('invoice_ref=' + invoice);
+
+  if ('party' in filters) queries.push('party=' + customer);
+
+  if ('payment_name' in filters) queries.push('payment_name=' + entry);
+
   this.query = 0 < queries.length ? queries.join('&') : null;
   return super.fetchERP({ method: 'GET' });
  }
 }
+
 module.exports = PaymentEntry;
