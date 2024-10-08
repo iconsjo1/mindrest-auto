@@ -14,9 +14,9 @@ module.exports = route => app => {
    } = res.locals.utils;
    const { role_id, doctor_id, user_id } = res.locals;
 
-   const { user_id: id, patient_id } = req.query;
+   const { patient_id } = req.query;
    const { user, patient, idsdoctors } = req.body;
-   if (!isPositiveInteger(id)) return res.status(404).json({ success: false, msg: 'Patient was not found.' });
+   if (!isPositiveInteger(patient_id)) return res.status(404).json({ success: false, msg: 'Patient was not found.' });
 
    delete req.body.user.is_deleted;
    delete req.body.user.teller;
@@ -34,27 +34,27 @@ module.exports = route => app => {
     throw Error('Incorrect submittion of data.');
 
    const {
-    sets: usersSets,
-    values: userValues,
-    filters: userFilters,
-   } = SQLfeatures.update({ filters: { id: id }, ...user });
-
-   const {
     sets: patientSets,
     values: patientValues,
     filters: patientFilters,
-   } = SQLfeatures.update({ filters: { user_id: patient_id }, ...patient });
+   } = SQLfeatures.update({ filters: { id: patient_id }, ...patient });
    const display = {};
 
    client = await db.connect();
    await client.query('BEGIN').then(() => (begun = true));
 
-   display.user = await client
-    .query(`UPDATE public."Users" SET ${usersSets} WHERE ${userFilters} RETURNING *`, userValues)
-    .then(({ rows }) => rows[0]);
-
    display.patient = await client
     .query(`UPDATE public."Patients" SET ${patientSets} WHERE ${patientFilters} RETURNING *`, patientValues)
+    .then(({ rows }) => rows[0]);
+
+   const {
+    sets: usersSets,
+    values: userValues,
+    filters: userFilters,
+   } = SQLfeatures.update({ filters: { id: display.patient.user_id }, ...user });
+
+   display.user = await client
+    .query(`UPDATE public."Users" SET ${usersSets} WHERE ${userFilters} RETURNING *`, userValues)
     .then(({ rows }) => rows[0]);
 
    await client.query('DELETE FROM public."Doctor_Incharges" WHERE patient_id =$1 ', [patient_id]);
