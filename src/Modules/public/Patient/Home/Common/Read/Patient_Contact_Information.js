@@ -47,7 +47,7 @@ module.exports = route => app => {
       ? await db.query(
          `SELECT * FROM public."V_Patient_Contact_Info" WHERE 1=1 AND patient_id= ANY($1) AND ${clause}
         ${getLimitClause(limit)}`,
-         [patientids, doctor_id]
+         [patientids]
         )
       : await db.query(`SELECT * FROM public."V_Patient_Contact_Info" WHERE ${clause} ${getLimitClause(limit)}`);
 
