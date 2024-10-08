@@ -9,27 +9,32 @@ module.exports = route => app => {
     isPositiveInteger,
     SQLfeatures,
     isValidObject,
+    isEObjArray,
     ROLES,
     env: { EVENT },
    } = res.locals.utils;
    const { role_id, doctor_id, user_id } = res.locals;
 
    const { id: patient_id } = req.query;
-   const { user, patient, idsdoctors } = req.body;
+   const { user, patient, idsdoctors, service_discounts } = req.body;
    if (!isPositiveInteger(patient_id)) return res.status(404).json({ success: false, msg: 'Patient was not found.' });
-
-   delete req.body.user.is_deleted;
-   delete req.body.user.teller;
-
-   delete req.body.patient.is_deleted;
-   delete req.body.patient.teller;
 
    if (
     !isValidObject(user) ||
     !isValidObject(patient) ||
     !Array.isArray(idsdoctors) ||
     idsdoctors.length == 0 ||
-    !idsdoctors.every(id => isPositiveInteger(id))
+    !idsdoctors.every(id => isPositiveInteger(id)) ||
+    !isEObjArray(service_discounts, sd => {
+     const { isValidObject, isPositiveInteger, isPositiveNumber, isBool } = res.locals.utils;
+
+     return (
+      isValidObject(sd) &&
+      isPositiveInteger(sd.service_id) &&
+      isPositiveNumber(sd.discount) &&
+      (null == sd.is_percentag || isBool(sd.is_percentage))
+     );
+    })
    )
     throw Error('Incorrect submittion of data.');
 
@@ -65,6 +70,21 @@ module.exports = route => app => {
      idsdoctors,
     ])
     .then(({ rows }) => rows);
+
+   if (0 < service_discounts.length) {
+    const { fields, rows, values } = SQLfeatures.bulkInsert(
+     service_discounts.map(sd => ({ ...sd, is_percentage: sd.is_percentage ?? '%DEFAULT%' })),
+     { patient_id }
+    );
+
+    await client.query(`DELETE FROM public."Patient_Service_Discounts" WHERE patient_id=$1`, [patient_id]);
+
+    display.service_discounts = await client
+     .query(`INSERT INTO public."Patient_Service_Discounts"(${fields}) VALUES${rows} RETURNING *`, values)
+     .then(({ rows }) => rows);
+
+    display.service_discounts.sort((a, b) => parseInt(b.id, 10) - parseInt(a.id, 10));
+   }
 
    await client.query('COMMIT').then(() => (begun = false));
    res.json({
