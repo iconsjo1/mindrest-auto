@@ -14,7 +14,7 @@ module.exports = route => app => {
    if (
     !(
      isValidObject(user) &&
-     isValidObject(contact) &&
+     (null == contact || isValidObject(contact)) &&
      (null == patient || isValidObject(patient)) &&
      // isValidObject(emergency_contact)
      !(!Array.isArray(idsdoctors) || idsdoctors.length == 0 || !idsdoctors.every(id => isPositiveInteger(id))) &&
@@ -46,9 +46,10 @@ module.exports = route => app => {
    const [userSQL, userValues] = dbSQLInsert(user, 'Users');
    dispData.user = await client.query(userSQL, userValues).then(getRows(false));
 
-   const [contactSQL, contactValues] = dbSQLInsert({ ...contact, user_id: dispData.user.id }, 'Contacts');
-   dispData.contact = await client.query(contactSQL, contactValues).then(getRows(false));
-
+   if (isValidObject(contact)) {
+    const [contactSQL, contactValues] = dbSQLInsert({ ...contact, user_id: dispData.user.id }, 'Contacts');
+    dispData.contact = await client.query(contactSQL, contactValues).then(getRows(false));
+   }
    const [patientSQL, patientValues] = dbSQLInsert({ ...patient, user_id: dispData.user.id }, 'Patients');
    dispData.patient = await client.query(patientSQL, patientValues).then(getRows(false));
 
