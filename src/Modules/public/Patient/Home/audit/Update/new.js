@@ -14,7 +14,7 @@ module.exports = route => app => {
    } = res.locals.utils;
    const { role_id, doctor_id, user_id } = res.locals;
 
-   const { patient_id } = req.query;
+   const { id: patient_id } = req.query;
    const { user, patient, idsdoctors } = req.body;
    if (!isPositiveInteger(patient_id)) return res.status(404).json({ success: false, msg: 'Patient was not found.' });
 
