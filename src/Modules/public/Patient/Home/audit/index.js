@@ -3,5 +3,5 @@ module.exports =
  app => {
   require('./Create')({ patients, newPatiant })(app);
   require('./Patch')(patientsMark)(app);
-  require('./Update')(patients)(app);
+  require('./Update')({ patients, newPatiant })(app);
  };
