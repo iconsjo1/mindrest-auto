@@ -13,7 +13,7 @@ module.exports = route => app => {
 
    const { filters, values } = SQLfeatures.IDFilters(ids);
 
-   const { rows } = await db.query(`SELECT * FROM public."Meetings" WHERE ${filters} ${getLimitClause(limit)}`, values);
+   const { rows } = await db.query(`SELECT * FROM public."V_Meetings" WHERE ${filters} ${getLimitClause(limit)}`, values);
 
    res.json({
     success: true,
