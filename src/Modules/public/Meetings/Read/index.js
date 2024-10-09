@@ -20,7 +20,7 @@ module.exports = route => app => {
    const dispaly = [];
    if (ROLES.DOCTOR === role_id || ROLES.THERAPIST === role_id) {
     dispaly.push(
-     rows.map(item => {
+     ...rows.map(item => {
       return {
        ...item,
        show: item.user_id == user_id ? true : false,
@@ -29,7 +29,7 @@ module.exports = route => app => {
     );
    } else {
     dispaly.push(
-     rows.map(item => {
+     ...rows.map(item => {
       return {
        ...item,
        show: true,
