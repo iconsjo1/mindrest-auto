@@ -37,6 +37,7 @@ module.exports = app => {
   'Lab_Test',
   'Marital_Status',
   'Medicine',
+  'Meetings',
   'Patient',
   'Personnel_Title',
   'Prescription',
