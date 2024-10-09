@@ -28,7 +28,7 @@ module.exports = route => app => {
      })
     );
    } else {
-    dispaly = [...rows];
+    dispaly.push(...rows);
    }
    res.json({
     success: true,
