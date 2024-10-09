@@ -18,7 +18,7 @@ module.exports = route => app => {
     values
    );
    const dispaly = [];
-   if (ROLES.DOCTOR === role_id) {
+   if (ROLES.DOCTOR === role_id || ROLES.THERAPIST === role_id) {
     dispaly.push(
      rows.map(item => {
       return {
