@@ -6,10 +6,10 @@ module.exports = route => app => {
 
    const { db, getLimitClause, SQLfeatures, ROLES } = res.locals.utils;
 
-   const { role_id, user_id } = res.locals;
+//    const { role_id, user_id } = res.locals;
 
-   if (ROLES.DOCTOR === role_id) ids.user_id = user_id;
-   if (ROLES.THERAPIST === role_id) ids.user_id = user_id;
+//    if (ROLES.DOCTOR === role_id) ids.user_id = user_id;
+//    if (ROLES.THERAPIST === role_id) ids.user_id = user_id;
 
    const { filters, values } = SQLfeatures.IDFilters(ids);
    console.log(`SELECT * FROM public."V_Meetings" WHERE ${filters} ${getLimitClause(limit)}`);
