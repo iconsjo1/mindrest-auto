@@ -8,7 +8,7 @@ const { FUNCTIONALAUDIT, APPPORT: PORT, route_logger, ...utils } = require('../s
 // middleware
 app.use([cors(), route_logger]);
 const flatData = (req, _, next) => {
- if (/new-(patient|doctor).+$/.test(req._parsedUrl.path)) {
+ if (/new-(patient|doctor)(\?.*)?$/.test(req._parsedUrl.path)) {
   next();
  } else {
   for (let prop in req.body) {
