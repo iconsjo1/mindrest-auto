@@ -28,7 +28,14 @@ module.exports = route => app => {
      })
     );
    } else {
-    dispaly.push(...rows);
+    dispaly.push(
+     rows.map(item => {
+      return {
+       ...item,
+       show: true,
+      };
+     })
+    );
    }
    res.json({
     success: true,
