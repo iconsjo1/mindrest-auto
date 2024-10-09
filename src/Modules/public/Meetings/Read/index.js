@@ -17,31 +17,16 @@ module.exports = route => app => {
     `SELECT * FROM public."V_Meetings" WHERE ${filters} ${getLimitClause(limit)}`,
     values
    );
-   const dispaly = [];
-   if (ROLES.DOCTOR === role_id || ROLES.THERAPIST === role_id) {
-    dispaly.push(
-     ...rows.map(item => {
-      return {
-       ...item,
-       show: item.user_id == user_id ? true : false,
-      };
-     })
-    );
-   } else {
-    dispaly.push(
-     ...rows.map(item => {
-      return {
-       ...item,
-       show: true,
-      };
-     })
-    );
-   }
+   const display = rows.map(item => ({
+    ...item,
+    show: ROLES.DOCTOR === role_id || ROLES.THERAPIST === role_id ? item.user_id === user_id : true
+  }));
+  
    res.json({
     success: true,
-    no_of_records: dispaly.length,
-    msg: `Meeting${1 === dispaly.length ? ' was' : 's were'} retrieved successfully.`,
-    data: dispaly,
+    no_of_records: display.length,
+    msg: `Meeting${1 === display.length ? ' was' : 's were'} retrieved successfully.`,
+    data: display,
    });
   } catch ({ message }) {
    res.json({ success: false, message });
