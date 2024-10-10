@@ -8,10 +8,6 @@ class Bill extends ERPFetch {
   if (null != ref) this.#ref = ref;
  }
 
- get ref() {
-  return this.#ref;
- }
-
  async CreateERP(customer, service, rate) {
   this.query = null;
 
