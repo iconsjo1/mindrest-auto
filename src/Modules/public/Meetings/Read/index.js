@@ -19,7 +19,7 @@ module.exports = route => app => {
    );
    const display = rows.map(item => ({
     ...item,
-    show: ROLES.DOCTOR === role_id || ROLES.THERAPIST === role_id ? item.user_id === user_id : true
+    show: ROLES.DOCTOR === role_id || ROLES.THERAPIST === role_id ? item.user_id == user_id : true
   }));
   
    res.json({
