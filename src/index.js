@@ -30,42 +30,40 @@ app.use((_, res, next) => {
 // routs
 app.audit = FUNCTIONALAUDIT;
 require('./Modules')(app);
-if ('development' === app.get('env')) {
- app.listen(PORT, () => {
-  console.clear();
-  console.log('Server started on port %s', PORT);
+app.listen(PORT, () => {
+ console.clear();
+ console.log('Server started on port %s', PORT);
 
-  let routes = [];
-  app._router.stack.forEach(r => {
-   if (r?.route?.path && '*' !== r.route.path) {
-    routes.push({
-     path: r.route.path.substring(5),
-     method: Object.keys(r.route.methods).join(',').toUpperCase(),
-    });
-   }
-  });
-
-  console.log('Number of routes: %i', routes.length);
-
-  routes = routes.reduce(
-   (acc, { path }) => ({
-    ...acc,
-    [path]: [
-     ...new Set(
-      routes.reduce((acc, { method, path: rf_path }) => {
-       if (rf_path === path) acc.push(method);
-       return acc;
-      }, [])
-     ),
-    ],
-   }),
-   {}
-  );
-
-  console.table(
-   Object.keys(routes)
-    .sort((a, b) => b - a)
-    .reduce((acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k].sort().join(', ') } }), {})
-  );
+ let routes = [];
+ app._router.stack.forEach(r => {
+  if (r?.route?.path && '*' !== r.route.path) {
+   routes.push({
+    path: r.route.path.substring(5),
+    method: Object.keys(r.route.methods).join(',').toUpperCase(),
+   });
+  }
  });
-} else app.listen(PORT, () => console.log('Server started!'));
+
+ console.log('Number of routes: %i', routes.length);
+
+ routes = routes.reduce(
+  (acc, { path }) => ({
+   ...acc,
+   [path]: [
+    ...new Set(
+     routes.reduce((acc, { method, path: rf_path }) => {
+      if (rf_path === path) acc.push(method);
+      return acc;
+     }, [])
+    ),
+   ],
+  }),
+  {}
+ );
+
+ console.table(
+  Object.keys(routes)
+   .sort((a, b) => b - a)
+   .reduce((acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k].sort().join(', ') } }), {})
+ );
+});
