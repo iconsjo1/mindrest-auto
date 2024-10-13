@@ -34,6 +34,11 @@ class ERPFetch {
 
   return rest[this.#dataField];
  }
+
+ queryERP(method, body) {
+  const returnPromise = null != body ? this.fetchERP(method, { body: JSON.stringify(body) }) : this.fetchERP(method);
+  return returnPromise.finally(() => (this.query = null));
+ }
 }
 
 module.exports = ERPFetch;

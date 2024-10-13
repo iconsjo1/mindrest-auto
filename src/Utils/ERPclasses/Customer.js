@@ -32,7 +32,6 @@ class Customer extends ERPFetch {
  async safeCreateERP(country_id) {
   try {
    await this.readERP();
-   this.query = null;
   } catch {
    this.territory = country_id;
 
@@ -48,7 +47,7 @@ class Customer extends ERPFetch {
  }
  readERP() {
   this.query = 'customer_ref=' + this.#ref;
-  return super.fetchERP('GET');
+  return super.queryERP('GET');
  }
 }
 module.exports = Customer;

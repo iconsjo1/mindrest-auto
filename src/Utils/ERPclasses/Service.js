@@ -21,7 +21,7 @@ class Service extends ERPFetch {
  }
  readERP() {
   this.query = 'item_name=' + this.#ref;
-  return super.fetchERP({ method: 'GET' });
+  return super.queryERP('GET');
  }
 }
 module.exports = Service;

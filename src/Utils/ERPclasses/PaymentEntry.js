@@ -22,8 +22,6 @@ class PaymentEntry extends ERPFetch {
  }
 
  async CreateERP() {
-  this.query = null;
-
   const entry = await super.fetchERP('POST', {
    body: JSON.stringify({
     mode_of_payment: this.#method_name,
@@ -49,7 +47,7 @@ class PaymentEntry extends ERPFetch {
   if ('payment_name' in filters) queries.push('payment_name=' + entry);
 
   this.query = 0 < queries.length ? queries.join('&') : null;
-  return super.fetchERP('GET');
+  return super.queryERP('GET');
  }
 }
 
