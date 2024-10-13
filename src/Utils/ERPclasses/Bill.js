@@ -15,9 +15,10 @@ class Bill extends ERPFetch {
 
   this.#ref = name;
 
-  const submittedInvoice = await this.queryERP('PUT', {
-   body: { docstatus: 1 }, //submitted,
-  });
+  const submittedInvoice = await this.queryERP(
+    'PUT',
+    { docstatus: 1 } //submitted,
+   );
 
   return submittedInvoice;
  }
