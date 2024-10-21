@@ -16,6 +16,6 @@
  },
  "scripts": {
   "dev": "yarn && nodemon .",
-  "format": "prettier --write .prettierrc.json package.json index.js src/**/*.js"
+  "format": "prettier --write **/*.{js,json}"
  }
 }

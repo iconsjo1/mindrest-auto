@@ -8,6 +8,11 @@ class Bill extends ERPFetch {
   if (null != ref) this.#ref = ref;
  }
 
+ get ref() {
+  // needed for Post Bill
+  return this.#ref;
+ }
+
  async CreateERP(customer, service, rate) {
   const { name } = await super.fetchERP('POST', {
    body: JSON.stringify({ customer, items: [{ item_code: service, qty: 1, rate }] }),
@@ -16,9 +21,9 @@ class Bill extends ERPFetch {
   this.#ref = name;
 
   const submittedInvoice = await this.queryERP(
-    'PUT',
-    { docstatus: 1 } //submitted,
-   );
+   'PUT',
+   { docstatus: 1 } //submitted,
+  );
 
   return submittedInvoice;
  }
