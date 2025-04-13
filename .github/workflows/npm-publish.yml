@@ -23,6 +23,7 @@ jobs:
      with:
       node-version: ${{ matrix.node-version }}
       cache: 'npm'
+
    - run: npm i |
       export NODE_ENV=development
       npx pm2 reload mindrest-Auto
