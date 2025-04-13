@@ -87,11 +87,7 @@ module.exports = route => app => {
    }
 
    await client.query('COMMIT').then(() => (begun = false));
-   res.json({
-    success: true,
-    msg: 'Patient was updated successfully.',
-    data: display,
-   });
+   res.json({ success: true, msg: 'Patient was updated successfully.', data: display });
   } catch ({ message }) {
    res.json({ success: false, message });
   } finally {

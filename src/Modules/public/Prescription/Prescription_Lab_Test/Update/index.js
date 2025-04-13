@@ -17,11 +17,7 @@ module.exports = route => app => {
     `UPDATE public."Prescription_Lab_Tests" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
-   res.json({
-    success: true,
-    msg: 'Prescription lab test was updated successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Prescription lab test was updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

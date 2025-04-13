@@ -40,10 +40,7 @@ module.exports = route => app => {
 
    if (false === mimetype) throw Error('File extention of [' + ext + '] does not have a mimetype');
 
-   const s3 = new AWS.S3({
-    ...credentials,
-    s3BucketEndpoint: true,
-   });
+   const s3 = new AWS.S3({ ...credentials, s3BucketEndpoint: true });
 
    client = await db.connect();
 
@@ -104,22 +101,9 @@ module.exports = route => app => {
        Key: document.document_path + '-medium' + ext,
       })
       .promise(),
-     s3
-      .putObject({
-       Body: file.buffer,
-       Bucket: bucket,
-       Key: document.document_path + '-full' + ext,
-      })
-      .promise(),
+     s3.putObject({ Body: file.buffer, Bucket: bucket, Key: document.document_path + '-full' + ext }).promise(),
     ]);
-   } else
-    await s3
-     .putObject({
-      Body: file.buffer,
-      Bucket: bucket,
-      Key: document.document_path + ext,
-     })
-     .promise();
+   } else await s3.putObject({ Body: file.buffer, Bucket: bucket, Key: document.document_path + ext }).promise();
 
    await client.query('COMMIT;').then(_ => (transactionStarted = false));
 

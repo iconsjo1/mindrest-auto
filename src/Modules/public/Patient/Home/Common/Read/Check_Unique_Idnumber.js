@@ -15,10 +15,7 @@ module.exports = route => app => {
     })
     .then(({ rows }) => 0 < rows.length);
 
-   res.json({
-    success: true,
-    msg: `ID-NUMBER ${hasMatch ? 'does not exist' : 'exists'}`,
-   });
+   res.json({ success: true, msg: `ID-NUMBER ${hasMatch ? 'does not exist' : 'exists'}` });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

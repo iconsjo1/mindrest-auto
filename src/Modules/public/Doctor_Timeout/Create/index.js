@@ -10,11 +10,7 @@ module.exports = route => app => {
     `INSERT INTO public."Doctor_Timeouts"(${fields}) VALUES(${enc_values}) RETURNING *,fn_calc_end_time(start,slots_count) end`,
     Object.values(req.body)
    );
-   res.json({
-    success: true,
-    msg: 'Doctor timeout was created successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Doctor timeout was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

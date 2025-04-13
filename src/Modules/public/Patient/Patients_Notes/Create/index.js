@@ -20,11 +20,7 @@ module.exports = route => app => {
     `INSERT INTO public."Patients_Notes"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
-   res.json({
-    success: true,
-    msg: 'Patient note was created successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Patient note was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

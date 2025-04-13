@@ -9,11 +9,7 @@ module.exports = route => app => {
 
    const { rows } = await db.query('DELETE FROM public."Patients_Notes" WHERE 1=1 AND id = $1 RETURNING *', [id]);
 
-   res.json({
-    Success: true,
-    msg: 'Patients note was deleted successfully.',
-    data: rows,
-   });
+   res.json({ Success: true, msg: 'Patients note was deleted successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

@@ -16,11 +16,7 @@ module.exports = route => app => {
     id,
    ]);
 
-   res.json({
-    success: true,
-    msg: 'Relationship was updated successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Relationship was updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

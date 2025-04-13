@@ -6,5 +6,6 @@
  "tabWidth": 1,
  "arrowParens": "avoid",
  "trailingComma": "es5",
- "bracketSpacing": true
+ "bracketSpacing": true,
+ "objectWrap": "collapse"
 }

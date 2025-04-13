@@ -22,12 +22,7 @@ module.exports = app => {
   note,
  } = routes;
 
- require('./Home')({
-  idnum,
-  patients,
-  pcontactInfo,
-  newPatiant,
- })(app);
+ require('./Home')({ idnum, patients, pcontactInfo, newPatiant })(app);
  require('./Patient_Answer')(answer)(app);
  require('./Patient_Deposite')(deposite)(app);
  require('./Patient_Document')(document)(app);

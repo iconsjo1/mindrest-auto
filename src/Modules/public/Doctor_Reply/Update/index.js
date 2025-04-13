@@ -16,11 +16,7 @@ module.exports = route => app => {
     id,
    ]);
 
-   res.json({
-    success: true,
-    msg: 'Doctor reply was updated successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Doctor reply was updated successfully.', data: rows });
   } catch ({ messge }) {
    res.json({ success: false, message });
   }

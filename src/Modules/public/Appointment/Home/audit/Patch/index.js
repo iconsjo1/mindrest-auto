@@ -31,11 +31,7 @@ module.exports = route => app => {
     ]);
 
    await client.query('COMMIT').then(() => (begun = false));
-   res.json({
-    Success: true,
-    msg: 'Appointment was marked deleted successfully.',
-    data: rows,
-   });
+   res.json({ Success: true, msg: 'Appointment was marked deleted successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   } finally {

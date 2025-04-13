@@ -21,11 +21,7 @@ module.exports = route => app => {
     `UPDATE public."Patients" SET ${changed} WHERE 1=1 AND id=$${i} AND ${clause} RETURNING *`,
     [...Object.values(req.body), id]
    );
-   res.json({
-    success: true,
-    msg: 'Patient was updated successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Patient was updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

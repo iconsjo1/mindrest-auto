@@ -28,9 +28,7 @@ module.exports = route => app => {
    if (0 === signedIn.length) throw Error('User email={' + email + '} WITH password does not exist.');
 
    const [{ id: user_id, user_name, teller }] = signedIn;
-   const token = jwt.sign({ user_id, user_name }, 'jwt-MIND-2023', {
-    expiresIn: '2d',
-   });
+   const token = jwt.sign({ user_id, user_name }, 'jwt-MIND-2023', { expiresIn: '2d' });
 
    client = await db.connect();
    await client.query('BEGIN').then(() => (begun = true));
@@ -50,15 +48,8 @@ module.exports = route => app => {
 
    res.json(
     0 < rows.length
-     ? {
-        success: true,
-        msg: `User logged in successfully.`,
-        data: rows,
-       }
-     : {
-        success: false,
-        msg: 'useraname and/or password does not match.',
-       }
+     ? { success: true, msg: `User logged in successfully.`, data: rows }
+     : { success: false, msg: 'useraname and/or password does not match.' }
    );
   } catch ({ message }) {
    res.json({ success: false, message });

@@ -4,26 +4,25 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: [ "main" ]
-
+ push:
+  branches: ['main']
 
 jobs:
-  build:
+ build:
+  runs-on: self-hosted
 
-    runs-on: self-hosted
+  strategy:
+   matrix:
+    node-version: [22.12.0]
+    # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
-    strategy:
-      matrix:
-        node-version: [18.14.1]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm i
-    - run: export NODE_ENV=development && npx pm2 reload mindrest-Auto
+  steps:
+   - uses: actions/checkout@v3
+   - name: Use Node.js ${{ matrix.node-version }}
+     uses: actions/setup-node@v3
+     with:
+      node-version: ${{ matrix.node-version }}
+      cache: 'npm'
+   - run: npm i |
+      export NODE_ENV=development
+      npx pm2 reload mindrest-Auto

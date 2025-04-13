@@ -10,11 +10,7 @@ module.exports = route => app => {
     ? await db.query('SELECT * FROM public."Forms" WHERE 1=1 AND id=$1', [id])
     : await db.query(`SELECT * FROM public."Forms" ${orderBy('id')} ${getLimitClause(limit)}`);
 
-   res.json({
-    success: true,
-    msg: `Form${1 === rows.length ? ' was' : 's were'} retrieved successfully.`,
-    data: rows,
-   });
+   res.json({ success: true, msg: `Form${1 === rows.length ? ' was' : 's were'} retrieved successfully.`, data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

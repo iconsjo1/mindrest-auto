@@ -1,8 +1,5 @@
 const routes = {
- home: {
-  documents: '/REST/documents',
-  do_documents: '/REST/do_documents',
- },
+ home: { documents: '/REST/documents', do_documents: '/REST/do_documents' },
  cat: '/REST/document_categories',
 };
 

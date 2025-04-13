@@ -1,12 +1,11 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const compression = require('compression');
 const db = require('./pool');
 
-const { FUNCTIONALAUDIT, APPPORT: PORT, route_logger, ...utils } = require('../src/Utils');
+const { FUNCTIONALAUDIT, APPPORT, route_logger, ...utils } = require('../src/Utils');
 
-// middleware
-app.use([cors(), route_logger]);
 const flatData = (req, _, next) => {
  if (/new-(patient|doctor)(\?.*)?$/.test(req._parsedUrl.path)) {
   next();
@@ -18,54 +17,63 @@ const flatData = (req, _, next) => {
   next();
  }
 };
+app.use([
+ cors(),
+ compression(),
+ (req, res, next) => {
+  res.locals.utils = { db, ...utils };
+  res.set('Access-Control-Allow-Origin', '*');
 
-app.post('*', [express.json(), flatData]);
-app.put('*', [express.json(), flatData]);
+  if (['POST', 'PUT'].includes(req.method)) return express.json()(req, res, flatData);
+  next();
+ },
+ route_logger,
+]);
 
-app.use((_, res, next) => {
- res.locals.utils = { db, ...utils };
- res.set('Access-Control-Allow-Origin', '*');
- next();
-});
+// middleware
 
-// routs
+// routes
 app.audit = FUNCTIONALAUDIT;
 require('./Modules')(app);
 
-app.listen(PORT, () => {
+app.listen(APPPORT, () => {
  console.clear();
- console.log('Server started on port %s', PORT);
+ console.log('Server started on port %s', APPPORT);
 
- let routes = [];
- app._router.stack.forEach(r => {
-  if (r?.route?.path && '*' !== r.route.path) {
-   routes.push({
-    path: r.route.path.substring(5),
-    method: Object.keys(r.route.methods).join(',').toUpperCase(),
-   });
-  }
- });
+ const { stack } = app.router;
 
- console.log('Number of routes: %i', routes.length);
+ const routes = stack
+  .reduce((acc, r) => {
+   if (r?.route?.path)
+    acc.push({ path: r.route.path.substring(5), method: Object.keys(r.route.methods).join(',').toUpperCase() });
 
- routes = routes.reduce(
-  (acc, { path }) => ({
-   ...acc,
-   [path]: [
-    ...new Set(
-     routes.reduce((acc, { method, path: rf_path }) => {
-      if (rf_path === path) acc.push(method);
-      return acc;
-     }, [])
-    ),
-   ],
-  }),
-  {}
- );
+   return acc;
+  }, [])
+  .reduce(
+   (outAcc, route, _, self) =>
+    Object.assign(outAcc, {
+     [route.path]: self.reduce((inAcc, s) => {
+      if (s.path === route.path) inAcc.push(s.method);
+
+      return inAcc;
+     }, []),
+    }),
+   {}
+  );
+
+ console.log('Number of routes: %i', stack.filter(s => 'handle' === s.name).length);
+
+ const fixedMethods = { POST: 'POST', GET: 'GET', PUT: 'PUT', DELETE: 'DELETE', PATCH: 'PATCH' };
 
  console.table(
   Object.keys(routes)
    .sort((a, b) => b - a)
-   .reduce((acc, k) => ({ ...acc, [++Object.keys(acc).length]: { path: k, method: routes[k].sort().join(', ') } }), {})
+   .reduce((acc, k) => {
+    const methods = {};
+    routes[k].forEach(r => (methods[r] = fixedMethods[r]));
+
+    return { ...acc, [++Object.keys(acc).length]: { Path: k, ...methods } };
+   }, {}),
+  ['Path'].concat(Object.values(fixedMethods))
  );
 });

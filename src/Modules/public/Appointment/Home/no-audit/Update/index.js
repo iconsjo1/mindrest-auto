@@ -19,11 +19,7 @@ module.exports = route => app => {
 
    const { rows } = await db.query(`UPDATE public."Appointments" SET ${sets} WHERE ${filters} RETURNING *`, values);
 
-   res.json({
-    success: true,
-    msg: 'Appointment was updated successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Appointment was updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

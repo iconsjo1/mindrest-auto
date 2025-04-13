@@ -12,11 +12,7 @@ module.exports = route => app => {
     [id]
    );
 
-   res.json({
-    Success: true,
-    msg: 'Emergency contact was marked deleted successfully.',
-    data: rows,
-   });
+   res.json({ Success: true, msg: 'Emergency contact was marked deleted successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

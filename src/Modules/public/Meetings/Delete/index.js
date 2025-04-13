@@ -17,11 +17,7 @@ module.exports = route => app => {
     [id]
    );
 
-   res.json({
-    Success: true,
-    msg: 'Meeting was deleted successfully.',
-    data: rows,
-   });
+   res.json({ Success: true, msg: 'Meeting was deleted successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

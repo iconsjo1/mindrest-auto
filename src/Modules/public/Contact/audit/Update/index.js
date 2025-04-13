@@ -35,11 +35,7 @@ module.exports = route => app => {
     ]);
 
    await client.query('COMMIT').then(() => (begun = false));
-   res.json({
-    success: true,
-    msg: 'Contact was updated successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Contact was updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   } finally {

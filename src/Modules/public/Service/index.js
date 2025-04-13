@@ -1,7 +1,4 @@
-const routes = {
- services: '/REST/services',
- servicec: '/REST/service_categories',
-};
+const routes = { services: '/REST/services', servicec: '/REST/service_categories' };
 module.exports = app => {
  const { services, servicec } = routes;
 

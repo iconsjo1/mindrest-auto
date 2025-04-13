@@ -14,11 +14,7 @@ module.exports = route => app => {
     `INSERT INTO public."Service_Categories"(${fields}) VALUES(${enc_values}) RETURNING *`,
     values
    );
-   res.json({
-    success: true,
-    msg: 'Service category was created successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Service category was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

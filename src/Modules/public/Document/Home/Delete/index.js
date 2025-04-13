@@ -14,10 +14,7 @@ module.exports = route => app => {
      do: { credentials, bucket },
     },
    } = res;
-   const s3 = new AWS.S3({
-    ...credentials,
-    s3BucketEndpoint: true,
-   });
+   const s3 = new AWS.S3({ ...credentials, s3BucketEndpoint: true });
 
    const { id } = req.query;
    if (!isPositiveInteger(id)) return res.status(404).json({ success: false, message: 'Document was not found.' });
@@ -50,32 +47,11 @@ module.exports = route => app => {
     try {
      if (true === is_resizable && /^ima/.test(document_mimetype)) {
       await Promise.all([
-       s3
-        .deleteObject({
-         Bucket: bucket,
-         Key: `${document_path}-small.${document_extension}`,
-        })
-        .promise(),
-       s3
-        .deleteObject({
-         Bucket: bucket,
-         Key: `${document_path}-medium.${document_extension}`,
-        })
-        .promise(),
-       s3
-        .deleteObject({
-         Bucket: bucket,
-         Key: `${document_path}-full.${document_extension}`,
-        })
-        .promise(),
+       s3.deleteObject({ Bucket: bucket, Key: `${document_path}-small.${document_extension}` }).promise(),
+       s3.deleteObject({ Bucket: bucket, Key: `${document_path}-medium.${document_extension}` }).promise(),
+       s3.deleteObject({ Bucket: bucket, Key: `${document_path}-full.${document_extension}` }).promise(),
       ]);
-     } else
-      await s3
-       .deleteObject({
-        Bucket: bucket,
-        Key: `${document_path}.${document_extension}`,
-       })
-       .promise();
+     } else await s3.deleteObject({ Bucket: bucket, Key: `${document_path}.${document_extension}` }).promise();
     } catch ({ message }) {
      throw Error(message);
     }
@@ -84,11 +60,7 @@ module.exports = route => app => {
    await client.query('COMMIT;').then(_ => (transactionStarted = false));
    client.release();
 
-   res.json({
-    Success: true,
-    message: 'Document was deleted successfully.',
-    data: deletedDocument,
-   });
+   res.json({ Success: true, message: 'Document was deleted successfully.', data: deletedDocument });
   } catch ({ message }) {
    let msg = message;
    if (null != client) {

@@ -15,11 +15,7 @@ module.exports = route => app => {
     `INSERT INTO public."Doctor_Todos"(${fields}) VALUES(${enc_values}) RETURNING ${todo_columns}`,
     Object.values(req.body)
    );
-   res.json({
-    success: true,
-    msg: 'Doctor todo was created successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Doctor todo was created successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

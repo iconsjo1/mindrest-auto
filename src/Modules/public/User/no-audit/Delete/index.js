@@ -20,12 +20,7 @@ module.exports = route => app => {
     uid,
    ]);
 
-   res.json({
-    success: true,
-    uid,
-    msg: 'User was logged out successfully.',
-    data: rows,
-   });
+   res.json({ success: true, uid, msg: 'User was logged out successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

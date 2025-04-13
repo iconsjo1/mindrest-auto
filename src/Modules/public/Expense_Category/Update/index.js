@@ -15,11 +15,7 @@ module.exports = route => app => {
     `UPDATE public."Expense_Categories" SET ${changed} WHERE 1=1 AND id=$${i} RETURNING *`,
     [...Object.values(req.body), id]
    );
-   res.json({
-    success: true,
-    msg: 'Expense category was updated successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Expense category was updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

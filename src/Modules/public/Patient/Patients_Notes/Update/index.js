@@ -21,11 +21,7 @@ module.exports = route => app => {
     ...Object.values(req.body),
     id,
    ]);
-   res.json({
-    success: true,
-    msg: 'Patients note was updated successfully.',
-    data: rows,
-   });
+   res.json({ success: true, msg: 'Patients note was updated successfully.', data: rows });
   } catch ({ message }) {
    res.json({ success: false, message });
   }

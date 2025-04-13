@@ -32,10 +32,7 @@ module.exports = route => app => {
        )`
     : '1=1';
 
-   const s3 = new AWS.S3({
-    ...credentials,
-    s3BucketEndpoint: true,
-   });
+   const s3 = new AWS.S3({ ...credentials, s3BucketEndpoint: true });
 
    const { rows: dbdocument } = await db.query(
     `SELECT 
@@ -54,10 +51,7 @@ module.exports = route => app => {
 
    const { Body } = await s3.getObject({ Bucket: bucket, Key }).promise();
 
-   res.set({
-    [CONTENT_DISPOSITION]: `attachment; filename=${basename(Key)}`,
-    'Content-Type': mimetype,
-   });
+   res.set({ [CONTENT_DISPOSITION]: `attachment; filename=${basename(Key)}`, 'Content-Type': mimetype });
    res.end(Body, 'binary');
   } catch ({ message }) {
    res.json({ success: false, message: message ?? 'File may not exists.' });
