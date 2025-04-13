@@ -28,16 +28,16 @@ module.exports = route => app => {
         SELECT 1
         FROM public."Document_Categories" dc
         WHERE d.document_category_id = dc.id
-        AND true = is_resizable
+        AND is_resizable = true
        )`
     : '1=1';
 
    const s3 = new AWS.S3({ ...credentials, s3BucketEndpoint: true });
 
    const { rows: dbdocument } = await db.query(
-    `SELECT 
-        CONCAT(document_path, '${'1=1' !== resizeCond ? '-' + required_size : ''}.', document_extension) "Key",
-        document_mimetype mimetype
+    `SELECT
+       CONCAT(document_path, '${'1=1' !== resizeCond ? '-' + required_size : ''}.', document_extension) "Key",
+       document_mimetype mimetype
     FROM public."Documents" d
    WHERE 1=1
     AND id = $1

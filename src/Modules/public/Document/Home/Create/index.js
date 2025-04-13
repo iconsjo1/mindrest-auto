@@ -106,7 +106,7 @@ module.exports = route => app => {
    if (null != client) {
     if (true === begun) {
      try {
-      await client.query('ROLLBACK TO SAVEPOINT ' + SAVEPOINT);
+      await client.query('ROLLBACK');
      } catch ({ message }) {
       console.error(message);
      }

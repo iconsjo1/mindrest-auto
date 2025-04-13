@@ -3,14 +3,12 @@ const AWS = require('aws-sdk');
 module.exports = route => app => {
  // Delete Documents
  app.delete(route, async (req, res) => {
-  const SAVEPOINT = 'FRESH';
-
   let client = null;
-  let transactionStarted = false;
+  let begun = false;
   try {
    const {
     locals: {
-     utils: { db, isPositiveInteger },
+     utils: { db, isPositiveInteger, pgRowMode },
      do: { credentials, bucket },
     },
    } = res;
@@ -21,15 +19,15 @@ module.exports = route => app => {
 
    client = await db.connect();
 
-   await client.query('BEGIN;SAVEPOINT ' + SAVEPOINT).then(_ => (transactionStarted = true));
+   await client.query('BEGIN').then(() => (begun = true));
 
    const { rows: deletedDocument } = await client.query(
     `DELETE FROM public."Documents"
-            WHERE 1=1 AND id = $1
-            RETURNING document_path,
-                      document_extension,
-                      document_mimetype,
-                      document_category_id`.replace(/\s+/g, ' '),
+     WHERE 1=1 AND id = $1
+     RETURNING document_path,
+               document_extension,
+               document_mimetype,
+               document_category_id`,
     [id]
    );
 
@@ -37,43 +35,36 @@ module.exports = route => app => {
     const [{ document_path, document_extension, document_mimetype, document_category_id }] = deletedDocument;
 
     const is_resizable = await client
-     .query({
-      text: 'SELECT is_resizable FROM public."Document_Categories" WHERE id=$1',
-      values: [document_category_id],
-      rowMode: 'array',
-     })
-     .then(({ rows }) => rows[0][0]);
+     .query(pgRowMode('SELECT is_resizable FROM public."Document_Categories" WHERE id = $1', [document_category_id]))
+     .then(({ rows }) => rows[0]?.[0]);
 
-    try {
-     if (true === is_resizable && /^ima/.test(document_mimetype)) {
-      await Promise.all([
-       s3.deleteObject({ Bucket: bucket, Key: `${document_path}-small.${document_extension}` }).promise(),
-       s3.deleteObject({ Bucket: bucket, Key: `${document_path}-medium.${document_extension}` }).promise(),
-       s3.deleteObject({ Bucket: bucket, Key: `${document_path}-full.${document_extension}` }).promise(),
-      ]);
-     } else await s3.deleteObject({ Bucket: bucket, Key: `${document_path}.${document_extension}` }).promise();
-    } catch ({ message }) {
-     throw Error(message);
-    }
+    if (undefined === is_resizable) throw Error('Document category was not found.');
+
+    if (true === is_resizable && /^ima/.test(document_mimetype)) {
+     await Promise.all([
+      s3.deleteObject({ Bucket: bucket, Key: `${document_path}-small.${document_extension}` }).promise(),
+      s3.deleteObject({ Bucket: bucket, Key: `${document_path}-medium.${document_extension}` }).promise(),
+      s3.deleteObject({ Bucket: bucket, Key: `${document_path}-full.${document_extension}` }).promise(),
+     ]);
+    } else await s3.deleteObject({ Bucket: bucket, Key: `${document_path}.${document_extension}` }).promise();
    }
 
-   await client.query('COMMIT;').then(_ => (transactionStarted = false));
-   client.release();
+   await client.query('COMMIT;').then(() => (begun = false));
 
    res.json({ Success: true, message: 'Document was deleted successfully.', data: deletedDocument });
   } catch ({ message }) {
-   let msg = message;
+   res.json({ success: false, message });
+  } finally {
    if (null != client) {
-    if (true === transactionStarted) {
+    if (true === begun) {
      try {
       await client.query('ROLLBACK TO SAVEPOINT ' + SAVEPOINT);
-     } catch ({ message: rmessage }) {
-      msg = rmessage;
+     } catch ({ message }) {
+      console.error(message);
      }
     }
     client.release();
    }
-   res.json({ success: false, message: msg });
   }
  });
 };

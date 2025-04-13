@@ -24,4 +24,5 @@ module.exports = {
  orderBy: fieldName => require('./orderBy')(fieldName),
  pgRowMode: (query, values) => require('./rowMode')(query, values),
  route_logger: require('./Route_Logger'),
+ toBuffer: stream => require('./StreemToBuffer')(stream),
 };
