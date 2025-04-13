@@ -15,6 +15,9 @@ class ERPFetch {
   this.#query = '?';
  }
 
+ /**
+  * @param {string | null} _query
+  */
  set query(_query) {
   if (null == _query) this.#query = '?';
   else this.#query += _query;

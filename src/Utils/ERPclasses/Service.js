@@ -13,8 +13,7 @@ class Service extends ERPFetch {
    await this.readERP();
    this.query = null;
   } catch {
-   await super.fetchERP({
-    method: 'POST',
+   await super.fetchERP('POST', {
     body: JSON.stringify({ item_code: this.#ref, item_group: 'Services' }),
    });
   }

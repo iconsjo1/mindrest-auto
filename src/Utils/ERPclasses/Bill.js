@@ -15,22 +15,26 @@ class Bill extends ERPFetch {
 
  async CreateERP(customer, service, rate) {
   const { name } = await super.fetchERP('POST', {
-   body: JSON.stringify({ customer, items: [{ item_code: service, qty: 1, rate }] }),
+   body: JSON.stringify({
+    customer,
+    items: [{ item_code: service, qty: 1, rate }],
+    allocate_advances_automatically: 1, // connected to first payment entry
+   }),
   });
 
   this.#ref = name;
 
   const submittedInvoice = await this.queryERP(
    'PUT',
-   { docstatus: 1 } //submitted,
+   { docstatus: 1 } //submitted,docstatus
   );
 
   return submittedInvoice;
  }
- queryERP(method) {
+ queryERP(method, body) {
   this.query = 'invoice_name=' + this.#ref;
 
-  return super.queryERP(method);
+  return super.queryERP(method, body);
  }
 
  static readManyERP(invoices) {
