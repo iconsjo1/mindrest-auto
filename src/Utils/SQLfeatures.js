@@ -1,5 +1,26 @@
-module.exports = {
- IDFilters(idFilters) {
+class CommandGenerator {
+ #makeCommand(commandParts, values) {
+  return commandParts.reduce((acc, _, i) => acc + commandParts[i] + (i < values.length ? values[i] : ''), '');
+ }
+
+ createUpdateCommand(tableName, ...rest) {
+  const sqlUpdateCommandParts = ['UPDATE ', ' SET ', ' WHERE ', ' RETURNING *'];
+  return this.#makeCommand(sqlUpdateCommandParts, [tableName, ...rest]);
+ }
+
+ createInsertCommand(tableName, ...rest) {
+  const sqlInsertCommandParts = ['INSERT INTO ', '(', ') VALUES (', ') RETURNING *'];
+  return this.#makeCommand(sqlInsertCommandParts, [tableName, ...rest]);
+ }
+
+ createDeleteCommand(tableName, ...rest) {
+  const sqlDeleteCommandParts = ['DELETE FROM ', ' WHERE ', ' RETURNING *'];
+  return this.#makeCommand(sqlDeleteCommandParts, [tableName, ...rest]);
+ }
+}
+
+class SQLfeatures {
+ static IDFilters(idFilters) {
   const { isValidObject, isPositiveInteger } = require('.');
 
   const conditionSet = ['1=1'];
@@ -16,9 +37,10 @@ module.exports = {
     valueSet.push(v);
    }
   }
-  return { filters: conditionSet.join(' AND '), values: valueSet };
- },
- update({ filters, ...setData }) {
+  return { filtersArr: conditionSet, filters: conditionSet.join(' AND '), values: valueSet };
+ }
+
+ static update({ filters, ...setData }, tableName) {
   const sets = [];
   const valueSet = [];
   let objIndex = 0;
@@ -38,9 +60,11 @@ module.exports = {
    valueSet.push(filters[k]);
   }
 
-  return { sets: sets, values: valueSet, filters: filterSet.join(' AND ') };
- },
- bulkInsert(arrobj, keyFieldsOBJ = {}) {
+  return undefined === tableName
+   ? { sets, values: valueSet, filters: filterSet.join(' AND ') }
+   : [new CommandGenerator().createUpdateCommand(tableName, sets, filterSet.join(' AND ')), valueSet];
+ }
+ static bulkInsert(arrobj, keyFieldsOBJ) {
   const values = [];
   const bulkKeyFields = [];
   const fields = [...new Set(arrobj.flatMap(o => Object.keys(o)))];
@@ -50,14 +74,14 @@ module.exports = {
 
    const encKeyFields = [];
 
-   if (0 < Object.keys(keyFieldsOBJ).length)
+   if (undefined !== keyFieldsOBJ)
     for (const key in keyFieldsOBJ) {
      encKeyFields.push(`$${++sanitizingIndex}`);
      values.push(keyFieldsOBJ[key]);
      bulkKeyFields.push(key);
     }
 
-   const keyEnc = encKeyFields.reduce((acc, enc) => (acc += enc + ', '), '');
+   const keyEnc = encKeyFields.reduce((acc, enc) => `${acc + enc}, `, '');
 
    const setPrefixComma = val => (0 < val ? ', ' : '');
 
@@ -69,7 +93,7 @@ module.exports = {
      const yret = setPrefixComma(j);
 
      if ('%DEFAULT%' === v) {
-      yield `${yret} DEFAULT`;
+      yield `${yret}DEFAULT`;
      } else {
       values.push(v);
       yield `${yret}$${++sanitizingIndex}`;
@@ -81,5 +105,28 @@ module.exports = {
   };
 
   return { rows: [...prepareBulkGenerator(arrobj)].join(''), values, fields: [...bulkKeyFields, ...fields] };
- },
-};
+ }
+
+ static insert(body, tableName) {
+  const fields = Object.keys(body);
+  const $enc = fields.map((_, i) => `$${i + 1}`);
+
+  return [new CommandGenerator().createInsertCommand(tableName, fields, $enc), Object.values(body)];
+ }
+
+ static delete({ filters }, tableName) {
+  const filterSet = ['1=1'];
+  const valueSet = [];
+
+  for (let i = 0, keys = Object.keys(filters); i < keys.length; i++) {
+   const k = keys[i];
+
+   filterSet.push(`${k} = $${i + 1}`);
+   valueSet.push(filters[k]);
+  }
+
+  return [new CommandGenerator().createDeleteCommand(tableName, filterSet.join(' AND ')), valueSet];
+ }
+}
+
+module.exports = SQLfeatures;

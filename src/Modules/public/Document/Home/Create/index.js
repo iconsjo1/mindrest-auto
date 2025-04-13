@@ -1,6 +1,5 @@
 module.exports = route => app => {
  // Create DO-Document
- let client = null;
 
  const { extname } = require('node:path');
  const { lookup } = require('mime-types');
@@ -10,16 +9,14 @@ module.exports = route => app => {
  const upload = multer({ storage: multer.memoryStorage() });
  const AWS = require('aws-sdk');
 
- const SAVEPOINT = 'FRESH';
- const rowMode = 'array';
- const TODAY = new Date();
-
  app.post(route, upload.single('file'), async (req, res) => {
-  let transactionStarted = false;
+  let client = null;
+  let begun = false;
   try {
+   const TODAYPATH = (d => [d.getFullYear(), d.getMonth() + 1, d.getDate()])(new Date());
    const {
     locals: {
-     utils: { db, isString, isPositiveInteger, isBool },
+     utils: { db, isString, isPositiveInteger, pgRowMode },
      do: { bucket, folder, credentials },
     },
    } = res;
@@ -45,15 +42,12 @@ module.exports = route => app => {
    client = await db.connect();
 
    const is_resizable = await client
-    .query({
-     text: 'SELECT is_resizable FROM public."Document_Categories" WHERE id=$1',
-     values: [document_category_id],
-     rowMode,
-    })
-    .then(({ rows }) => (0 < rows.length ? rows[0][0] : null));
-
-   if (!isBool(is_resizable))
-    throw Error('Category id={' + document_category_id + '} is going to violate foreign key constraint.');
+    .query(pgRowMode('SELECT is_resizable FROM public."Document_Categories" WHERE id=$1', [document_category_id]))
+    .then(({ rows }) => {
+     if (0 === rows.length)
+      throw Error(`Document category id={${document_category_id}} is going to violate foreign key constraint.`);
+     return rows[0][0];
+    });
 
    const document = {
     document_filename: name,
@@ -64,21 +58,19 @@ module.exports = route => app => {
    };
 
    const docFields = Object.keys(document);
-   const doc_encValues = docFields.map((_, i) => `$${i + 1}`);
+   const $docenc = docFields.map((_, i) => `$${i + 1}`);
 
-   await client.query('BEGIN;SAVEPOINT ' + SAVEPOINT).then(_ => (transactionStarted = true));
+   await client.query('BEGIN').then(() => (begun = true));
 
    const document_id = await client
-    .query({
-     text: `INSERT INTO public."Documents"(${docFields}) VALUES(${doc_encValues}) RETURNING id`,
-     values: Object.values(document),
-     rowMode,
-    })
-    .then(({ rows }) => parseInt(rows[0][0], 10));
+    .query(
+     pgRowMode(`INSERT INTO public."Documents"(${docFields}) VALUES(${$docenc}) RETURNING id`, Object.values(document))
+    )
+    .then(({ rows }) => parseInt(rows[0]?.[0], 10));
 
-   if (!isPositiveInteger(document_id)) throw Error('Document was not inserted.');
+   if (!isNaN(document_id)) throw Error('Document was not inserted.');
 
-   document.document_path = [folder, TODAY.getFullYear(), TODAY.getMonth() + 1, TODAY.getDate(), document_id].join('/');
+   document.document_path = [folder, ...TODAYPATH, document_id].join('/');
 
    const { rows } = await client.query('UPDATE public."Documents" SET document_path=$1 WHERE id=$2 RETURNING *', [
     document.document_path,
@@ -105,24 +97,22 @@ module.exports = route => app => {
     ]);
    } else await s3.putObject({ Body: file.buffer, Bucket: bucket, Key: document.document_path + ext }).promise();
 
-   await client.query('COMMIT;').then(_ => (transactionStarted = false));
-
-   client.release();
+   await client.query('COMMIT;').then(() => (begun = false));
 
    res.json({ success: true, msg: 'File was uploaded successfully.', data: rows });
   } catch ({ message }) {
-   let msg = message;
+   res.json({ success: false, message });
+  } finally {
    if (null != client) {
-    if (true === transactionStarted) {
+    if (true === begun) {
      try {
       await client.query('ROLLBACK TO SAVEPOINT ' + SAVEPOINT);
-     } catch ({ message: rmessage }) {
-      msg = rmessage;
+     } catch ({ message }) {
+      console.error(message);
      }
     }
     client.release();
    }
-   res.json({ success: false, message: msg });
   }
  });
 };

@@ -25,5 +25,5 @@ jobs:
       cache: 'npm'
 
    - run: |
-       npm install
-       NODE_ENV=development npx pm2 reload mindrest-Auto
+      npm install
+      NODE_ENV=development npx pm2 reload mindrest-Auto
