@@ -1,6 +1,7 @@
 module.exports = async (req, res) => {
- const { db, isPositiveInteger } = res.locals.utils;
  try {
+  const { db, isPositiveInteger } = res.locals.utils;
+
   const { id } = req.query;
   if (!isPositiveInteger(id)) return res.status(404).json({ Success: false, msg: 'Document category was not found.' });
 

@@ -1,7 +1,9 @@
 module.exports = async (req, res) => {
- const { db, isPositiveInteger, getLimitClause, orderBy } = res.locals.utils;
  try {
+  const { db, isPositiveInteger, getLimitClause, orderBy } = res.locals.utils;
+
   const { id, limit } = req.query;
+
   const { rows } = isPositiveInteger(id)
    ? await db.query('SELECT * FROM public."Document_Categories" WHERE 1=1 AND id=$1', [id])
    : await db.query(`SELECT * FROM public."Document_Categories" ${orderBy('id')} ${getLimitClause(limit)}`);
