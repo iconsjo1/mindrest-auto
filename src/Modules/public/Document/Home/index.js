@@ -1,7 +1,6 @@
-module.exports =
- ({ documents, do_documents }) =>
- app => {
-  require('./Create')(do_documents)(app);
-  require('./Delete')(do_documents)(app);
-  require('./Read')({ documents, do_documents })(app);
- };
+module.exports = {
+ createController: require('./Create'),
+ readController: require('./Read/all'),
+ readDOController: require('./Read/DO-read'),
+ deleteController: require('./Delete'),
+};

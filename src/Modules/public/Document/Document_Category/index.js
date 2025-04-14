@@ -1,6 +1,6 @@
-module.exports = route => app => {
- require('./Create')(route)(app);
- require('./Delete')(route)(app);
- require('./Read')(route)(app);
- require('./Update')(route)(app);
+module.exports = {
+ createController: require('./Create'),
+ readController: require('./Read'),
+ updateController: require('./Update'),
+ deleteController: require('./Delete'),
 };

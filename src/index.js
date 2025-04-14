@@ -6,6 +6,8 @@ const db = require('./pool');
 
 const { FUNCTIONALAUDIT, APPPORT, route_logger, ...utils } = require('../src/Utils');
 
+// middlewares
+
 const flatData = (req, _, next) => {
  if (/new-(patient|doctor)(\?.*)?$/.test(req._parsedUrl.path)) {
   next();
@@ -17,6 +19,7 @@ const flatData = (req, _, next) => {
   next();
  }
 };
+
 app.use([
  cors(),
  compression(),
@@ -24,13 +27,15 @@ app.use([
   res.locals.utils = { db, ...utils };
   res.set('Access-Control-Allow-Origin', '*');
 
-  if (['POST', 'PUT'].includes(req.method)) return express.json()(req, res, flatData);
+  if (['POST', 'PUT'].includes(req.method)) return express.json()(req, res, next);
+  next();
+ },
+ (req, res, next) => {
+  if (['POST', 'PUT'].includes(req.method)) return flatData(req, res, next);
   next();
  },
  route_logger,
 ]);
-
-// middleware
 
 // routes
 app.audit = FUNCTIONALAUDIT;

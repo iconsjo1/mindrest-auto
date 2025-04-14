@@ -1,27 +1,46 @@
-const routes = {
- home: { documents: '/REST/documents', do_documents: '/REST/do_documents' },
- cat: '/REST/document_categories',
-};
+const { S3Client } = require('@aws-sdk/client-s3');
+const multer = require('multer');
 
 module.exports = app => {
- const {
-  home: { documents, do_documents },
-  cat,
- } = routes;
+ const documents = '/REST/documents';
+ const do_documents = '/REST/do_documents';
+ const cat = '/REST/document_categories';
 
- app.use(do_documents, (_, res, next) => {
+ const multerSingleMiddleware = multer({ storage: multer.memoryStorage() }).single('file');
+
+ const aws_do = (_, res, next) => {
   res.locals.do = {
-   credentials: {
-    accessKeyId: '973ed6064ca7b2b632e92ddab9fde782',
-    secretAccessKey: '653c20a890739359c769972daf61b948',
-    endpoint: 'https://eu2.contabostorage.com/icon',
-   },
    bucket: 'icon',
    folder: 'Mind',
+   getS3() {
+    const region = 'eu2';
+    return new S3Client({
+     endpoint: `https://${region}.contabostorage.com`,
+     forcePathStyle: true,
+     region,
+     credentials: {
+      accessKeyId: '973ed6064ca7b2b632e92ddab9fde782',
+      secretAccessKey: '653c20a890739359c769972daf61b948',
+     },
+    });
+   },
   };
-  next();
- });
 
- require('./Home')({ documents, do_documents })(app);
- require('./Document_Category')(cat)(app);
+  next();
+ };
+
+ // Home
+ const homeControllers = require('./Home');
+ app.post(do_documents, [aws_do, multerSingleMiddleware], homeControllers.createController);
+ app.get(documents, homeControllers.readController);
+ app.get(do_documents, aws_do, homeControllers.readDOController);
+ app.delete(do_documents, aws_do, homeControllers.deleteController);
+
+ // cat
+ const catControllers = require('./Document_Category');
+
+ app.post(cat, catControllers.createController);
+ app.get(cat, catControllers.readController);
+ app.put(cat, catControllers.updateController);
+ app.delete(cat, catControllers.deleteController);
 };
