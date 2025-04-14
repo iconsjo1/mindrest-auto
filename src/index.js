@@ -27,11 +27,7 @@ app.use([
   res.locals.utils = { db, ...utils };
   res.set('Access-Control-Allow-Origin', '*');
 
-  if (['POST', 'PUT'].includes(req.method)) return express.json()(req, res, next);
-  next();
- },
- (req, res, next) => {
-  if (['POST', 'PUT'].includes(req.method)) return flatData(req, res, next);
+  if (['POST', 'PUT'].includes(req.method)) return express.json()(req, res, () => flatData(req, res, next));
   next();
  },
  route_logger,
