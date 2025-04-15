@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { ROLES } = require('.');
-
-const rowMode = 'array';
+const pgRowMode = require('./rowMode');
 
 module.exports = [
  (req, res, next) => {
@@ -10,22 +9,15 @@ module.exports = [
   try {
    jwt.verify(token, secret);
    const { db } = res.locals.utils;
-   db
-    .query({
-     name: 'SELECT-ROLE',
-     text: 'SELECT id, role_id FROM public."Users" WHERE jwt_token = $1',
-     values: [token],
-     rowMode,
-    })
-    .then(({ rows }) => {
-     if (0 === rows.length) return res.status(401).json({ success: false, message: 'Token was not found.' });
+   db.query(pgRowMode('SELECT id, role_id FROM public."Users" WHERE jwt_token = $1', [token])).then(({ rows }) => {
+    if (0 === rows.length) return res.status(401).json({ success: false, message: 'Token was not found.' });
 
-     res.locals.token = token;
-     res.locals.user_id = parseInt(rows[0][0]);
-     res.locals.role_id = parseInt(rows[0][1]);
+    res.locals.token = token;
+    res.locals.user_id = parseInt(rows[0][0]);
+    res.locals.role_id = parseInt(rows[0][1]);
 
-     next();
-    });
+    next();
+   });
   } catch ({ message, name }) {
    let msg = '';
 
@@ -46,17 +38,20 @@ module.exports = [
 
   const { db } = res.locals.utils;
   db
-   .query({
-    name: 'CHECK_PERMISSION',
-    text: `SELECT 1 
-           FROM public."Role_Routes" rr 
-            JOIN public."Rest_Routes" rer ON rr.rest_route_id = rer.id 
-            WHERE $1 = 5 OR (role_id = $1
-             AND route = $2
-             AND method = $3)`.replace(/\s+/g, ' '),
-    values: [res.locals.role_id, pathname, method],
-    rowMode: 'array',
-   })
+   .query(
+    pgRowMode(
+     `SELECT 1
+      FROM public."Role_Routes" rr 
+      JOIN public."Rest_Routes" rer ON rr.rest_route_id = rer.id 
+      WHERE $1 = 5
+        OR (
+          role_id = $1
+          AND route = $2
+          AND method = $3
+        )`,
+     [res.locals.role_id, pathname, method]
+    )
+   )
    .then(({ rows }) => {
     if (0 === rows.length)
      return res.status(401).json({ success: false, message: 'You are not authorized to perform this action.' });
@@ -78,12 +73,7 @@ module.exports = [
    switch (role_id) {
     case ROLES.THERAPIST:
      db
-      .query({
-       name: 'get-therapist-id',
-       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND TRUE = is_therapist',
-       values: [user_id],
-       rowMode,
-      })
+      .query(pgRowMode('SELECT id FROM public."Doctors" WHERE user_id = $1 AND TRUE = is_therapist', [user_id]))
       .then(({ rows }) => {
        if (0 === rows.length) return res.status(500).json({ success: false, message: INTSERERR });
 
@@ -94,12 +84,7 @@ module.exports = [
      break;
     case ROLES.DOCTOR:
      db
-      .query({
-       name: 'get-doctor-id',
-       text: 'SELECT id FROM public."Doctors" WHERE user_id = $1 AND FALSE = is_therapist',
-       values: [user_id],
-       rowMode,
-      })
+      .query(pgRowMode('SELECT id FROM public."Doctors" WHERE user_id = $1 AND FALSE = is_therapist', [user_id]))
       .then(({ rows }) => {
        if (0 === rows.length) return res.status(500).json({ success: false, message: INTSERERR });
 
@@ -109,20 +94,13 @@ module.exports = [
       });
      break;
     case ROLES.PATIENT:
-     db
-      .query({
-       name: 'get-patients-id',
-       text: 'SELECT id FROM public."Patients" WHERE user_id = $1 ',
-       values: [user_id],
-       rowMode,
-      })
-      .then(({ rows }) => {
-       if (0 === rows.length) return res.status(500).json({ success: false, message: INTSERERR });
+     db.query(pgRowMode('SELECT id FROM public."Patients" WHERE user_id = $1 ', [user_id])).then(({ rows }) => {
+      if (0 === rows.length) return res.status(500).json({ success: false, message: INTSERERR });
 
-       res.locals.patient_id = parseInt(rows[0][0]);
+      res.locals.patient_id = parseInt(rows[0][0]);
 
-       next();
-      });
+      next();
+     });
      break;
    }
   }
